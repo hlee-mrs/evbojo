@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전기차 비교 — 보조금·주행거리·유지비 | EV보조금</title>
+<meta name="description" content="전기차 최대 3대를 나란히 비교 — 지역 보조금 합계, 겨울 주행거리, 배터리, 연간 충전비까지.">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="container">
+  <div class="hero">
+    <h1>전기차 <span class="hl">나란히 비교</span></h1>
+    <p>보조금은 내 지역 기준으로, 유지비는 연 15,000km 기준으로 계산해요</p>
+  </div>
+
+  <section class="card">
+    <h2 class="mt0">📍 기준 지역</h2>
+    <div id="cp-picker"></div>
+  </section>
+
+  <section class="card">
+    <div style="display:flex;align-items:center;gap:8px">
+      <h2 class="mt0" style="margin-bottom:0">비교 차량 <span class="sub" id="cp-count"></span></h2>
+      <button class="btn btn-ghost btn-s" id="cp-clear" style="margin-left:auto">전체 비우기</button>
+    </div>
+    <div class="field mt8">
+      <select class="select" id="cp-add" aria-label="차량 추가"><option value="">＋ 차량 추가 (최대 3대)</option></select>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl" id="cp-table" style="min-width:560px"></table>
+    </div>
+    <p class="small muted" id="cp-note"></p>
+  </section>
+
+  <div class="ad-slot" data-slot="compare-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/js/app.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', async () => {
+  const [cars, regions, meta] = await EVData.all();
+  let cd = qs('cd') || myRegion.get(); if (!regions[cd]) cd = '1100';
+  // URL ?cars=1,5,9 지원
+  const urlCars = (qs('cars') || '').split(',').map(Number).filter(n => cars[n]);
+  if (urlCars.length) { try { localStorage.setItem('ev.compare', JSON.stringify(urlCars.slice(0, 3))); } catch (e) {} }
+
+  const addSel = document.getElementById('cp-add');
+  addSel.innerHTML += cars.filter(c => !c.disc).map(c => `<option value="${c.id}">[${makerShort(c.maker)}] ${c.name}</option>`).join('');
+
+  function fuelCost(c) {
+    const eff = carEff(c); if (!eff) return null;
+    const cr = (coldRatio(c) || 82) / 100;
+    const effY = eff * ((8.5 + 3.5 * cr) / 12);
+    return 15000 / effY * 1.1 * (150 * 0.6 + 350 * 0.4);
+  }
+  function render() {
+    const ids = cmpBasket.get();
+    document.getElementById('cp-count').textContent = ids.length + ' / 3';
+    setQs({ cars: ids.join(',') || null, cd });
+    const tbl = document.getElementById('cp-table');
+    if (!ids.length) { tbl.innerHTML = '<tr><td class="muted" style="padding:20px">아직 담은 차가 없어요. 위에서 추가하거나, 차종 페이지에서 "비교 담기"를 눌러보세요.</td></tr>'; return; }
+    const list = ids.map(i => cars[i]);
+    const val = (arr, best, fmtFn) => arr.map(v => `<td class="num" style="${v != null && v === best ? 'color:var(--money);font-weight:800' : ''}">${v == null ? '-' : fmtFn(v)}</td>`).join('');
+    const tot = list.map(c => regions[cd].v[c.id] ? c.nat + regions[cd].v[c.id][0] : c.nat);
+    const rng = list.map(c => c.range), cold = list.map(c => c.rangeCold);
+    const crs = list.map(c => coldRatio(c));
+    const effs = list.map(c => carEff(c));
+    const fuels = list.map(c => fuelCost(c));
+    tbl.innerHTML = `
+      <tr><th></th>${list.map(c => `<th style="min-width:130px">${c.name}<br><button class="btn-s btn btn-ghost mt8" data-del="${c.id}">빼기</button></th>`).join('')}</tr>
+      <tr><td>보조금 합계<br><span class="small muted">${regions[cd].name}</span></td>${val(tot, Math.max(...tot), manwon)}</tr>
+      <tr><td>국비 / 지방비</td>${list.map(c => { const v = regions[cd].v[c.id]; return `<td class="num">${fmt(c.nat)} / ${v ? fmt(v[0]) : '-'}</td>`; }).join('')}</tr>
+      <tr><td>주행거리(상온)</td>${val(rng, Math.max(...rng.filter(Boolean)), v => v + 'km')}</tr>
+      <tr><td>주행거리(겨울)</td>${val(cold, Math.max(...cold.filter(Boolean)), v => v + 'km')}</tr>
+      <tr><td>겨울 유지율</td>${val(crs, Math.max(...crs.filter(Boolean)), v => v + '%')}</tr>
+      <tr><td>배터리</td>${list.map(c => `<td class="num">${c.batt || '-'}kWh</td>`).join('')}</tr>
+      <tr><td>추정 전비</td>${val(effs, Math.max(...effs.filter(Boolean)), v => v + 'km/kWh')}</tr>
+      <tr><td>연간 충전비<br><span class="small muted">15,000km</span></td>${val(fuels, Math.min(...fuels.filter(Boolean)), v => won(v))}</tr>
+      <tr><td></td>${list.map(c => `<td><a class="btn btn-primary btn-s" href="car.html?id=${c.id}&cd=${cd}">상세 →</a></td>`).join('')}</tr>`;
+    document.getElementById('cp-note').textContent = `보조금: 2026년 ${regions[cd].name} 단가 기준(${meta.updated}) · 충전비: 집밥60%/급속40%·겨울보정 포함 추정치`;
+  }
+  regionPicker(document.getElementById('cp-picker'), { value: cd, onPick: c => { cd = c; render(); } });
+  addSel.addEventListener('change', () => { if (addSel.value) { cmpBasket.toggle(+addSel.value); addSel.value = ''; render(); } });
+  document.getElementById('cp-table').addEventListener('click', e => {
+    const d = e.target.dataset && e.target.dataset.del;
+    if (d != null) { cmpBasket.toggle(+d); render(); }
+  });
+  document.getElementById('cp-clear').onclick = () => { cmpBasket.clear(); render(); };
+  render();
+});
+</script>
+</body>
+</html>

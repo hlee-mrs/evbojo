@@ -1,0 +1,230 @@
+/* ═══════════════════════════════════════════════
+   EV보조금 — 전기차 구매보조금 현황  main.css
+   모바일 우선 · 라이트/다크 · 시스템 폰트
+   ═══════════════════════════════════════════════ */
+:root{
+  --bg:#f4f6f9; --surface:#ffffff; --surface2:#f8fafc;
+  --text:#191f28; --text2:#4e5968; --text3:#8b95a1;
+  --line:#e5e8eb; --line2:#f2f4f6;
+  --primary:#2563eb; --primary-soft:#eff4ff; --primary-dark:#1d4ed8;
+  --money:#059669; --money-soft:#ecfdf5;
+  --warn:#d97706; --warn-soft:#fffbeb;
+  --danger:#dc2626; --danger-soft:#fef2f2;
+  --badge-open:#059669; --badge-low:#d97706; --badge-closed:#6b7280;
+  --radius:14px; --radius-s:10px;
+  --shadow:0 1px 3px rgba(25,31,40,.06),0 4px 14px rgba(25,31,40,.04);
+  --maxw:760px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101418; --surface:#1a2027; --surface2:#20272f;
+    --text:#e9edf1; --text2:#aab3bd; --text3:#727c87;
+    --line:#2b333d; --line2:#242b34;
+    --primary:#4f83ff; --primary-soft:#1a2540; --primary-dark:#6d9aff;
+    --money:#34d399; --money-soft:#0d2b22;
+    --warn:#fbbf24; --warn-soft:#2e2410;
+    --danger:#f87171; --danger-soft:#341a1a;
+    --shadow:0 1px 3px rgba(0,0,0,.3);
+  }
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",Pretendard,"Noto Sans KR","Segoe UI","Malgun Gothic",sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.55;
+  font-size:16px; word-break:keep-all;
+}
+a{color:var(--primary);text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select{font:inherit;color:inherit}
+.container{max-width:var(--maxw);margin:0 auto;padding:0 16px}
+
+/* ── header ── */
+.site-header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line2)}
+.site-header .inner{max-width:var(--maxw);margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.logo{font-weight:800;font-size:18px;color:var(--text);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.logo .bolt{color:var(--money)}
+.gnb{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.gnb::-webkit-scrollbar{display:none}
+.gnb a{padding:7px 10px;border-radius:8px;color:var(--text2);font-size:14px;font-weight:600;white-space:nowrap}
+.gnb a:hover{background:var(--surface2)}
+.gnb a.on{color:var(--primary);background:var(--primary-soft)}
+
+/* ── hero ── */
+.hero{padding:34px 0 10px;text-align:center}
+.hero h1{font-size:clamp(22px,5.6vw,30px);font-weight:800;letter-spacing:-.4px}
+.hero h1 .hl{color:var(--primary)}
+.hero p{color:var(--text2);margin-top:8px;font-size:15px}
+
+/* ── cards ── */
+.card{background:var(--surface);border:1px solid var(--line2);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:14px 0}
+.card h2,.section-title{font-size:17px;font-weight:800;margin-bottom:12px;letter-spacing:-.2px}
+.card .sub{font-size:13px;color:var(--text3);font-weight:500}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.grid2.collapse{grid-template-columns:1fr}}
+
+/* ── selects / inputs ── */
+.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.field label{font-size:13px;font-weight:700;color:var(--text2)}
+.select,.input{
+  width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--radius-s);
+  background:var(--surface);color:var(--text);font-size:16px;appearance:none;
+}
+.select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b95a1' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.select:focus,.input:focus{outline:none;border-color:var(--primary)}
+.input-suffix{position:relative}
+.input-suffix .sfx{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none}
+
+/* ── buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 18px;border-radius:var(--radius-s);font-weight:700;font-size:15px;transition:.15s;border:1.5px solid transparent}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-ghost{border-color:var(--line);color:var(--text2);background:var(--surface)}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
+.btn-block{width:100%}
+.btn-s{padding:8px 12px;font-size:13px;border-radius:8px}
+
+/* ── badges ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.badge-open{background:var(--money-soft);color:var(--badge-open)}
+.badge-low{background:var(--warn-soft);color:var(--badge-low)}
+.badge-closed{background:var(--line2);color:var(--badge-closed)}
+.badge-info{background:var(--primary-soft);color:var(--primary)}
+.badge-warn{background:var(--warn-soft);color:var(--warn)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+
+/* ── money display ── */
+.money-xl{font-size:clamp(28px,7vw,38px);font-weight:800;color:var(--money);letter-spacing:-1px;line-height:1.15}
+.money-l{font-size:22px;font-weight:800;color:var(--money)}
+.strike{color:var(--text3);text-decoration:line-through;font-weight:500}
+
+/* ── list rows ── */
+.rowlist{display:flex;flex-direction:column}
+.rowlist .row{display:flex;align-items:center;gap:10px;padding:13px 4px;border-bottom:1px solid var(--line2);color:inherit}
+.rowlist .row:last-child{border-bottom:0}
+.rowlist .row:hover{background:var(--surface2);border-radius:8px}
+.row .grow{flex:1;min-width:0}
+.row .tit{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .desc{font-size:12.5px;color:var(--text3);margin-top:1px}
+.row .amt{font-weight:800;color:var(--money);font-size:16px;white-space:nowrap}
+.row .amt small{font-weight:600;color:var(--text3);font-size:11.5px;display:block;text-align:right}
+
+/* ── tables ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px -18px;padding:0 18px}
+table.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:480px}
+.tbl th{font-size:12px;color:var(--text3);font-weight:700;text-align:left;padding:8px 10px;border-bottom:1.5px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 10px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.tbl tr:hover td{background:var(--surface2)}
+.tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl .best td{background:var(--money-soft)}
+
+/* ── stacked bar (국비/지방비) ── */
+.stack{display:flex;height:10px;border-radius:6px;overflow:hidden;background:var(--line2);margin:6px 0}
+.stack .nat{background:var(--primary)}
+.stack .loc{background:var(--money)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--text3)}
+.legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:4px}
+
+/* ── callouts ── */
+.callout{border-radius:var(--radius-s);padding:13px 15px;font-size:13.5px;margin:12px 0;background:var(--primary-soft);color:var(--text2);border:1px solid color-mix(in srgb,var(--primary) 18%,transparent)}
+.callout b{color:var(--text)}
+.callout-warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 25%,transparent)}
+.callout-danger{background:var(--danger-soft);border-color:color-mix(in srgb,var(--danger) 22%,transparent)}
+.callout-green{background:var(--money-soft);border-color:color-mix(in srgb,var(--money) 22%,transparent)}
+
+/* ── accordion ── */
+details.acc{border:1px solid var(--line2);border-radius:var(--radius-s);margin:8px 0;background:var(--surface);overflow:hidden}
+details.acc summary{padding:14px 16px;font-weight:700;font-size:15px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:"+";margin-left:auto;color:var(--text3);font-size:18px;font-weight:400}
+details.acc[open] summary::after{content:"−"}
+details.acc .acc-body{padding:0 16px 16px;color:var(--text2);font-size:14.5px}
+.acc-body p{margin:8px 0}
+.acc-body ul,.acc-body ol{padding-left:20px;margin:8px 0}
+.acc-body li{margin:5px 0}
+
+/* ── timeline ── */
+.timeline{position:relative;padding-left:26px;margin:16px 0}
+.timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl-step{position:relative;padding:0 0 22px}
+.tl-step::before{content:"";position:absolute;left:-24px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:3px solid var(--primary)}
+.tl-step h3{font-size:15.5px;font-weight:800}
+.tl-step .who{font-size:12px;font-weight:700;margin:4px 0}
+.who .me{color:var(--primary)}.who .dealer{color:var(--money)}
+.tl-step p{font-size:13.5px;color:var(--text2);margin-top:4px}
+.tl-warn{display:inline-block;background:var(--danger-soft);color:var(--danger);font-size:12px;font-weight:700;padding:2px 8px;border-radius:6px;margin-top:6px}
+
+/* ── chips ── */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 13px;border-radius:999px;border:1.5px solid var(--line);font-size:13.5px;font-weight:600;color:var(--text2);background:var(--surface)}
+.chip:hover,.chip.on{border-color:var(--primary);color:var(--primary);background:var(--primary-soft)}
+
+/* ── ad slots (CLS 방지 고정 높이 · 라벨 명시) ── */
+.ad-slot{margin:20px 0;text-align:center}
+.ad-slot .ad-label{font-size:10px;color:var(--text3);letter-spacing:1.5px;margin-bottom:4px;text-transform:uppercase}
+.ad-slot .ad-box{min-height:280px;border:1px dashed var(--line);border-radius:var(--radius-s);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;background:var(--surface2)}
+.ad-slot.ad-h90 .ad-box{min-height:90px}
+.ad-slot.ad-h250 .ad-box{min-height:250px}
+@media(min-width:640px){.ad-slot .ad-box{min-height:250px}}
+
+/* ── freshness / trust ── */
+.stamp{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:5px;margin-top:8px}
+.stale-banner{background:var(--warn-soft);color:var(--warn);border-radius:var(--radius-s);padding:10px 14px;font-size:13px;font-weight:600;margin:10px 0;display:none}
+.stale-banner.show{display:block}
+
+/* ── wizard (자가진단) ── */
+.wizard-step{display:none}
+.wizard-step.on{display:block;animation:fadein .25s}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.wizard-opts{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.wizard-opts button{padding:16px;border:1.5px solid var(--line);border-radius:var(--radius-s);background:var(--surface);font-size:15.5px;font-weight:600;text-align:left;transition:.12s}
+.wizard-opts button:hover{border-color:var(--primary);background:var(--primary-soft)}
+.progressbar{height:5px;background:var(--line2);border-radius:3px;margin:12px 0 20px;overflow:hidden}
+.progressbar i{display:block;height:100%;background:var(--primary);border-radius:3px;transition:width .3s}
+
+/* ── result gauge / bars ── */
+.hbar{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+.hbar .nm{width:88px;color:var(--text2);font-weight:600;flex-shrink:0;text-align:right}
+.hbar .bar{flex:1;height:20px;background:var(--line2);border-radius:6px;overflow:hidden}
+.hbar .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),color-mix(in srgb,var(--primary) 60%,var(--money)));border-radius:6px;min-width:2px}
+.hbar .val{width:84px;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
+.hbar.top .bar i{background:linear-gradient(90deg,var(--money),#34d399)}
+
+/* ── compare bar ── */
+#cmp-bar{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:60;background:var(--text);color:var(--bg);border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;box-shadow:0 6px 24px rgba(0,0,0,.25);display:none;align-items:center;gap:10px;white-space:nowrap}
+#cmp-bar.show{display:flex}
+#cmp-bar a{color:inherit;text-decoration:underline}
+#cmp-bar .x{opacity:.6}
+
+/* ── receipt (실구매가) ── */
+.receipt{border:1px solid var(--line);border-radius:var(--radius-s);overflow:hidden;margin:12px 0}
+.receipt .r-row{display:flex;justify-content:space-between;padding:11px 16px;font-size:14.5px;border-bottom:1px dashed var(--line2)}
+.receipt .r-row:last-child{border-bottom:0}
+.receipt .r-row.total{background:var(--money-soft);font-weight:800;font-size:16px}
+.receipt .r-row .minus{color:var(--money);font-weight:700}
+.receipt .r-row .plus{color:var(--danger);font-weight:700}
+
+/* ── footer ── */
+.site-footer{margin-top:40px;border-top:1px solid var(--line2);background:var(--surface);padding:26px 0 90px}
+.site-footer .inner{max-width:var(--maxw);margin:0 auto;padding:0 16px;font-size:12.5px;color:var(--text3);line-height:1.8}
+.site-footer .links{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-weight:600}
+.site-footer .links a{color:var(--text2)}
+.disclaimer{background:var(--surface2);border-radius:var(--radius-s);padding:12px 14px;margin-top:10px}
+
+/* ── misc ── */
+.center{text-align:center}
+.mt0{margin-top:0}.mt8{margin-top:8px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+.muted{color:var(--text3);font-size:13px}
+.small{font-size:12.5px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.skeleton{background:linear-gradient(90deg,var(--line2) 25%,var(--surface2) 50%,var(--line2) 75%);background-size:200% 100%;animation:sk 1.4s infinite;border-radius:8px;color:transparent!important}
+@keyframes sk{to{background-position:-200% 0}}
+.pill-tabs{display:flex;background:var(--line2);border-radius:10px;padding:3px;gap:2px;margin:10px 0}
+.pill-tabs button{flex:1;padding:8px;border-radius:8px;font-size:13.5px;font-weight:700;color:var(--text3)}
+.pill-tabs button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.range-row{display:flex;align-items:center;gap:12px}
+input[type=range]{flex:1;accent-color:var(--primary);height:32px}
+.kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line2);font-size:14.5px}
+.kv:last-child{border:0}
+.kv b{font-variant-numeric:tabular-nums}
+.notice-badge{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--line2);color:var(--text3);font-weight:700;vertical-align:middle}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전기차 보조금 자격 자가진단 (30초) | EV보조금</title>
+<meta name="description" content="전기차 보조금 받을 수 있는지 30초 자가진단. 재지원 제한, 청년 생애최초, 다자녀, 차상위 추가 지원금까지 한 번에 확인하세요.">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="container">
+  <div class="hero">
+    <h1><span class="hl">30초</span> 보조금 자격 진단</h1>
+    <p>입력 내용은 서버로 전송되지 않아요 — 브라우저에서만 계산됩니다 🔒</p>
+  </div>
+
+  <section class="card">
+    <div class="progressbar"><i id="w-prog" style="width:16%"></i></div>
+
+    <div class="wizard-step on" data-step="0">
+      <h2>최근 2년 안에 전기차 구매보조금을 받은 적 있나요?</h2>
+      <p class="muted small">본인 명의 기준이에요. (재지원 제한 확인)</p>
+      <div class="wizard-opts">
+        <button data-v="no">아니요, 처음이에요</button>
+        <button data-v="yes">네, 받은 적 있어요</button>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-step="1">
+      <h2>출생연도가 어떻게 되세요?</h2>
+      <p class="muted small">만 19~34세 청년 생애최초 구매자는 추가 지원이 있어요.</p>
+      <div class="field"><input class="input" id="w-birth" type="number" inputmode="numeric" placeholder="예: 1993"></div>
+      <button class="btn btn-primary btn-block" id="w-birth-next">다음</button>
+      <button class="btn btn-ghost btn-block mt8" data-skip>건너뛰기</button>
+    </div>
+
+    <div class="wizard-step" data-step="2">
+      <h2>생애 <b>첫 차</b>인가요?</h2>
+      <p class="muted small">본인 명의 자동차를 소유한 적이 없는 경우예요.</p>
+      <div class="wizard-opts">
+        <button data-v="yes">네, 첫 차예요</button>
+        <button data-v="no">아니요</button>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-step="3">
+      <h2>18세 이하 자녀가 몇 명인가요?</h2>
+      <div class="wizard-opts">
+        <button data-v="0">없어요 / 1명</button>
+        <button data-v="2">2명</button>
+        <button data-v="3">3명</button>
+        <button data-v="4">4명 이상</button>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-step="4">
+      <h2>기초생활수급자 또는 차상위계층인가요?</h2>
+      <div class="wizard-opts">
+        <button data-v="yes">네</button>
+        <button data-v="no">아니요</button>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-step="5">
+      <h2>폐차(또는 처분) 예정인 내연기관차가 있나요?</h2>
+      <p class="muted small">내연차에서 전기차로 '전환'하면 전환지원금이 추가돼요.</p>
+      <div class="wizard-opts">
+        <button data-v="yes">네, 있어요</button>
+        <button data-v="no">아니요</button>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-step="result"><div id="w-result"></div></div>
+  </section>
+
+  <div class="ad-slot" data-slot="check-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/js/app.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', () => {
+  const steps = [...document.querySelectorAll('.wizard-step')];
+  const ans = {};
+  let cur = 0;
+  const ORDER = ['repeat', 'birth', 'first', 'kids', 'lowinc', 'scrap'];
+
+  function show(i) {
+    steps.forEach(s => s.classList.remove('on'));
+    const el = steps.find(s => s.dataset.step === String(i)) || steps.find(s => s.dataset.step === 'result');
+    el.classList.add('on');
+    document.getElementById('w-prog').style.width = (i === 'result' ? 100 : (i + 1) / 7 * 100) + '%';
+    if (i === 'result') renderResult();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  steps.forEach(stepEl => {
+    stepEl.addEventListener('click', e => {
+      const v = e.target.dataset && e.target.dataset.v;
+      const skip = e.target.hasAttribute && e.target.hasAttribute('data-skip');
+      if (v == null && !skip) return;
+      const idx = +stepEl.dataset.step;
+      if (!skip) ans[ORDER[idx]] = v;
+      if (idx === 0 && v === 'yes') { show('result'); return; }
+      cur = idx + 1;
+      // 청년이 아니면 생애최초 질문 건너뜀
+      if (cur === 2 && !isYouth()) cur = 3;
+      show(cur > 5 ? 'result' : cur);
+    });
+  });
+  document.getElementById('w-birth-next').onclick = () => {
+    ans.birth = +document.getElementById('w-birth').value || null;
+    cur = isYouth() ? 2 : 3;
+    show(cur);
+  };
+  function isYouth() {
+    if (!ans.birth) return false;
+    const age = 2026 - ans.birth; // 만나이 근사(생일 경과 가정)
+    return age >= 19 && age <= 34;
+  }
+
+  function renderResult() {
+    const box = document.getElementById('w-result');
+    if (ans.repeat === 'yes') {
+      box.innerHTML = `
+        <div class="center"><span class="badge badge-closed" style="font-size:15px;padding:8px 16px">지금은 어려워요</span></div>
+        <div class="callout-danger callout mt16"><b>재지원 제한(2년)</b>에 해당할 가능성이 높아요. 같은 사람 명의로는 최종 수령일부터 2년간 재신청이 제한됩니다.</div>
+        <p class="muted small">단, 세대 내 다른 가족 명의 신청은 가능할 수 있어요(1인 1대 원칙 내). 자세한 건 지자체 문의처로 확인하세요.</p>
+        <a class="btn btn-primary btn-block mt16" href="law.html">재지원 제한 자세히 보기</a>`;
+      return;
+    }
+    const perks = [];
+    if (isYouth() && ans.first === 'yes') perks.push({ t: '🧑 청년 생애최초 추가 지원', d: '만 19~34세 + 생애 첫 차 구매 시 국비 추가 지원(지침 기준 국비의 20% 수준). 증빙: 주민등록·차량 소유 이력.' });
+    const kids = +(ans.kids || 0);
+    if (kids >= 2) perks.push({ t: `👨‍👩‍👧 다자녀 추가 보조금 (자녀 ${kids === 4 ? '4명 이상' : kids + '명'})`, d: `18세 이하 자녀 2명 100만원 · 3명 200만원 · 4명 이상 300만원 추가(지침 기준). 증빙: 가족관계증명서 등.` });
+    if (ans.lowinc === 'yes') perks.push({ t: '🤝 차상위·기초수급 추가 지원', d: '국비 추가 지원(지침 기준 10% 수준) + 일부 지자체 자체 우대. 증빙: 수급자 증명서.' });
+    if (ans.scrap === 'yes') perks.push({ t: '♻️ 내연차 전환지원금', d: '기존 내연기관차를 폐차·처분하고 전기차로 전환하면 국비 최대 100만원 + 지방비 추가. 처분 시점·차령 요건은 공고 확인.' });
+
+    box.innerHTML = `
+      <div class="center"><span class="badge badge-open" style="font-size:15px;padding:8px 16px"><span class="dot"></span>신청 가능해 보여요!</span></div>
+      ${perks.length ? `<h2 class="section-title mt24">받을 수 있는 추가 혜택 ${perks.length}가지</h2>` +
+        perks.map(p => `<div class="callout-green callout"><b>${p.t}</b><br><span class="small">${p.d}</span></div>`).join('')
+        : '<div class="callout mt16">기본 보조금(국비+지방비) 대상이에요. 추가 우대 항목은 해당사항이 없지만, 지자체별 자체 우대(택시·소상공인 등)가 있을 수 있어요.</div>'}
+      <div class="callout-warn callout small">✋ 최종 자격·금액은 <b>거주지 지자체 공고문</b>이 기준이에요. 거주기간 요건(30일~1년, 지자체별 다름)도 꼭 확인하세요.</div>
+      <div class="grid2 mt16">
+        <a class="btn btn-primary" href="index.html">우리 지역 보조금 보기</a>
+        <a class="btn btn-ghost" href="guide.html">신청 절차 7단계</a>
+      </div>
+      <p class="stamp">기준: 2026년 보조금 업무처리지침 · 입력값은 저장·전송되지 않아요</p>`;
+  }
+});
+</script>
+</body>
+</html>
