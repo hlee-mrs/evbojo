@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>지역별 전기차 보조금 | EV보조금</title>
+<meta name="description" content="우리 지역 2026년 전기차 차종별 보조금 — 국비+지방비 합계, 전환지원금, 접수 잔여현황, 담당부서 연락처까지.">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="container">
+  <div class="hero" style="text-align:left;padding-bottom:0">
+    <h1 id="r-title" class="skeleton" style="min-height:38px">지역</h1>
+    <p id="r-sub"></p>
+  </div>
+
+  <section class="card" id="r-status-card">
+    <div id="r-status"></div>
+    <div class="grid2 mt8">
+      <a class="btn btn-ghost" id="r-tel-btn" href="#">📞 담당부서 전화</a>
+      <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">실시간 잔여 확인 ↗</a>
+    </div>
+    <p class="stamp" id="r-stamp"></p>
+  </section>
+
+  <section class="card">
+    <h2 class="mt0">차종별 보조금 <span class="sub" id="r-count"></span></h2>
+    <div class="grid2">
+      <input class="input" id="f-search" type="search" placeholder="차종 검색" aria-label="차종 검색">
+      <select class="select" id="f-maker" aria-label="제조사 필터"><option value="">전체 제조사</option></select>
+    </div>
+    <div class="pill-tabs" role="tablist">
+      <button class="on" data-sort="total">보조금 많은 순</button>
+      <button data-sort="name">이름순</button>
+      <button data-sort="range">주행거리순</button>
+    </div>
+    <label class="small muted" style="display:flex;align-items:center;gap:6px;margin:6px 0">
+      <input type="checkbox" id="f-conv"> 내연차 폐차·전환 지원금(＋최대 130만원) 포함해서 보기
+    </label>
+    <div class="tbl-wrap">
+      <table class="tbl" id="r-table">
+        <thead><tr><th>차종</th><th class="num">국비</th><th class="num">지방비</th><th class="num">합계</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button class="btn btn-ghost btn-block" id="r-more">더 보기</button>
+    <div class="callout mt16 small">
+      · 표의 금액은 <b>2026년 전기승용 기준 단가</b>입니다(만원). 실제 지급액은 공고·차량 옵션가에 따라 달라질 수 있어요.<br>
+      · <b>전환지원금</b>: 기존 내연기관차를 폐차·처분하고 전기차로 전환할 때 추가 지원(국비 최대 100만원+지방비). 세부 요건은 지자체 공고 확인.<br>
+      · 지방비 0원인 차종은 해당 지자체에서 지방비 미지원이거나 공고 확인이 필요한 차종입니다.
+    </div>
+  </section>
+
+  <div class="ad-slot" data-slot="region-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+
+  <section class="card">
+    <h2 class="mt0">같은 시·도 다른 지역</h2>
+    <div class="chips" id="r-siblings"></div>
+  </section>
+
+  <section class="card">
+    <h2 class="mt0">다음 단계</h2>
+    <div class="chips">
+      <a class="chip" href="check.html">✅ 내 자격·추가혜택 진단</a>
+      <a class="chip" href="calc.html">⛽ 유지비 계산</a>
+      <a class="chip" href="guide.html">📋 신청 절차</a>
+    </div>
+  </section>
+
+  <div class="ad-slot" data-slot="region-2"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/js/app.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', async () => {
+  const [cars, regions, meta, statusFile] = await EVData.all();
+  const cd = qs('cd') || myRegion.get() || '1100';
+  const r = regions[cd];
+  if (!r) { location.replace('index.html'); return; }
+  myRegion.set(cd);
+  const status = statusFile && statusFile.data && statusFile.data[cd];
+  const statusUpdated = statusFile && statusFile.updated;
+
+  document.title = `${r.name} 전기차 보조금 2026 — 차종별 국비+지방비 | EV보조금`;
+  const tEl = document.getElementById('r-title');
+  tEl.classList.remove('skeleton');
+  tEl.innerHTML = `${r.name} <span class="hl">전기차 보조금</span>`;
+  document.getElementById('r-sub').textContent = `2026년 전기승용 기준 · 승용 최대 ${manwon(r.maxP)} · 경·소형 최대 ${manwon(r.maxS)}`;
+
+  const b = statusBadge(status, statusUpdated);
+  document.getElementById('r-status').innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <span class="badge ${b.cls}" style="font-size:14px;padding:6px 14px"><span class="dot"></span>${b.label}</span>
+      ${status ? `<span class="muted small">공고 ${fmt(status.n)}대 · 접수 ${fmt(status.a)} · 출고 ${fmt(status.r)}</span>` : ''}
+    </div>
+    ${status ? `<p class="small muted mt8">선정 방식: ${status.m}</p>` : ''}
+    ${r.rep ? '<p class="small muted mt8">ℹ️ 이 지역 단가는 도(道) 공통 단가 기준입니다. 시·군 자체 추가 지원은 공고문을 확인하세요.</p>' : ''}`;
+  const telBtn = document.getElementById('r-tel-btn');
+  if (/0000-?0000/.test(r.tel) || !r.tel) {
+    telBtn.href = 'https://ev.or.kr/nportal/buySupprt/initPsLocalInquiriesAction.do';
+    telBtn.target = '_blank'; telBtn.rel = 'noopener';
+    telBtn.textContent = `📞 ${r.dept} — 문의처 확인 ↗`;
+  } else {
+    telBtn.href = 'tel:' + r.tel.replace(/[^0-9]/g, '');
+    telBtn.textContent = `📞 ${r.dept} (${r.tel})`;
+  }
+  document.getElementById('r-stamp').innerHTML =
+    `잔여현황 기준 ${statusUpdated ? new Date(statusUpdated).toLocaleString('ko-KR') : '-'} · 단가 기준일 ${meta.updated} · 출처 ev.or.kr`;
+
+  /* 형제 지역 */
+  document.getElementById('r-siblings').innerHTML = Object.entries(regions)
+    .filter(([k, v]) => v.sido === r.sido && k !== cd)
+    .map(([k, v]) => `<a class="chip" href="region.html?cd=${k}">${v.name} ${manwon(v.maxP)}</a>`).join('') || '<span class="muted small">단일 지역</span>';
+
+  /* 표 */
+  const makerSel = document.getElementById('f-maker');
+  [...new Set(cars.map(c => c.maker))].forEach(m => makerSel.insertAdjacentHTML('beforeend', `<option value="${m}">${makerShort(m)}</option>`));
+
+  let sortKey = 'total', limit = 25, includeConv = false, q = '', makerF = '';
+  function rows() {
+    let list = cars.map(c => {
+      const v = r.v[c.id];
+      if (!v) return null;
+      const conv = includeConv ? c.convNat + v[1] : 0;
+      return { c, nat: c.nat, loc: v[0], tot: c.nat + v[0] + conv, conv };
+    }).filter(Boolean).filter(x => !x.c.disc || q);
+    if (q) { const nq = q.toLowerCase().replace(/\s/g, ''); list = list.filter(x => (x.c.name + x.c.maker + makerShort(x.c.maker)).toLowerCase().replace(/\s/g, '').includes(nq)); }
+    if (makerF) list = list.filter(x => x.c.maker === makerF);
+    if (sortKey === 'total') list.sort((a, b) => b.tot - a.tot);
+    if (sortKey === 'name') list.sort((a, b) => a.c.name.localeCompare(b.c.name, 'ko'));
+    if (sortKey === 'range') list.sort((a, b) => (b.c.range || 0) - (a.c.range || 0));
+    return list;
+  }
+  function render() {
+    const list = rows();
+    const best = Math.max(...list.map(x => x.tot));
+    document.getElementById('r-count').textContent = `${list.length}개 모델`;
+    document.querySelector('#r-table tbody').innerHTML = list.slice(0, limit).map(x => `
+      <tr class="${x.tot === best && sortKey === 'total' ? 'best' : ''}">
+        <td><a href="car.html?id=${x.c.id}&cd=${cd}" style="color:inherit;font-weight:700">${x.c.name}</a>
+          <div class="small muted">${makerShort(x.c.maker)}${x.c.range ? ' · ' + x.c.range + 'km' : ''}${x.c.disc ? ' · <span class="notice-badge">단종/이월</span>' : ''}</div></td>
+        <td class="num">${fmt(x.nat)}</td>
+        <td class="num">${fmt(x.loc)}${includeConv && x.conv ? `<div class="small" style="color:var(--money)">+전환 ${fmt(x.conv)}</div>` : ''}</td>
+        <td class="num" style="font-weight:800;color:var(--money)">${fmt(x.tot)}</td>
+        <td><button class="btn-s btn btn-ghost" data-cmp="${x.c.id}">비교</button></td>
+      </tr>`).join('');
+    document.getElementById('r-more').hidden = list.length <= limit;
+  }
+  document.getElementById('f-search').addEventListener('input', e => { q = e.target.value.trim(); limit = 25; render(); });
+  makerSel.addEventListener('change', () => { makerF = makerSel.value; limit = 25; render(); });
+  document.getElementById('f-conv').addEventListener('change', e => { includeConv = e.target.checked; render(); });
+  document.querySelectorAll('.pill-tabs button').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('.pill-tabs button').forEach(x => x.classList.remove('on'));
+    btn.classList.add('on'); sortKey = btn.dataset.sort; render();
+  }));
+  document.getElementById('r-more').onclick = () => { limit += 40; render(); };
+  document.getElementById('r-table').addEventListener('click', e => {
+    const id = e.target.dataset && e.target.dataset.cmp;
+    if (id != null) { cmpBasket.toggle(+id); e.preventDefault(); }
+  });
+  render();
+});
+</script>
+</body>
+</html>

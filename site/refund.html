@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전기차 보조금 환수금 계산기 — 의무운행 2년 | EV보조금</title>
+<meta name="description" content="전기차를 의무운행기간(2년) 안에 팔면 보조금을 얼마나 반납할까? 운행기간별 환수 요율로 예상 환수금과 '환수 0원 날짜'를 계산합니다.">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="container">
+  <div class="hero">
+    <h1>보조금 <span class="hl">환수금 계산기</span></h1>
+    <p>2년 의무운행 — 언제 팔면 얼마를 토해낼까?</p>
+  </div>
+
+  <section class="card">
+    <div class="field">
+      <label for="rf-date">차량 최초 등록 연월</label>
+      <input class="input" id="rf-date" type="month" value="2025-01">
+    </div>
+    <div class="field">
+      <label for="rf-amt">받은 보조금 총액 (국비+지방비, 만원)</label>
+      <div class="input-suffix"><input class="input" id="rf-amt" type="number" inputmode="numeric" placeholder="예: 750"><span class="sfx">만원</span></div>
+    </div>
+    <div class="field">
+      <label for="rf-type">처분 방법</label>
+      <select class="select" id="rf-type">
+        <option value="sell">중고 판매 (국내, 타 지역 거주자에게)</option>
+        <option value="same">중고 판매 (같은 지자체 거주자에게)</option>
+        <option value="export">수출 (말소)</option>
+        <option value="accident">사고·천재지변으로 폐차</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="card" id="rf-result" style="border:2px solid var(--primary)">
+    <h2 class="mt0">결과</h2>
+    <div id="rf-out"></div>
+  </section>
+
+  <section class="card">
+    <h2 class="mt0">운행기간별 환수 요율표 <span class="sub">승용 · 국내 처분 기준</span></h2>
+    <div class="tbl-wrap"><table class="tbl" id="rf-table">
+      <thead><tr><th>운행 기간</th><th class="num">환수 요율</th><th class="num">예시(보조금 1,000만원)</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <p class="small muted">근거: 전기자동차 보급사업 보조금 업무처리지침의 운행기간별 회수요율(2026 기준). 지자체 운영에 따라 세부 적용이 다를 수 있으니 최종 금액은 관할 지자체·한국환경공단에 확인하세요. <b>수출 목적 말소는 의무기간이 5년</b>이며 별도 요율이 적용됩니다.</p>
+  </section>
+
+  <div class="ad-slot" data-slot="refund-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+
+  <section class="card">
+    <h2 class="mt0">환수 없이 처분하는 방법</h2>
+    <div class="callout-green callout"><b>① 의무운행기간(2년)을 채운다</b> — 가장 확실해요.</div>
+    <div class="callout-green callout"><b>② 같은 지자체 거주자에게 판다</b> — 의무운행이 <b>승계</b>되어 환수 없이 양도 가능한 경우가 많아요(지자체 사전 승인 필요).</div>
+    <div class="callout callout-warn"><b>③ 사고·폐차 등 불가피한 사유</b>는 증빙 시 환수가 면제·감경될 수 있어요.</div>
+    <div class="chips mt16"><a class="chip" href="law.html">의무운행·환수 규정 자세히</a><a class="chip" href="faq.html">이사 가면 어떻게 되나요?</a></div>
+  </section>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/js/app.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', () => {
+  // 운행기간(개월)별 회수요율 — 2026 지침 기준
+  const RATES = [
+    { max: 3,  rate: 0.70, label: '3개월 미만' },
+    { max: 6,  rate: 0.65, label: '3~6개월' },
+    { max: 9,  rate: 0.60, label: '6~9개월' },
+    { max: 12, rate: 0.55, label: '9~12개월' },
+    { max: 15, rate: 0.50, label: '12~15개월' },
+    { max: 18, rate: 0.40, label: '15~18개월' },
+    { max: 21, rate: 0.30, label: '18~21개월' },
+    { max: 24, rate: 0.20, label: '21~24개월' },
+  ];
+  document.querySelector('#rf-table tbody').innerHTML = RATES.map(r =>
+    `<tr><td>${r.label}</td><td class="num">${Math.round(r.rate * 100)}%</td><td class="num">${fmt(1000 * r.rate)}만원</td></tr>`
+  ).join('') + '<tr><td><b>24개월 이후</b></td><td class="num"><b>0%</b></td><td class="num"><b>환수 없음</b></td></tr>';
+
+  const $id = x => document.getElementById(x);
+  function calc() {
+    const d = $id('rf-date').value, amt = +$id('rf-amt').value, type = $id('rf-type').value;
+    const out = $id('rf-out');
+    if (!d || !amt) { out.innerHTML = '<p class="muted">등록 연월과 보조금 총액을 입력하세요.</p>'; return; }
+    const reg = new Date(d + '-01');
+    const now = new Date();
+    const months = Math.max(0, (now.getFullYear() - reg.getFullYear()) * 12 + now.getMonth() - reg.getMonth());
+    const freeDate = new Date(reg); freeDate.setMonth(freeDate.getMonth() + 24);
+    const dday = Math.ceil((freeDate - now) / 864e5);
+
+    if (type === 'accident') {
+      out.innerHTML = `<div class="callout-green callout"><b>사고·천재지변 폐차</b>는 증빙(사고사실확인원, 전손 처리 서류 등) 제출 시 환수가 면제되거나 감경되는 사유예요. 지자체에 사유서와 함께 문의하세요.</div>`;
+      return;
+    }
+    if (type === 'same') {
+      out.innerHTML = `<div class="callout-green callout"><b>같은 지자체 거주자에게 양도</b>하면 의무운행기간이 <b>매수인에게 승계</b>되어 환수 없이 처분 가능한 경우가 많아요.<br><span class="small">※ 반드시 <b>사전에</b> 지자체 승인 절차를 거치세요. 임의 처분 후 신고하면 환수될 수 있어요.</span></div>
+      <div class="kv"><span>의무운행 종료일</span><b>${freeDate.toLocaleDateString('ko-KR')} ${dday > 0 ? `(D-${dday})` : '(경과)'}</b></div>`;
+      return;
+    }
+    if (type === 'export') {
+      out.innerHTML = `<div class="callout-danger callout"><b>수출 목적 말소는 의무운행기간이 5년</b>이에요(2021년 이후 지침 강화). 5년 내 수출 말소 시 별도 요율표에 따라 환수됩니다 — 일반 중고 판매보다 훨씬 오래, 많이 환수되니 주의하세요.</div>
+      <div class="kv"><span>수출 기준 의무 종료(등록 후 5년)</span><b>${new Date(reg.getFullYear() + 5, reg.getMonth(), 1).toLocaleDateString('ko-KR')}</b></div>`;
+      return;
+    }
+    let rate = 0;
+    for (const r of RATES) { if (months < r.max) { rate = r.rate; break; } }
+    const refund = Math.round(amt * rate);
+    out.innerHTML = `
+      <div class="center">
+        <p class="muted small">지금 판다면 예상 환수금</p>
+        <div class="money-xl" style="color:${refund ? 'var(--danger)' : 'var(--money)'}">${refund ? manwonLong(refund) : '0원 🎉'}</div>
+        <p class="muted small">경과 ${months}개월 · 적용 요율 ${Math.round(rate * 100)}%</p>
+      </div>
+      <div class="kv"><span>환수 0원이 되는 날</span><b>${freeDate.toLocaleDateString('ko-KR')} ${dday > 0 ? `(D-${dday})` : '(이미 지남)'}</b></div>
+      ${rate > 0 && months >= 21 ? '<div class="callout-green callout small">조금만 더! 3개월 이내에 환수 구간이 끝나요. 급하지 않다면 기다리는 게 이득이에요.</div>' : ''}
+      <p class="stamp">추정치입니다. 최종 판단은 관할 지자체·한국환경공단 기준.</p>`;
+  }
+  ['rf-date', 'rf-amt', 'rf-type'].forEach(i => $id(i).addEventListener('input', calc));
+  calc();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>차종별 전기차 보조금 | EV보조금</title>
+<meta name="description" content="차종별 2026년 전기차 보조금 — 지역 선택하면 국비+지방비 합계와 실구매가, 겨울 주행거리, 예상 유지비까지 바로 계산.">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="container">
+  <div class="hero" style="text-align:left;padding-bottom:0">
+    <p class="muted small" id="c-maker"></p>
+    <h1 id="c-name" class="skeleton" style="min-height:38px">차종</h1>
+  </div>
+
+  <!-- 보조금 카드 -->
+  <section class="card">
+    <h2 class="mt0">💰 보조금 <span class="sub" id="c-region-label"></span></h2>
+    <div id="c-picker"></div>
+    <div class="center mt16">
+      <div class="money-xl" id="c-total">-</div>
+      <div class="muted small mt8" id="c-breakdown"></div>
+      <div class="stack" style="max-width:340px;margin:10px auto"><i class="nat" id="bar-nat"></i><i class="loc" id="bar-loc"></i></div>
+      <div class="legend" style="justify-content:center"><span><i style="background:var(--primary)"></i>국비</span><span><i style="background:var(--money)"></i>지방비</span></div>
+    </div>
+    <div class="callout-green callout" id="c-conv"></div>
+    <p class="stamp" id="c-stamp"></p>
+  </section>
+
+  <!-- 실구매가 영수증 -->
+  <section class="card">
+    <h2 class="mt0">🧾 실구매가 계산 <span class="sub">견적서 금액을 넣어보세요</span></h2>
+    <div class="field">
+      <label for="c-price">차량 가격 (옵션 포함, 만원)</label>
+      <div class="input-suffix"><input class="input" id="c-price" type="number" inputmode="numeric" placeholder="예: 4890"><span class="sfx">만원</span></div>
+    </div>
+    <div id="c-band-warn"></div>
+    <div class="receipt" id="c-receipt" hidden></div>
+    <p class="small muted">· 취득세 감면(최대 140만원)·개별소비세 감면은 계약 조건에 따라 다릅니다 — <a href="law.html">세금 혜택 보기</a><br>· 가격 구간(5,300 / 8,500만원)을 넘으면 국비가 50% / 0%로 줄어요. 표시 금액은 참고용입니다.</p>
+  </section>
+
+  <div class="ad-slot" data-slot="car-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+
+  <!-- 제원 -->
+  <section class="card">
+    <h2 class="mt0">📊 인증 제원</h2>
+    <div id="c-specs"></div>
+    <div class="callout callout-warn small" id="c-winter"></div>
+  </section>
+
+  <!-- 유지비 미리보기 -->
+  <section class="card">
+    <h2 class="mt0">⛽ 연료비 미리보기 <span class="sub">연 15,000km 기준</span></h2>
+    <div id="c-fuel"></div>
+    <a class="btn btn-primary btn-block mt8" id="c-calc-link" href="calc.html">내 조건으로 정확히 계산하기</a>
+  </section>
+
+  <div class="grid2">
+    <button class="btn btn-ghost" id="c-cmp">🚗 비교함에 담기</button>
+    <button class="btn btn-ghost" id="c-share">🔗 이 조건 공유하기</button>
+  </div>
+
+  <section class="card">
+    <h2 class="mt0">같은 모델 다른 트림</h2>
+    <div class="rowlist" id="c-trims"></div>
+  </section>
+
+  <div class="ad-slot" data-slot="car-2"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/js/app.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', async () => {
+  const [cars, regions, meta] = await EVData.all();
+  const id = +(qs('id') || 0);
+  const car = cars[id] || cars[0];
+  let cd = qs('cd') || myRegion.get();
+  if (!regions[cd]) cd = null;
+
+  document.title = `${car.name} 보조금 2026 — 국비 ${manwon(car.nat)}${cd ? ' + ' + regions[cd].name + ' 지방비' : ''} | EV보조금`;
+  document.getElementById('c-maker').textContent = makerShort(car.maker) + (car.disc ? ' · 단종/이월 모델' : '');
+  const nameEl = document.getElementById('c-name');
+  nameEl.classList.remove('skeleton');
+  nameEl.textContent = car.name;
+
+  /* 보조금 표시 */
+  function renderSubsidy() {
+    const v = cd && regions[cd].v[id];
+    const loc = v ? v[0] : null;
+    const total = car.nat + (loc || 0);
+    document.getElementById('c-total').textContent = manwon(total);
+    document.getElementById('c-region-label').textContent = cd ? regions[cd].name + ' 기준' : '지역을 선택하세요';
+    document.getElementById('c-breakdown').innerHTML = cd
+      ? `국비 <b>${manwon(car.nat)}</b> + ${regions[cd].name} 지방비 <b>${loc == null ? '지원 대상 아님' : manwon(loc)}</b>`
+      : `국비 ${manwon(car.nat)} (지방비는 지역 선택 시 합산)`;
+    const pct = loc ? car.nat / total * 100 : 100;
+    document.getElementById('bar-nat').style.width = pct + '%';
+    document.getElementById('bar-loc').style.width = (100 - pct) + '%';
+    const convLoc = v ? v[1] : 0;
+    document.getElementById('c-conv').innerHTML =
+      `♻️ <b>내연차 폐차·전환 시 추가</b>: 국비 최대 ${manwon(car.convNat)}${convLoc ? ` + 지방비 ${manwon(convLoc)}` : ''} → 총 최대 <b>${manwon(total + car.convNat + convLoc)}</b> <span class="small muted">(요건: 기존 내연차 폐차·이전 후 전환, 공고 확인)</span>`;
+    document.getElementById('c-stamp').textContent = `2026년 단가 기준일 ${meta.updated} · 출처: 무공해차 통합누리집(ev.or.kr) · 실제 지급액은 공고 기준`;
+    renderReceipt(); renderFuel();
+    setQs({ id, cd });
+  }
+  regionPicker(document.getElementById('c-picker'), { value: cd, onPick: c => { cd = c; renderSubsidy(); } });
+
+  /* 실구매가 영수증 */
+  const priceInput = document.getElementById('c-price');
+  function renderReceipt() {
+    const p = +priceInput.value;
+    const box = document.getElementById('c-receipt');
+    const warn = document.getElementById('c-band-warn');
+    warn.innerHTML = '';
+    if (!p) { box.hidden = true; return; }
+    let natEff = car.nat, note = '';
+    if (p >= meta.priceBands.half) { natEff = 0; note = `<div class="callout-danger callout small"><b>가격 ${manwonLong(meta.priceBands.half)} 이상</b> — 국비 보조금 0원 구간입니다.</div>`; }
+    else if (p >= meta.priceBands.full) { natEff = Math.round(car.nat / 2); note = `<div class="callout-warn callout small"><b>가격 ${manwonLong(meta.priceBands.full)}~${manwonLong(meta.priceBands.half)} 구간</b> — 국비가 50%로 줄어요. 표시된 단가가 이미 반영분일 수 있으니 공고 기준으로 확인하세요.</div>`; }
+    warn.innerHTML = note;
+    const v = cd && regions[cd].v[id];
+    const loc = v ? (natEff === car.nat ? v[0] : Math.floor(v[0] * (natEff / car.nat || 0))) : 0;
+    const final = p - natEff - loc;
+    box.hidden = false;
+    box.innerHTML = `
+      <div class="r-row"><span>차량 가격</span><b>${manwonLong(p)}</b></div>
+      <div class="r-row"><span>국비 보조금</span><span class="minus">− ${manwon(natEff)}</span></div>
+      <div class="r-row"><span>지방비 보조금${cd ? ' (' + regions[cd].name + ')' : ' (지역 미선택)'}</span><span class="minus">− ${manwon(loc)}</span></div>
+      <div class="r-row"><span>취득세(감면 후 예상)</span><span class="plus">＋ 등록 시 별도</span></div>
+      <div class="r-row total"><span>예상 실구매가</span><span>${manwonLong(final)}</span></div>`;
+  }
+  priceInput.addEventListener('input', renderReceipt);
+
+  /* 제원 */
+  const eff = carEff(car), cr = coldRatio(car);
+  document.getElementById('c-specs').innerHTML = `
+    <div class="kv"><span>1회 충전 주행거리 (상온)</span><b>${car.range ? car.range + ' km' : '미공개'}</b></div>
+    <div class="kv"><span>1회 충전 주행거리 (저온·겨울)</span><b>${car.rangeCold ? car.rangeCold + ' km' : '미공개'}</b></div>
+    <div class="kv"><span>배터리 용량</span><b>${car.batt ? car.batt + ' kWh' : '미공개'}</b></div>
+    <div class="kv"><span>추정 전비 <span class="notice-badge">주행거리÷배터리</span></span><b>${eff ? eff + ' km/kWh' : '-'}</b></div>`;
+  document.getElementById('c-winter').innerHTML = cr
+    ? `❄️ 겨울(저온) 주행거리는 상온의 <b>${cr}%</b> 수준이에요. ${cr >= 85 ? '저온 효율이 좋은 편입니다.' : cr >= 75 ? '평균적인 수준입니다.' : '겨울 감소폭이 큰 편이니 장거리 출퇴근이라면 참고하세요.'} <span class="small muted">(환경부 인증값 기준)</span>`
+    : '저온 인증값이 공개되지 않은 모델입니다.';
+
+  /* 연료비 미리보기: 15,000km, 집밥 60%/급속 40%, 충전손실 10% */
+  function renderFuel() {
+    const box = document.getElementById('c-fuel');
+    if (!eff) { box.innerHTML = '<p class="muted">전비 정보가 없어 계산할 수 없어요.</p>'; return; }
+    const km = 15000, loss = 1.1, homeR = 150, fastR = 350, mix = 0.6;
+    const kwh = km / eff * loss;
+    const evCost = kwh * (homeR * mix + fastR * (1 - mix));
+    const gasCost = km / 11 * 1650;
+    box.innerHTML = `
+      <div class="hbar top"><span class="nm">이 전기차</span><span class="bar"><i style="width:${Math.round(evCost / gasCost * 100)}%"></i></span><span class="val">연 ${won(evCost)}</span></div>
+      <div class="hbar"><span class="nm">휘발유차</span><span class="bar"><i style="width:100%;background:var(--text3)"></i></span><span class="val">연 ${won(gasCost)}</span></div>
+      <p class="small muted mt8">가정: 집밥 60%(150원/kWh)+급속 40%(350원/kWh), 충전손실 10%, 휘발유 11km/L·1,650원/L — 계산기에서 내 조건으로 조정 가능</p>`;
+    document.getElementById('c-calc-link').href = `calc.html?id=${id}${cd ? '&cd=' + cd : ''}`;
+  }
+
+  /* 트림 목록 */
+  const base = car.name.replace(/\s?(2WD|AWD|4WD|RWD).*$|(\s\d+인치.*$)/, '').slice(0, 6);
+  document.getElementById('c-trims').innerHTML = cars
+    .filter(c => c.id !== id && !c.disc && c.name.slice(0, 6) === base)
+    .slice(0, 6)
+    .map(c => `<a class="row" href="car.html?id=${c.id}${cd ? '&cd=' + cd : ''}"><div class="grow"><div class="tit">${c.name}</div><div class="desc">${c.range || '-'}km · ${c.batt || '-'}kWh</div></div><div class="amt">${manwon(c.nat + ((cd && regions[cd].v[c.id]) ? regions[cd].v[c.id][0] : 0))}</div></a>`)
+    .join('') || '<p class="muted small" style="padding:10px 4px">다른 트림이 없어요.</p>';
+
+  /* 비교/공유 */
+  document.getElementById('c-cmp').onclick = () => {
+    const arr = cmpBasket.toggle(id);
+    document.getElementById('c-cmp').textContent = arr.includes(id) ? '✓ 비교함에 담김' : '🚗 비교함에 담기';
+  };
+  if (cmpBasket.get().includes(id)) document.getElementById('c-cmp').textContent = '✓ 비교함에 담김';
+  document.getElementById('c-share').onclick = async () => {
+    const url = location.href;
+    const title = `${car.name} 보조금${cd ? ' — ' + regions[cd].name : ''}`;
+    if (navigator.share) { try { await navigator.share({ title, url }); } catch (e) {} }
+    else { await navigator.clipboard.writeText(url); alert('링크가 복사됐어요!'); }
+  };
+
+  renderSubsidy();
+});
+</script>
+</body>
+</html>

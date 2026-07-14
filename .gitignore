@@ -1,0 +1,5 @@
+site/data/*.bak
+updater/updater.log
+updater/.last_full
+.DS_Store
+.claude/

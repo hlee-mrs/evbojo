@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전기차 유지비 계산기 — 충전요금 vs 기름값 | EV보조금</title>
+<meta name="description" content="전기차 충전요금 계산기. 차종별 공인 전비, 집밥/급속 비율, 겨울 효율 저하까지 반영해 휘발유차 대비 연간 절감액을 계산합니다.">
+<meta property="og:title" content="전기차 유지비 계산기 — 1년에 얼마나 아낄까?">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="container">
+  <div class="hero">
+    <h1>전기차 <span class="hl">유지비 계산기</span></h1>
+    <p>인증 전비 × 내 충전 환경 × 겨울 보정 — 탁상계산 말고 진짜 계산</p>
+  </div>
+
+  <section class="card">
+    <h2 class="mt0">1️⃣ 차종</h2>
+    <select class="select" id="k-car" aria-label="차종 선택"></select>
+    <div class="kv mt8"><span>적용 전비 <span class="notice-badge">인증 주행거리÷배터리</span></span><b id="k-eff-show">-</b></div>
+    <details class="acc"><summary class="small">전비 직접 입력</summary><div class="acc-body">
+      <div class="input-suffix"><input class="input" id="k-eff" type="number" step="0.1" inputmode="decimal" placeholder="예: 5.5"><span class="sfx">km/kWh</span></div>
+      <p class="small muted mt8">실주행 전비를 아신다면 직접 입력하세요. 비워두면 인증값 기반 추정치를 사용해요.</p>
+    </div></details>
+  </section>
+
+  <section class="card">
+    <h2 class="mt0">2️⃣ 주행 환경</h2>
+    <div class="field">
+      <label>연간 주행거리 <b id="k-km-show" style="color:var(--primary)">15,000 km</b></label>
+      <div class="range-row"><input type="range" id="k-km" min="3000" max="50000" step="1000" value="15000" aria-label="연간 주행거리"></div>
+    </div>
+    <div class="field">
+      <label>집밥(완속·홈충전) 비율 <b id="k-mix-show" style="color:var(--primary)">60%</b></label>
+      <div class="range-row"><input type="range" id="k-mix" min="0" max="100" step="10" value="60" aria-label="집밥 비율"></div>
+      <div class="chips">
+        <button class="chip" data-mix="0">집밥 없음 (급속만)</button>
+        <button class="chip" data-mix="60">아파트 완속</button>
+        <button class="chip" data-mix="90">주택·개인 충전기</button>
+      </div>
+    </div>
+    <label class="small" style="display:flex;align-items:center;gap:6px;margin:10px 0">
+      <input type="checkbox" id="k-winter" checked> 겨울(약 3.5개월) 효율 저하 반영 <span class="notice-badge" id="k-winter-note">차종 인증 저온값</span>
+    </label>
+    <details class="acc"><summary class="small">충전 단가 조정 (기본값: 집밥 150 · 외부완속 250 · 급속 350원/kWh)</summary><div class="acc-body">
+      <div class="grid2">
+        <div class="field"><label>집밥 단가(원/kWh)</label><input class="input" id="k-rate-home" type="number" value="150"></div>
+        <div class="field"><label>급속 단가(원/kWh)</label><input class="input" id="k-rate-fast" type="number" value="350"></div>
+      </div>
+      <p class="small muted">참고: 환경부 급속(100kW) 347.2원/kWh, 아파트 완속은 계절·시간대별 약 100~250원/kWh 수준(2026-07 기준, 사업자별 상이). 충전손실 10%는 자동 반영돼요.</p>
+    </div></details>
+  </section>
+
+  <section class="card">
+    <h2 class="mt0">3️⃣ 비교할 내연기관차</h2>
+    <div class="grid2">
+      <div class="field"><label>연비 (km/L)</label><input class="input" id="k-gas-eff" type="number" step="0.1" value="11"></div>
+      <div class="field"><label>휘발유 가격 (원/L)</label><input class="input" id="k-gas-price" type="number" value="1650"></div>
+    </div>
+  </section>
+
+  <!-- 결과 -->
+  <section class="card" id="k-result" style="border:2px solid var(--money)">
+    <h2 class="mt0">📊 결과</h2>
+    <div class="center">
+      <p class="muted small">휘발유차 대비 연간 절감액</p>
+      <div class="money-xl" id="k-save">-</div>
+      <p class="muted small" id="k-save-month"></p>
+    </div>
+    <div class="mt16" id="k-bars"></div>
+    <div class="kv"><span>연간 충전 전력량</span><b id="k-kwh">-</b></div>
+    <div class="kv"><span>km당 연료비 (전기 vs 휘발유)</span><b id="k-per-km">-</b></div>
+    <div class="kv"><span>5년 누적 절감액</span><b id="k-save5" style="color:var(--money)">-</b></div>
+    <div class="callout small mt16">
+      🚗 연료비 외에도: 자동차세 <b>연 13만원(교육세 포함)</b> 고정 · 엔진오일 등 소모품 절감 · 공영주차장·고속도로 통행료 할인(지역별 상이).
+      반대로 보험료는 동급 내연차보다 다소 높은 경향이 있어요.
+    </div>
+    <div class="grid2 mt8">
+      <button class="btn btn-primary" id="k-share">🔗 결과 공유</button>
+      <a class="btn btn-ghost" href="index.html">보조금도 확인하기</a>
+    </div>
+    <p class="stamp">계산 방식: 연간거리 ÷ 전비 × 충전손실 1.1 × 단가(집밥/급속 가중평균) · 겨울 보정: 저온 인증 유지율을 3.5/12개월 가중 적용 · 단가 기준 2026-07</p>
+  </section>
+
+  <div class="ad-slot" data-slot="calc-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+
+  <section class="card">
+    <h2 class="mt0">함께 보면 좋아요</h2>
+    <div class="chips">
+      <a class="chip" href="check.html">✅ 보조금 자격 진단</a>
+      <a class="chip" href="compare.html">🚗 차종 비교</a>
+      <a class="chip" href="faq.html">❓ 아파트인데 괜찮을까?</a>
+    </div>
+  </section>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/js/app.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', async () => {
+  const cars = await EVData.cars();
+  const sel = document.getElementById('k-car');
+  const usable = cars.filter(c => !c.disc && carEff(c));
+  sel.innerHTML = '<option value="">— 차종 선택 (미선택 시 평균 전비 5.3) —</option>' +
+    usable.map(c => `<option value="${c.id}">[${makerShort(c.maker)}] ${c.name}</option>`).join('');
+
+  const $id = x => document.getElementById(x);
+  const state = () => ({
+    car: sel.value ? cars[+sel.value] : null,
+    km: +$id('k-km').value,
+    mix: +$id('k-mix').value / 100,
+    winter: $id('k-winter').checked,
+    effManual: +$id('k-eff').value || null,
+    rateHome: +$id('k-rate-home').value || 150,
+    rateFast: +$id('k-rate-fast').value || 350,
+    gasEff: +$id('k-gas-eff').value || 11,
+    gasPrice: +$id('k-gas-price').value || 1650,
+  });
+
+  function calc() {
+    const s = state();
+    let eff = s.effManual || (s.car ? carEff(s.car) : 5.3);
+    const cr = s.car ? (coldRatio(s.car) || 82) / 100 : 0.82;
+    $id('k-winter-note').textContent = s.car ? `이 차 저온 유지율 ${Math.round(cr * 100)}%` : '평균 82% 적용';
+    let effYear = eff;
+    if (s.winter) effYear = eff * ((8.5 + 3.5 * cr) / 12);
+    $id('k-eff-show').textContent = (s.effManual ? s.effManual + ' (직접입력)' : eff.toFixed(1)) + ' km/kWh' + (s.winter ? ` → 연평균 ${effYear.toFixed(1)} 적용` : '');
+
+    const kwh = s.km / effYear * 1.1; // 충전손실 10%
+    const rate = s.rateHome * s.mix + s.rateFast * (1 - s.mix);
+    const evCost = kwh * rate;
+    const gasCost = s.km / s.gasEff * s.gasPrice;
+    const save = gasCost - evCost;
+
+    $id('k-km-show').textContent = fmt(s.km) + ' km';
+    $id('k-mix-show').textContent = Math.round(s.mix * 100) + '%';
+    $id('k-save').textContent = (save >= 0 ? '' : '−') + won(Math.abs(save));
+    $id('k-save-month').textContent = `한 달에 약 ${won(Math.abs(save) / 12)} ${save >= 0 ? '아껴요' : '더 들어요'}`;
+    $id('k-kwh').textContent = fmt(Math.round(kwh)) + ' kWh';
+    $id('k-per-km').textContent = `${Math.round(evCost / s.km)}원 vs ${Math.round(gasCost / s.km)}원`;
+    $id('k-save5').textContent = won(save * 5);
+    const maxC = Math.max(evCost, gasCost);
+    $id('k-bars').innerHTML = `
+      <div class="hbar top"><span class="nm">전기차</span><span class="bar"><i style="width:${Math.round(evCost / maxC * 100)}%"></i></span><span class="val">${won(evCost)}</span></div>
+      <div class="hbar"><span class="nm">휘발유차</span><span class="bar"><i style="width:${Math.round(gasCost / maxC * 100)}%;background:var(--text3)"></i></span><span class="val">${won(gasCost)}</span></div>`;
+    setQs({ id: sel.value || null, km: s.km, mix: Math.round(s.mix * 100), w: s.winter ? 1 : 0 });
+  }
+
+  ['k-km','k-mix','k-winter','k-eff','k-rate-home','k-rate-fast','k-gas-eff','k-gas-price'].forEach(i => $id(i).addEventListener('input', calc));
+  sel.addEventListener('change', calc);
+  document.querySelectorAll('[data-mix]').forEach(b => b.onclick = () => { $id('k-mix').value = b.dataset.mix; calc(); });
+  $id('k-share').onclick = async () => {
+    if (navigator.share) { try { await navigator.share({ title: '전기차 유지비 계산 결과', url: location.href }); } catch (e) {} }
+    else { await navigator.clipboard.writeText(location.href); alert('링크가 복사됐어요!'); }
+  };
+
+  /* URL 복원 */
+  if (qs('id') && cars[+qs('id')]) sel.value = qs('id');
+  if (qs('km')) $id('k-km').value = qs('km');
+  if (qs('mix')) $id('k-mix').value = qs('mix');
+  if (qs('w') === '0') $id('k-winter').checked = false;
+  calc();
+});
+</script>
+</body>
+</html>

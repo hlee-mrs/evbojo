@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전기차 보조금 2026 — 지자체별·차종별 한눈에 | EV보조금</title>
+<meta name="description" content="2026년 전국 161개 지자체 전기차 구매보조금과 117개 차종 국비·지방비를 한눈에. 접수 잔여현황, 실구매가, 유지비 계산까지 10초 만에 확인하세요.">
+<meta property="og:title" content="전기차 보조금 2026 — 우리 지역 얼마 받나?">
+<meta property="og:description" content="161개 지자체 × 117개 차종 보조금 + 잔여물량 + 유지비 계산기">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"EV보조금","url":"./","description":"전국 지자체 전기차 구매보조금 현황과 유지비 계산기"}
+</script>
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="container">
+  <div class="hero">
+    <h1>우리 지역 전기차 보조금,<br><span class="hl">10초 만에</span> 확인하세요</h1>
+    <p>2026년 · 전국 161개 지자체 · 전기승용 117개 모델 · 접수 현황까지</p>
+  </div>
+
+  <!-- 지역 선택 -->
+  <section class="card" aria-label="지역 선택">
+    <h2 class="mt0">📍 내 지역 선택 <span class="sub">한 번 고르면 기억해요</span></h2>
+    <div id="region-picker"><div class="grid2"><div class="select skeleton">&nbsp;</div><div class="select skeleton">&nbsp;</div></div></div>
+    <div id="my-region"></div>
+  </section>
+
+  <!-- 차종 검색 -->
+  <section class="card" aria-label="차종 검색">
+    <h2 class="mt0">🚗 차종으로 찾기</h2>
+    <input class="input" id="car-search" type="search" placeholder="차종 검색 — 아이오닉, EV3, 모델Y…" autocomplete="off" aria-label="차종 검색">
+    <div class="chips mt8" id="hot-chips"></div>
+    <div class="rowlist mt8" id="car-list" aria-live="polite"></div>
+    <button class="btn btn-ghost btn-block mt8" id="more-cars" hidden>차종 전체 보기</button>
+  </section>
+
+  <div class="ad-slot" data-slot="home-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+
+  <!-- 보조금 랭킹 -->
+  <section class="card">
+    <h2 class="mt0">🏆 보조금 많이 주는 지역 TOP 10 <span class="sub">승용 최대 기준(국비+지방비)</span></h2>
+    <div id="rank"></div>
+    <p class="muted mt8">같은 차라도 <b>주민등록 주소지</b>에 따라 보조금이 최대 1,000만원 이상 차이납니다.</p>
+  </section>
+
+  <!-- 도구 바로가기 -->
+  <section class="card">
+    <h2 class="mt0">🧰 구매 전 필수 도구</h2>
+    <div class="grid2 collapse">
+      <a class="btn btn-ghost" href="calc.html">⛽ 유지비 계산기<br><span class="small muted">기름값 대비 얼마나 아낄까</span></a>
+      <a class="btn btn-ghost" href="check.html">✅ 30초 자격 진단<br><span class="small muted">추가 지원금 받을 수 있는지</span></a>
+      <a class="btn btn-ghost" href="refund.html">↩️ 환수금 계산기<br><span class="small muted">2년 안에 팔면 얼마 토해내나</span></a>
+      <a class="btn btn-ghost" href="guide.html">📋 신청 절차 7단계<br><span class="small muted">순서 틀리면 못 받아요</span></a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="mt0">💡 이것만은 알고 사세요</h2>
+    <div class="callout"><b>보조금은 통장에 입금되지 않아요.</b> 차값에서 차감되고 지자체가 제조사에 지급하는 구조입니다.</div>
+    <div class="callout-warn callout"><b>옵션 넣다가 5,300만원 넘으면</b> 국비 보조금이 절반으로 줄어듭니다. 견적 최종 확인 필수!</div>
+    <div class="callout-danger callout"><b>대상자 선정 전에 출고·등록하면</b> 보조금을 못 받습니다. 반드시 선정 통보 후 출고하세요.</div>
+    <div class="chips mt16">
+      <a class="chip" href="law.html">제도·법령 쉽게 보기</a>
+      <a class="chip" href="faq.html">자주 묻는 질문</a>
+    </div>
+  </section>
+
+  <div class="ad-slot" data-slot="home-2"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/js/app.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', async () => {
+  const [cars, regions, meta, statusFile] = await EVData.all();
+  const status = statusFile && statusFile.data || {};
+  const statusUpdated = statusFile && statusFile.updated;
+
+  /* ── 내 지역 카드 ── */
+  const myBox = document.getElementById('my-region');
+  function renderMyRegion(cd) {
+    const r = regions[cd]; if (!r) { myBox.innerHTML = ''; return; }
+    const st = status[cd];
+    const b = statusBadge(st, statusUpdated);
+    const bestP = Math.max(...r.v.map((v, i) => v && cars[i].cls === 'P' && !cars[i].disc ? cars[i].nat + v[0] : 0));
+    myBox.innerHTML = `
+      <div class="callout-green callout" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+        <div style="flex:1;min-width:200px">
+          <b>${r.name}</b> 승용 최대 <b class="money-l">${manwon(bestP)}</b>
+          <div class="small muted mt8">${st ? '접수방법: ' + st.m : ''}</div>
+        </div>
+        <span class="badge ${b.cls}"><span class="dot"></span>${b.label}</span>
+      </div>
+      <div class="grid2 mt8">
+        <a class="btn btn-primary" href="region.html?cd=${cd}">차종별 보조금 전체 보기</a>
+        <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">실시간 잔여 확인 ↗</a>
+      </div>
+      <p class="stamp">📞 ${r.dept}${/0000-?0000/.test(r.tel) ? '' : ' ' + r.tel} · 잔여현황 기준 ${statusUpdated ? new Date(statusUpdated).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'numeric'}) : '-'} · 단가 기준 ${meta.updated}</p>`;
+  }
+  regionPicker(document.getElementById('region-picker'), { onPick: cd => renderMyRegion(cd) });
+  if (myRegion.get() && regions[myRegion.get()]) renderMyRegion(myRegion.get());
+
+  /* ── 차종 리스트/검색 ── */
+  const listEl = document.getElementById('car-list');
+  const moreBtn = document.getElementById('more-cars');
+  const myCd = () => myRegion.get() && regions[myRegion.get()] ? myRegion.get() : null;
+  function total(c) {
+    const cd = myCd();
+    if (cd && regions[cd].v[c.id]) return { amt: c.nat + regions[cd].v[c.id][0], label: regions[cd].name + ' 기준' };
+    return { amt: c.nat, label: '국비만 · 지역 선택 시 합산' };
+  }
+  const norm = s => s.toLowerCase().replace(/\s/g, '');
+  const ALIAS = { '아이오닉': 'ioniq', 'ev': 'ev', '모델': 'model' };
+  function carRow(c) {
+    const t = total(c);
+    return `<a class="row" href="car.html?id=${c.id}">
+      <div class="grow"><div class="tit">${c.name}</div>
+      <div class="desc">${makerShort(c.maker)} · ${c.range ? c.range + 'km' : '제원 미공개'}${c.batt ? ' · ' + c.batt + 'kWh' : ''}</div></div>
+      <div class="amt">${manwon(t.amt)}<small>${t.label}</small></div></a>`;
+  }
+  const POPULAR = ['더뉴EV6 롱레인지 2WD 19인치','더 뉴 아이오닉5 2WD 롱레인지 19인치','EV3 롱레인지 2WD 17인치','캐스퍼 일렉트릭 항속형 15인치','Model Y Premium Long Range','코나 일렉트릭 2WD 롱레인지 17인치','레이 EV 2WD 14인치 4인승 승용','토레스 EVX 18인치(2026)'];
+  let expanded = false;
+  function render(q) {
+    let list = cars.filter(c => !c.disc);
+    if (q) {
+      const nq = norm(q);
+      list = list.filter(c => norm(c.name + c.maker + makerShort(c.maker)).includes(nq));
+      listEl.innerHTML = list.slice(0, 30).map(carRow).join('') || '<p class="muted" style="padding:14px 4px">검색 결과가 없어요. 다른 이름으로 검색해보세요 (예: 아이오닉, EV3, 모델Y)</p>';
+      moreBtn.hidden = true;
+    } else if (expanded) {
+      list.sort((a, b) => b.nat - a.nat);
+      listEl.innerHTML = list.map(carRow).join('');
+      moreBtn.hidden = true;
+    } else {
+      const pop = POPULAR.map(n => list.find(c => c.name === n)).filter(Boolean);
+      listEl.innerHTML = pop.map(carRow).join('');
+      moreBtn.hidden = false;
+    }
+  }
+  document.getElementById('car-search').addEventListener('input', e => render(e.target.value.trim()));
+  moreBtn.onclick = () => { expanded = true; render(''); };
+  const chips = ['아이오닉5','아이오닉6','EV3','EV6','캐스퍼','모델Y','코나','레이'];
+  document.getElementById('hot-chips').innerHTML = chips.map(c => `<button class="chip" data-q="${c}">${c}</button>`).join('');
+  document.getElementById('hot-chips').addEventListener('click', e => {
+    const q = e.target.dataset && e.target.dataset.q;
+    if (q) { document.getElementById('car-search').value = q; render(q); }
+  });
+  render('');
+
+  /* ── TOP10 랭킹 ── */
+  const ranked = Object.entries(regions).filter(([cd]) => cd !== '9999')
+    .sort((a, b) => b[1].maxP - a[1].maxP).slice(0, 10);
+  const maxAmt = ranked[0][1].maxP;
+  document.getElementById('rank').innerHTML = ranked.map(([cd, r], i) =>
+    `<a class="hbar ${i === 0 ? 'top' : ''}" href="region.html?cd=${cd}" style="color:inherit">
+      <span class="nm">${i + 1}. ${r.name.replace('특별자치도','').replace('특별자치시','')}</span>
+      <span class="bar"><i style="width:${Math.round(r.maxP / maxAmt * 100)}%"></i></span>
+      <span class="val">${manwon(r.maxP)}</span></a>`).join('');
+});
+</script>
+</body>
+</html>

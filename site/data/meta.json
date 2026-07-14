@@ -1,0 +1,14 @@
+{
+ "year": 2026,
+ "updated": "2026-07-15",
+ "statusUpdated": "2026-07-15T14:00+09:00",
+ "source": "무공해차 통합누리집(ev.or.kr)",
+ "sourceUrl": "https://ev.or.kr",
+ "natMax": 570,
+ "convNatMax": 100,
+ "priceBands": {
+  "full": 5300,
+  "half": 8500
+ },
+ "notes": "국비·지방비 단가: ev.or.kr 지자체 차종별 보조금(2026) 실측 수집. 강원·충북·충남·전북·경북(울릉 제외)·경남 일부는 도 단위 동일 단가 확인 후 대표값 적용."
+}
