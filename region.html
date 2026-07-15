@@ -111,8 +111,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     ${status ? `<p class="small muted mt8">선정 방식: ${status.m}</p>` : ''}
     ${r.rep ? '<p class="small muted mt8">ℹ️ 이 지역 단가는 도(道) 공통 단가 기준입니다. 시·군 자체 추가 지원은 공고문을 확인하세요.</p>' : ''}`;
   if (status && status.note) {
+    const LIMIT = 180, full = status.note, long = full.length > LIMIT;
+    const clip = full.slice(0, LIMIT) + '…';
     document.getElementById('r-note').innerHTML =
-      `<div class="callout callout-warn small" style="margin:10px 0 0">📢 <b>지자체 공지</b> · ${esc(status.note)}${status.note.length >= 140 ? '…' : ''}</div>`;
+      `<div class="callout callout-warn small" style="margin:10px 0 0">📢 <b>지자체 공지</b> · <span id="note-body">${esc(long ? clip : full)}</span>` +
+      (long ? `<button type="button" id="note-toggle" style="background:none;border:0;color:var(--primary);font:inherit;font-weight:700;cursor:pointer;padding:0 0 0 6px;text-decoration:underline">더보기</button>` : '') +
+      `</div>`;
+    if (long) {
+      const body = document.getElementById('note-body'), btn = document.getElementById('note-toggle');
+      let open = false;
+      btn.addEventListener('click', () => {
+        open = !open;
+        body.textContent = open ? full : clip;      // textContent = 자동 이스케이프
+        btn.textContent = open ? '접기' : '더보기';
+      });
+    }
   }
   categoryBar(document.getElementById('r-split'), status, () => {
     const el = document.getElementById('r-badge'); if (el) el.innerHTML = badgeHTML();
