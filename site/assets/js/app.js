@@ -25,7 +25,7 @@
     // Payoneer '결제 요청(Request a Payment)' 링크를 넣으면 후원 버튼이 활성화됨.
     //   Payoneer 로그인 → 받기(Get Paid) → 결제 요청 링크 생성 → 그 URL을 아래에 붙여넣기
     donate: {
-      payoneerUrl: '',                        // 예: 'https://payoneer.com/...'  (비워두면 '준비 중')
+      payoneerUrl: 'https://link.payoneer.com/Token?t=BC4B67FF13CD4007A359F1F7E8BB9EA9&src=pl',  // 지급인이 금액 입력(USD)
     },
     staleDays: 14,
   };
