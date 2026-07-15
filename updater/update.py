@@ -87,16 +87,26 @@ def wait_table(page, min_rows=1):
 
 
 def scrape_status(page):
-    """지급현황: 161개 지자체 공고/접수/출고/잔여 (전기승용)"""
+    """지급현황: 161개 지자체 공고/접수/출고/잔여 (전기승용)
+    각 셀 형식: "전체 (우선순위) (법인·기관) (택시) (일반)" → 전체 + 4개 항목 분해 수집.
+    ※ 항목 합계가 전체와 다를 수 있음(공고 회차 이월 등, ev.or.kr 원본 특성) — 그대로 보존."""
     page.goto(f'{BASE}/nportal/buySupprt/initSubsidyPaymentCheckAction.do', wait_until='domcontentloaded')
     wait_table(page, 150)
     rows = page.evaluate(r"""() => {
       const t = [...document.querySelectorAll('table')].find(x => x.querySelectorAll('tbody tr').length >= 150);
-      const num = s => { const m = (s||'').match(/^([0-9,]+)/); return m ? +m[1].replace(/,/g,'') : null; };
+      const parse = s => {                       // "12201 (1600) (0) (840) (9761)" → [12201,1600,0,840,9761]
+        const m = (s||'').match(/-?[0-9,]+/g) || [];
+        const v = m.map(x => +x.replace(/,/g,''));
+        return { t: v.length ? v[0] : null, b: v.length >= 5 ? v.slice(1,5) : null };
+      };
       return [...t.querySelectorAll('tbody tr')].map(tr => {
         const c = [...tr.querySelectorAll('td,th')].map(x => x.textContent.replace(/\s+/g,' ').trim());
+        const n = parse(c[5]), a = parse(c[6]), r = parse(c[7]), l = parse(c[8]);
+        const note = (c[9]||'').slice(0,140);
         return { name: c[1], m: (c[4]||'').replace('*일반: ','일반 ').replace('*우선: ',' · 우선 '),
-                 n: num(c[5]), a: num(c[6]), r: num(c[7]), left: num(c[8]) };
+                 n: n.t, a: a.t, r: r.t, left: l.t,
+                 d: (n.b||a.b||r.b||l.b) ? { n: n.b, a: a.b, r: r.b, left: l.b } : null,
+                 note: note || null };
       });
     }""")
     if len(rows) < 150:
@@ -162,7 +172,12 @@ def update_status(page):
             continue
         idx = used.get(row['name'], 0)
         if idx < len(cds):
-            data[cds[idx]] = {'m': row['m'], 'n': row['n'], 'a': row['a'], 'r': row['r'], 'left': row['left']}
+            entry = {'m': row['m'], 'n': row['n'], 'a': row['a'], 'r': row['r'], 'left': row['left']}
+            if row.get('d'):
+                entry['d'] = row['d']
+            if row.get('note'):
+                entry['note'] = row['note']
+            data[cds[idx]] = entry
             used[row['name']] = idx + 1
     if len(data) < 150:
         raise ValueError(f'매핑된 지역 수 이상: {len(data)}')

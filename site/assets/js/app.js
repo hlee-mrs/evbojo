@@ -113,6 +113,46 @@
     return { cls: 'badge-open', label: `접수 중 · 잔여 ${fmt(st.left)}대`, stale: false };
   };
 
+  /* ── HTML 이스케이프 ── */
+  window.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* ── 잔여물량 항목별(우선순위/법인·기관/택시/일반) 표시 ──
+     d.left 등 배열 순서 = ev.or.kr 표 순서: [우선순위, 법인·기관, 택시, 일반] */
+  window.CAT_INFO = [
+    ['일반', '일반 개인 구매자에게 배정된 물량이에요. 대부분의 신청자가 여기에 해당해요.', 3],
+    ['우선순위', '다자녀·차상위·기초수급, 생애최초 청년 등 우대 대상에게 우선 배정된 물량이에요. 해당 여부는 [자격 진단]에서 확인하세요.', 0],
+    ['법인·기관', '법인·공공기관·단체 명의 구매에 배정된 물량이에요. 개인 구매와는 별도 관리돼요.', 1],
+    ['택시', '전기택시(영업용) 전용 물량이에요. 개인 승용 신청과 무관해요.', 2],
+  ];
+  window.splitHTML = function (d, key) {
+    if (!d || !d[key]) return '';
+    const v = d[key];
+    return '<div class="split-grid">' + CAT_INFO.map(([label, tip, idx]) => {
+      const n = v[idx];
+      const cls = n == null ? '' : (n > 0 ? 'pos' : 'zero');
+      return `<div class="split-item"><div class="split-label">${label}<button class="tip" type="button" data-tip="${esc(tip)}" aria-label="${label} 설명">?</button></div><b class="${cls}">${n == null ? '-' : fmt(n)}</b></div>`;
+    }).join('') + '</div>' +
+    `<p class="small muted" style="margin-top:6px">항목 합계가 '전체'와 다를 수 있어요<button class="tip" type="button" data-tip="본공고·추경 등 공고 회차가 나뉘어 운영되면 이월분 때문에 항목별 수치의 합과 전체 수치가 다를 수 있어요. ev.or.kr 원본 수치를 그대로 보여드립니다." aria-label="합계 차이 설명">?</button></p>`;
+  };
+
+  /* ── 모델 그룹핑 (브랜드→차종→트림 선택용) ── */
+  const MODEL_RULES = [
+    [/아이오닉\s?5/, '아이오닉5'], [/아이오닉\s?6/, '아이오닉6'], [/아이오닉\s?9|아이오닉9/, '아이오닉9'],
+    [/EV3/i, 'EV3'], [/EV4/i, 'EV4'], [/EV5/i, 'EV5'], [/EV6/i, 'EV6'], [/EV9/i, 'EV9'], [/PV5/i, 'PV5'],
+    [/코나/, '코나 일렉트릭'], [/캐스퍼/, '캐스퍼 일렉트릭'], [/레이/, '레이 EV'], [/니로/i, '니로 EV'], [/스타리아/, '스타리아 일렉트릭'],
+    [/GV60/i, 'GV60'], [/GV70/i, 'GV70'], [/G80/i, 'G80'],
+    [/Model 3/i, '모델3'], [/Model Y/i, '모델Y'],
+    [/EQA/i, 'EQA'], [/EQB/i, 'EQB'], [/EX30/i, 'EX30'], [/토레스/, '토레스 EVX'],
+    [/ID\.4/i, 'ID.4'], [/ID\.5/i, 'ID.5'], [/Q4/i, 'Q4 e-tron'], [/Q6/i, 'Q6 e-tron'],
+    [/Countryman/i, 'MINI 컨트리맨'], [/Aceman/i, 'MINI 에이스맨'], [/Cooper|JCW/i, 'MINI 쿠퍼'],
+    [/iX1/i, 'iX1'], [/iX2/i, 'iX2'], [/iX3/i, 'iX3'], [/i4/i, 'i4'], [/i5/i, 'i5'],
+    [/ATTO/i, 'BYD 아토3'], [/DOLPHIN/i, 'BYD 돌핀'], [/SEALION/i, 'BYD 씨라이언7'], [/SEAL/i, 'BYD 씰'],
+  ];
+  window.modelGroup = function (c) {
+    for (const [re, g] of MODEL_RULES) { if (re.test(c.name)) return g; }
+    return c.name.replace(/\(단종\)/, '').trim();
+  };
+
   /* ── 차량 표시 헬퍼 ── */
   window.carDisp = c => (c.maker === '기아' || c.maker === '현대자동차' ? '' : '') + c.name;
   window.makerShort = m => ({ '현대자동차': '현대', '테슬라코리아': '테슬라', '메르세데스벤츠코리아': '벤츠', '볼보자동차코리아': '볼보', '케이지모빌리티': 'KGM', '폭스바겐그룹코리아': '폭스바겐그룹', '비와이디코리아': 'BYD' })[m] || m;
@@ -235,5 +275,12 @@
   /* ── 부팅 ── */
   document.addEventListener('DOMContentLoaded', () => {
     header(); footer(); renderCmpBar(); renderAds();
+  });
+
+  /* ── (?)툴팁: 모바일 탭 토글, 바깥 탭으로 닫기 ── */
+  document.addEventListener('click', e => {
+    const tip = e.target.closest && e.target.closest('.tip');
+    $$('.tip.on').forEach(t => { if (t !== tip) t.classList.remove('on'); });
+    if (tip) { tip.classList.toggle('on'); e.preventDefault(); e.stopPropagation(); }
   });
 })();

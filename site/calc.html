@@ -19,9 +19,18 @@
   </div>
 
   <section class="card">
-    <h2 class="mt0">1️⃣ 차종</h2>
-    <select class="select" id="k-car" aria-label="차종 선택"></select>
-    <div class="kv mt8"><span>적용 전비 <span class="notice-badge">인증 주행거리÷배터리</span></span><b id="k-eff-show">-</b></div>
+    <h2 class="mt0">1️⃣ 차종 <span class="sub">검색하거나, 브랜드→차종→트림 순으로 골라보세요</span></h2>
+    <input class="input" id="k-search" type="search" placeholder="🔍 차종·트림 검색 — 예: 아이오닉5 롱레인지" autocomplete="off" aria-label="차종 검색">
+    <div class="rowlist" id="k-suggest" aria-live="polite"></div>
+    <div class="grid2" style="margin-top:10px">
+      <div class="field" style="margin:0"><label for="k-maker">브랜드</label>
+        <select class="select" id="k-maker"><option value="">전체 브랜드</option></select></div>
+      <div class="field" style="margin:0"><label for="k-model">차종</label>
+        <select class="select" id="k-model" disabled><option value="">차종 선택</option></select></div>
+    </div>
+    <div class="field"><label for="k-trim">구체적 트림</label>
+      <select class="select" id="k-trim" disabled><option value="">트림 선택 (미선택 시 평균 전비 5.3 적용)</option></select></div>
+    <div class="kv mt8"><span>적용 전비 <span class="notice-badge">인증 주행거리÷배터리</span><button class="tip" type="button" data-tip="환경부 인증 상온 주행거리 ÷ 배터리 용량으로 계산한 추정 전비예요. 충전 손실 10%는 아래 계산에서 별도로 반영됩니다." aria-label="전비 설명">?</button></span><b id="k-eff-show">-</b></div>
     <details class="acc"><summary class="small">전비 직접 입력</summary><div class="acc-body">
       <div class="input-suffix"><input class="input" id="k-eff" type="number" step="0.1" inputmode="decimal" placeholder="예: 5.5"><span class="sfx">km/kWh</span></div>
       <p class="small muted mt8">실주행 전비를 아신다면 직접 입력하세요. 비워두면 인증값 기반 추정치를 사용해요.</p>
@@ -103,14 +112,79 @@
 <script defer>
 document.addEventListener('DOMContentLoaded', async () => {
   const cars = await EVData.cars();
-  const sel = document.getElementById('k-car');
   const usable = cars.filter(c => !c.disc && carEff(c));
-  sel.innerHTML = '<option value="">— 차종 선택 (미선택 시 평균 전비 5.3) —</option>' +
-    usable.map(c => `<option value="${c.id}">[${makerShort(c.maker)}] ${c.name}</option>`).join('');
-
   const $id = x => document.getElementById(x);
+
+  /* ── 차종 선택: 검색 + 브랜드→차종→트림 ── */
+  let curId = null;
+  const makerSel = $id('k-maker'), modelSel = $id('k-model'), trimSel = $id('k-trim');
+  const searchIn = $id('k-search'), suggest = $id('k-suggest');
+  const brands = [...new Set(usable.map(c => makerShort(c.maker)))].sort((a, b) => a.localeCompare(b, 'ko'));
+  makerSel.innerHTML += brands.map(b => `<option>${b}</option>`).join('');
+
+  const byBrand = b => usable.filter(c => !b || makerShort(c.maker) === b);
+  function fillModels(brand, keep) {
+    const groups = [...new Set(byBrand(brand).map(modelGroup))].sort((a, b) => a.localeCompare(b, 'ko'));
+    modelSel.innerHTML = '<option value="">차종 선택</option>' + groups.map(g => `<option>${g}</option>`).join('');
+    modelSel.disabled = false;
+    if (keep && groups.includes(keep)) modelSel.value = keep;
+  }
+  function fillTrims(brand, model, keepId) {
+    const list = byBrand(brand).filter(c => modelGroup(c) === model);
+    trimSel.innerHTML = '<option value="">트림 선택</option>' +
+      list.map(c => `<option value="${c.id}">${c.name} · ${c.range}km/${c.batt}kWh</option>`).join('');
+    trimSel.disabled = false;
+    if (keepId != null && list.some(c => c.id === keepId)) trimSel.value = keepId;
+    else if (list.length === 1) { trimSel.value = list[0].id; curId = list[0].id; }
+  }
+  function pickCar(id) {
+    const c = cars[id]; if (!c) return;
+    curId = id;
+    makerSel.value = makerShort(c.maker);
+    fillModels(makerSel.value, modelGroup(c));
+    fillTrims(makerSel.value, modelGroup(c), id);
+  }
+  makerSel.addEventListener('change', () => {
+    curId = null; fillModels(makerSel.value);
+    trimSel.innerHTML = '<option value="">트림 선택</option>'; trimSel.disabled = true; calc();
+  });
+  modelSel.addEventListener('change', () => {
+    curId = null;
+    if (modelSel.value) fillTrims(makerSel.value, modelSel.value);
+    else { trimSel.innerHTML = '<option value="">트림 선택</option>'; trimSel.disabled = true; }
+    calc();
+  });
+  trimSel.addEventListener('change', () => {
+    curId = trimSel.value ? +trimSel.value : null;
+    searchIn.value = curId != null ? cars[curId].name : '';
+    suggest.innerHTML = '';
+    calc();
+  });
+
+  const norm = s => s.toLowerCase().replace(/\s/g, '');
+  searchIn.addEventListener('input', () => {
+    const toks = searchIn.value.trim().split(/\s+/).filter(Boolean).map(norm);
+    if (!toks.length) { suggest.innerHTML = ''; return; }
+    const hits = usable.filter(c => {
+      const hay = norm(makerShort(c.maker) + modelGroup(c) + c.name);
+      return toks.every(t => hay.includes(t));
+    }).slice(0, 8);
+    suggest.innerHTML = hits.map(c => `<a class="row" data-pick="${c.id}">
+      <div class="grow"><div class="tit">${c.name}</div><div class="desc">${makerShort(c.maker)} · ${modelGroup(c)} · ${c.range}km · ${carEff(c)}km/kWh</div></div></a>`).join('')
+      || '<p class="muted small" style="padding:10px 12px">검색 결과가 없어요 — 예: 아이오닉5, EV3, 모델Y</p>';
+  });
+  suggest.addEventListener('click', e => {
+    const el = e.target.closest && e.target.closest('[data-pick]');
+    if (!el) return;
+    e.preventDefault();
+    pickCar(+el.dataset.pick);
+    searchIn.value = cars[curId].name;
+    suggest.innerHTML = '';
+    calc();
+  });
+
   const state = () => ({
-    car: sel.value ? cars[+sel.value] : null,
+    car: curId != null ? cars[curId] : null,
     km: +$id('k-km').value,
     mix: +$id('k-mix').value / 100,
     winter: $id('k-winter').checked,
@@ -147,11 +221,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     $id('k-bars').innerHTML = `
       <div class="hbar top"><span class="nm">전기차</span><span class="bar"><i style="width:${Math.round(evCost / maxC * 100)}%"></i></span><span class="val">${won(evCost)}</span></div>
       <div class="hbar"><span class="nm">휘발유차</span><span class="bar"><i style="width:${Math.round(gasCost / maxC * 100)}%;background:var(--text3)"></i></span><span class="val">${won(gasCost)}</span></div>`;
-    setQs({ id: sel.value || null, km: s.km, mix: Math.round(s.mix * 100), w: s.winter ? 1 : 0 });
+    setQs({ id: curId != null ? curId : null, km: s.km, mix: Math.round(s.mix * 100), w: s.winter ? 1 : 0 });
   }
 
   ['k-km','k-mix','k-winter','k-eff','k-rate-home','k-rate-fast','k-gas-eff','k-gas-price'].forEach(i => $id(i).addEventListener('input', calc));
-  sel.addEventListener('change', calc);
   document.querySelectorAll('[data-mix]').forEach(b => b.onclick = () => { $id('k-mix').value = b.dataset.mix; calc(); });
   $id('k-share').onclick = async () => {
     if (navigator.share) { try { await navigator.share({ title: '전기차 유지비 계산 결과', url: location.href }); } catch (e) {} }
@@ -159,7 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   /* URL 복원 */
-  if (qs('id') && cars[+qs('id')]) sel.value = qs('id');
+  if (qs('id') && cars[+qs('id')]) { pickCar(+qs('id')); searchIn.value = cars[curId] ? cars[curId].name : ''; }
   if (qs('km')) $id('k-km').value = qs('km');
   if (qs('mix')) $id('k-mix').value = qs('mix');
   if (qs('w') === '0') $id('k-winter').checked = false;

@@ -19,6 +19,8 @@
 
   <section class="card" id="r-status-card">
     <div id="r-status"></div>
+    <div id="r-note"></div>
+    <div id="r-split"></div>
     <div class="grid2 mt8">
       <a class="btn btn-ghost" id="r-tel-btn" href="#">📞 담당부서 전화</a>
       <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">실시간 잔여 확인 ↗</a>
@@ -99,6 +101,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
     ${status ? `<p class="small muted mt8">선정 방식: ${status.m}</p>` : ''}
     ${r.rep ? '<p class="small muted mt8">ℹ️ 이 지역 단가는 도(道) 공통 단가 기준입니다. 시·군 자체 추가 지원은 공고문을 확인하세요.</p>' : ''}`;
+  if (status && status.note) {
+    document.getElementById('r-note').innerHTML =
+      `<div class="callout callout-warn small" style="margin:10px 0 0">📢 <b>지자체 공지</b> · ${esc(status.note)}${status.note.length >= 140 ? '…' : ''}</div>`;
+  }
+  if (status && status.d) {
+    document.getElementById('r-split').innerHTML =
+      `<p class="small" style="font-weight:800;margin-top:12px">항목별 잔여물량<button class="tip" type="button" data-tip="지자체는 물량을 신청 유형별로 나눠 배정해요. 내 유형의 잔여가 중요합니다 — 개인 구매자는 '일반'(우대 대상이면 '우선순위')을 보세요." aria-label="항목별 잔여물량 설명">?</button></p>` +
+      splitHTML(status.d, 'left');
+  }
   const telBtn = document.getElementById('r-tel-btn');
   if (/0000-?0000/.test(r.tel) || !r.tel) {
     telBtn.href = 'https://ev.or.kr/nportal/buySupprt/initPsLocalInquiriesAction.do';
@@ -128,7 +139,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const conv = includeConv ? c.convNat + v[1] : 0;
       return { c, nat: c.nat, loc: v[0], tot: c.nat + v[0] + conv, conv };
     }).filter(Boolean).filter(x => !x.c.disc || q);
-    if (q) { const nq = q.toLowerCase().replace(/\s/g, ''); list = list.filter(x => (x.c.name + x.c.maker + makerShort(x.c.maker)).toLowerCase().replace(/\s/g, '').includes(nq)); }
+    if (q) {
+      const nrm = s => s.toLowerCase().replace(/\s/g, '');
+      const toks = q.split(/\s+/).filter(Boolean).map(nrm);
+      list = list.filter(x => { const hay = nrm(x.c.name + x.c.maker + makerShort(x.c.maker) + modelGroup(x.c)); return toks.every(t => hay.includes(t)); });
+    }
     if (makerF) list = list.filter(x => x.c.maker === makerF);
     if (sortKey === 'total') list.sort((a, b) => b.tot - a.tot);
     if (sortKey === 'name') list.sort((a, b) => a.c.name.localeCompare(b.c.name, 'ko'));
