@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');</script>
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7688026325140831" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>오류 제보 | EV보조금</title>
+<meta name="description" content="EV보조금의 틀린 금액, 바뀐 공고, 어색한 설명을 제보해 주세요. 확인 후 바로잡습니다. 메일 앱 없이 바로 보낼 수 있어요.">
+<meta name="keywords" content="EV보조금 오류 제보, 전기차 보조금 정보 정정, 문의">
+<meta property="og:title" content="오류 제보 — EV보조금">
+<meta property="og:description" content="틀린 정보를 발견하셨나요? 바로 알려주시면 확인 후 고칩니다.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://evbojo.co.kr/report.html">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<meta name="naver-site-verification" content="29413de3319d0b4b5a504cdbb92084043d6d663b" />
+<meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
+<meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
+<style>
+  .frm label{display:block;font-size:14px;font-weight:600;margin:14px 0 6px}
+  .frm .req{color:var(--danger,#e5484d)}
+  .frm textarea.input{min-height:140px;resize:vertical;line-height:1.6}
+  .frm .hint{font-size:12.5px;color:var(--text3);margin-top:5px}
+  .hp{position:absolute!important;left:-9999px!important;opacity:0!important;height:0!important;width:0!important}
+</style>
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="container">
+  <div class="hero">
+    <h1>오류 <span class="hl">제보</span>하기</h1>
+    <p>틀린 금액, 바뀐 공고, 어색한 설명 — 무엇이든 알려주세요. 확인 후 바로잡을게요 🙏</p>
+  </div>
+
+  <div class="callout callout-green">
+    <b>이 사이트는 개인이 운영합니다.</b> 보조금 공고는 수시로 바뀌는데 혼자 다 따라가기가 어려워요.
+    제보 한 줄이 다른 방문자 수백 명을 살립니다. 짧아도 좋으니 편하게 남겨 주세요.
+  </div>
+
+  <section class="card">
+    <form class="frm" id="report-form" novalidate>
+      <input type="hidden" name="access_key" value="2c29bfb3-ba02-4899-905d-3a07e2e13427">
+      <input type="hidden" name="subject" value="[EV보조금] 오류 제보">
+      <input type="hidden" name="from_name" value="evbojo.co.kr 제보">
+      <!-- 숨은 컨텍스트: 제보를 '바로 조치 가능한' 상태로 만드는 핵심 -->
+      <input type="hidden" name="페이지" id="f-page">
+      <input type="hidden" name="접수시각" id="f-time">
+      <input type="hidden" name="환경" id="f-stamp">
+      <!-- Web3Forms 허니팟(전용 필드명 botcheck) -->
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <label for="f-type">무엇에 대한 제보인가요?</label>
+      <select class="select" id="f-type" name="유형">
+        <option>보조금 금액이 실제와 달라요</option>
+        <option>공고가 바뀌었어요 (마감·재공고 등)</option>
+        <option>차종 정보가 틀렸어요</option>
+        <option>계산기 결과가 이상해요</option>
+        <option>페이지가 깨지거나 작동을 안 해요</option>
+        <option>설명이 어렵거나 헷갈려요</option>
+        <option>기타 / 제안</option>
+      </select>
+
+      <label for="f-where">어느 지역·차종·페이지인가요? <span class="hint" style="display:inline;font-weight:400">(선택)</span></label>
+      <input class="input" id="f-where" name="위치" placeholder="예: 서울시 / 아이오닉 5 / 유지비 계산기">
+
+      <label for="f-msg">내용 <span class="req">*</span></label>
+      <textarea class="input" id="f-msg" name="내용" required placeholder="예) 서울시 아이오닉 5 보조금이 사이트엔 000만원인데, 공고문에는 000만원으로 나와 있어요."></textarea>
+      <div class="hint">
+        가능하면 <b>어디서 본 정보인지</b>(공고문 링크 등)도 적어주시면 확인이 훨씬 빨라요.<br>
+        답장이 필요하시면 <b>본문에 이메일을 적어주세요</b>(선택). 전화번호·주민번호 등은 적지 말아주세요.
+      </div>
+
+      <button class="btn btn-primary btn-block mt16" id="f-submit" type="submit">제보 보내기</button>
+      <p class="small muted mt8" id="f-note" style="text-align:center;min-height:1.2em"></p>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2 class="mt0">메일로 직접 보내셔도 됩니다</h2>
+    <p class="small muted">위 양식이 안 되거나, 스크린샷·파일을 첨부하고 싶으시면 아래 주소로 보내주세요.</p>
+    <div class="kv"><span>📮 이메일</span><b><span id="mail-addr">hlee9108@gmail.com</span> <button class="btn btn-ghost" id="copy-mail" type="button" style="padding:4px 10px;font-size:13px;margin-left:6px">복사</button></b></div>
+    <p class="small muted mt8">평일 기준 보통 1~3일 안에 확인합니다. 개인이 운영하다 보니 답장이 늦을 수 있어요 🙇</p>
+  </section>
+
+  <p class="muted mt24">함께 보면 좋은 페이지</p>
+  <div class="chips">
+    <a class="chip" href="about.html">사이트 소개</a>
+    <a class="chip" href="faq.html">자주 묻는 질문</a>
+    <a class="chip" href="index.html">지역별 보조금 보기</a>
+  </div>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/js/app.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('report-form');
+  const btn  = document.getElementById('f-submit');
+  const note = document.getElementById('f-note');
+  const msg  = document.getElementById('f-msg');
+  const track = ok => { try { gtag('event', 'report_submit', { status: ok ? 'success' : 'fail' }); } catch (e) {} };
+
+  // 숨은 컨텍스트 — 어느 페이지에서 언제 보냈는지가 있어야 바로 조치 가능
+  document.getElementById('f-page').value  = location.href;
+  document.getElementById('f-time').value  = new Date().toLocaleString('ko-KR');
+  document.getElementById('f-stamp').value = (navigator.userAgent || '').slice(0, 120);
+
+  const fail = why => {
+    track(false);
+    note.innerHTML = `전송에 실패했어요 (${why}). 번거로우시겠지만 아래 <b>hlee9108@gmail.com</b> 으로 보내주시면 꼭 확인할게요 🙇`;
+    note.style.color = 'var(--danger,#e5484d)';
+    document.getElementById('copy-mail')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!msg.value.trim()) { msg.focus(); note.textContent = '내용을 적어주세요.'; return; }
+    btn.disabled = true; btn.textContent = '보내는 중…';
+    note.textContent = ''; note.style.color = '';
+
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 12000);   // 무한 대기 방지
+    try {
+      // FormData 그대로 전송(multipart) → CORS preflight 없음. ⚠️ JSON으로 바꾸지 말 것(preflight 403 실측).
+      const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: new FormData(form), signal: ac.signal });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        track(true);
+        form.innerHTML = '<div class="callout callout-green" style="margin:0"><b>제보 감사합니다 🙏</b><br>확인 후 바로잡을게요. 평일 기준 보통 1~3일 안에 확인합니다.</div>';
+      } else {
+        fail('서버 응답 오류');
+      }
+    } catch (err) {
+      fail(err.name === 'AbortError' ? '시간 초과' : '네트워크');
+    } finally {
+      clearTimeout(timer);
+      btn.disabled = false; btn.textContent = '제보 보내기';
+    }
+  });
+
+  // 이메일 복사 (첨부가 필요하거나 폼이 실패할 때의 폴백 — 절대 제거하지 말 것)
+  const copyBtn = document.getElementById('copy-mail');
+  copyBtn.addEventListener('click', async () => {
+    const addr = document.getElementById('mail-addr').textContent.trim();
+    try {
+      await navigator.clipboard.writeText(addr);
+      copyBtn.textContent = '복사됨 ✓';
+    } catch (e) {
+      const r = document.createRange(); r.selectNode(document.getElementById('mail-addr'));
+      getSelection().removeAllRanges(); getSelection().addRange(r);
+      copyBtn.textContent = '드래그해 복사하세요';
+    }
+    setTimeout(() => { copyBtn.textContent = '복사'; }, 2000);
+  });
+});
+</script>
+</body>
+</html>
