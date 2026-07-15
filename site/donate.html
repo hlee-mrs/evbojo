@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>후원하기 | EV보조금</title>
+<meta name="description" content="EV보조금은 광고와 후원으로 운영되는 무료 개인 사이트예요. 서버비와 데이터 갱신에 보탬이 되도록 Payoneer로 후원할 수 있어요.">
+<meta name="keywords" content="전기차 보조금 사이트 후원, EV보조금 후원, 기부, Payoneer 후원">
+<meta property="og:title" content="EV보조금 후원하기">
+<meta property="og:description" content="무료로 제공하는 전기차 보조금 사이트, 후원으로 함께 유지해요.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="container">
+  <div class="hero">
+    <h1>이 사이트, <span class="hl">후원</span>으로 함께 만들어요</h1>
+    <p>EV보조금은 누구나 무료로 쓰는 개인 운영 사이트예요. 작은 후원이 큰 힘이 됩니다 💛</p>
+  </div>
+
+  <section class="card">
+    <h2 class="mt0">후원금은 이렇게 쓰여요</h2>
+    <div class="kv"><span>🖥️ 서버·도메인 유지비</span><b>연간 고정 비용</b></div>
+    <div class="kv"><span>🔄 보조금 데이터 자동 갱신</span><b>매시간 수집 운영</b></div>
+    <div class="kv"><span>🛠️ 계산기·기능 개선</span><b>지속 업데이트</b></div>
+    <p class="small muted mt8">광고 수익만으로는 부족한 운영비에 보탬이 됩니다. 후원은 100% 자발적이며, 후원 여부와 상관없이 모든 기능을 무료로 이용할 수 있어요.</p>
+  </section>
+
+  <section class="card center" style="border:2px solid var(--money)">
+    <div style="font-size:40px">☕</div>
+    <h2 style="margin:8px 0">커피 한 잔으로 응원하기</h2>
+    <p class="muted small">Payoneer로 안전하게 후원할 수 있어요. 버튼을 누르면 결제 페이지로 이동합니다.</p>
+    <a class="btn btn-primary btn-block mt16" id="donate-btn" href="#" target="_blank" rel="noopener">💛 Payoneer로 후원하기</a>
+    <p class="small muted mt8" id="donate-note"></p>
+  </section>
+
+  <section class="card">
+    <h2 class="mt0">후원 전에 알아두세요</h2>
+    <ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px">
+      <li>후원은 <b>대가 없는 자발적 후원</b>이에요. 별도의 상품·서비스 제공이나 환불은 없습니다.</li>
+      <li>결제는 Payoneer의 안전한 결제 페이지에서 처리되며, 본 사이트는 <b>카드·계좌 정보를 받지 않습니다</b>.</li>
+      <li>세금계산서·현금영수증 등은 발행되지 않는 개인 간 후원입니다.</li>
+    </ul>
+    <div class="chips mt16">
+      <a class="chip" href="index.html">지역별 보조금 보기</a>
+      <a class="chip" href="calc.html">유지비 계산기</a>
+      <a class="chip" href="about.html">사이트 소개</a>
+    </div>
+  </section>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/js/app.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', () => {
+  const url = (window.SITE && SITE.donate && SITE.donate.payoneerUrl || '').trim();
+  const btn = document.getElementById('donate-btn');
+  const note = document.getElementById('donate-note');
+  if (url) {
+    btn.href = url;
+    note.textContent = 'Payoneer 결제 페이지로 이동합니다.';
+  } else {
+    btn.href = 'javascript:void(0)';
+    btn.classList.remove('btn-primary'); btn.classList.add('btn-ghost');
+    btn.style.pointerEvents = 'none'; btn.style.opacity = '.6';
+    btn.textContent = '후원 링크 준비 중이에요';
+    note.innerHTML = '곧 열려요! 문의: <a href="mailto:hlee9108@gmail.com">hlee9108@gmail.com</a>';
+  }
+});
+</script>
+</body>
+</html>

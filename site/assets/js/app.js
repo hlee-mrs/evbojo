@@ -21,6 +21,12 @@
       },
       adfitSize: { width: 320, height: 100 }, // 애드핏 반응형 미지원 → 모바일 배너 기준
     },
+    // ── 후원(기부) 설정 ───────────────────────────────────
+    // Payoneer '결제 요청(Request a Payment)' 링크를 넣으면 후원 버튼이 활성화됨.
+    //   Payoneer 로그인 → 받기(Get Paid) → 결제 요청 링크 생성 → 그 URL을 아래에 붙여넣기
+    donate: {
+      payoneerUrl: '',                        // 예: 'https://payoneer.com/...'  (비워두면 '준비 중')
+    },
     staleDays: 14,
   };
   window.SITE = SITE;
@@ -224,6 +230,7 @@
     el.innerHTML = `<div class="inner">
       <div class="links">
         <a href="about.html">사이트 소개</a><a href="privacy.html">개인정보처리방침</a>
+        <a href="donate.html">💛 후원하기</a>
         <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
         <a href="mailto:hlee9108@gmail.com">오류 제보</a>
       </div>

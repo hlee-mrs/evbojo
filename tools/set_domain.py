@@ -14,7 +14,7 @@ regions = json.load(open(f'{SITE}/data/regions.json', encoding='utf-8'))
 cars = json.load(open(f'{SITE}/data/cars.json', encoding='utf-8'))
 
 pages = ['', 'calc.html', 'check.html', 'guide.html', 'law.html', 'refund.html',
-         'faq.html', 'compare.html', 'about.html', 'privacy.html']
+         'faq.html', 'compare.html', 'about.html', 'privacy.html', 'donate.html']
 lines = ['<?xml version="1.0" encoding="UTF-8"?>',
          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
 for u in pages:
