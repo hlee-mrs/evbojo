@@ -304,10 +304,18 @@
     const sidoSel = el.querySelector('[data-r=sido]'), guSel = el.querySelector('[data-r=gu]');
     function fillGu(sido, pick) {
       const list = Object.entries(regions).filter(([, r]) => r.sido === sido);
-      guSel.innerHTML = `<option value="">시·군·구</option>` + list.map(([cd, r]) => `<option value="${cd}">${r.name}</option>`).join('');
-      guSel.disabled = false;
-      if (list.length === 1) { guSel.value = list[0][0]; guSel.dispatchEvent(new Event('change')); }
-      else if (pick) guSel.value = pick;
+      const single = list.length === 1;   // 광역시·특별시·세종·제주 등: 하위 시·군·구 없음(시 전체 단일 단가)
+      // 단일 지역은 placeholder 없이 그 지역만 표시하고 잠금 → "구를 골라야 하나?" 혼동 제거
+      guSel.innerHTML = (single ? '' : `<option value="">시·군·구</option>`) +
+        list.map(([cd, r]) => `<option value="${cd}">${r.name}</option>`).join('');
+      if (single) {
+        guSel.value = list[0][0];
+        guSel.dispatchEvent(new Event('change'));   // onPick은 활성 상태에서 발생
+        guSel.disabled = true;                       // 이후 잠금(자동 선택 고정)
+      } else {
+        guSel.disabled = false;
+        if (pick) guSel.value = pick;
+      }
     }
     // 시·도 변경: 단일 지역이면 fillGu가 gu change를 발생시켜 onPick(valid) 호출.
     // 다지역이면 gu가 미선택(빈값)으로 리셋되므로 onPick(null)로 '선택 해제'를 알려 화면을 갱신.

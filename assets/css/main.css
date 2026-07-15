@@ -265,3 +265,6 @@ input[type=range]{flex:1;accent-color:var(--primary);height:32px}
 .cat-tab.on{border-color:var(--primary);background:var(--primary-soft);box-shadow:0 0 0 1px var(--primary) inset}
 .cat-tab.on .cat-nm{color:var(--primary)}
 .cat-note{margin-top:6px}
+
+/* ── 비활성 셀렉터(광역시 등 하위 지역 없음) ── */
+.select:disabled{opacity:.65;cursor:default;background-color:var(--surface2);color:var(--text2)}
