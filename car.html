@@ -44,12 +44,13 @@
   <section class="card">
     <h2 class="mt0">🧾 실구매가 계산 <span class="sub">견적서 금액을 넣어보세요</span></h2>
     <div class="field">
-      <label for="c-price">차량 가격 (옵션 포함, 만원)</label>
+      <label for="c-price">차량 기본가격 (옵션 제외, 만원)</label>
       <div class="input-suffix"><input class="input" id="c-price" type="number" inputmode="numeric" placeholder="예: 4890"><span class="sfx">만원</span></div>
+      <p class="small muted mt8">제조사가 정부에 신고한 <b>인증사양별 기본가격</b>을 넣으세요 — 옵션·색상·딜러 프로모션은 제외합니다.</p>
     </div>
     <div id="c-band-warn"></div>
     <div class="receipt" id="c-receipt" hidden></div>
-    <p class="small muted">· 취득세 감면(최대 140만원)·개별소비세 감면은 계약 조건에 따라 다릅니다 — <a href="law.html">세금 혜택 보기</a><br>· 가격 구간(5,300 / 8,500만원)을 넘으면 국비가 50% / 0%로 줄어요. 표시 금액은 참고용입니다.</p>
+    <p class="small muted">· 취득세 감면(최대 140만원)·개별소비세 감면은 계약 조건에 따라 다릅니다 — <a href="law.html">세금 혜택 보기</a><br>· 가격 구간은 <b>제조사가 신고한 인증사양별 기본가격</b> 기준입니다(옵션·색상·프로모션 제외). 기본가격이 5,300만원 이상이면 국비 50%, 8,500만원 이상이면 0원. 표시 금액은 참고용입니다.</p>
   </section>
 
   <div class="ad-slot" data-slot="car-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
