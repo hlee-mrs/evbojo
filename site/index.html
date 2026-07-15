@@ -14,9 +14,16 @@
 <meta property="og:type" content="website">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="canonical" href="https://evbojo.co.kr/">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","name":"EV보조금","url":"./","description":"전국 지자체 전기차 구매보조금 현황과 유지비 계산기"}
+{"@context":"https://schema.org","@graph":[
+{"@type":"WebSite","@id":"https://evbojo.co.kr/#website","name":"EV보조금","alternateName":"전기차 보조금 현황","url":"https://evbojo.co.kr/","inLanguage":"ko-KR","description":"2026년 전국 161개 지자체 전기차 구매보조금과 117개 차종 국비·지방비를 한눈에. 유지비 계산기 포함.","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://evbojo.co.kr/?q={search_term_string}"},"query-input":"required name=search_term_string"}},
+{"@type":"Organization","@id":"https://evbojo.co.kr/#org","name":"EV보조금","url":"https://evbojo.co.kr/","description":"국내 지자체 전기차 구매보조금 현황을 직관적으로 제공하는 개인 운영 정보 사이트","contactPoint":{"@type":"ContactPoint","contactType":"customer support","email":"hlee9108@gmail.com"}}
+]}
 </script>
+<meta name="naver-site-verification" content="29413de3319d0b4b5a504cdbb92084043d6d663b" />
+<meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
+<meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 </head>
 <body>
 <header id="site-header"></header>
@@ -181,9 +188,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const q = e.target.dataset && e.target.dataset.q;
     if (q) { document.getElementById('car-search').value = q; render(q); }
   });
-  // 초기 렌더: 저장된 지역이 있으면 지역 카드 + 지역가 리스트, 없으면 국비만 리스트
+  // 초기 렌더: ?q= 검색 딥링크(구글 SearchAction) 우선, 그다음 저장된 지역, 없으면 국비만 리스트
+  const initQ = qs('q');
   if (myRegion.get() && regions[myRegion.get()]) pickRegion(myRegion.get());
   else render('');
+  if (initQ) { const sb = document.getElementById('car-search'); sb.value = initQ; sb.focus(); render(initQ); }
 
   /* ── TOP10 랭킹 ── */
   const ranked = Object.entries(regions).filter(([cd]) => cd !== '9999')
