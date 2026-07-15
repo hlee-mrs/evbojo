@@ -40,8 +40,7 @@
   <section class="card center" style="border:2px solid var(--money)">
     <div style="font-size:40px">☕</div>
     <h2 style="margin:8px 0">커피 한 잔으로 응원하기</h2>
-    <p class="muted small">버튼을 누르면 안전한 결제 페이지로 이동합니다.</p>
-    <a class="btn btn-primary btn-block mt16" id="donate-domestic" href="#" target="_blank" rel="noopener" hidden></a>
+    <p class="muted small">Payoneer로 안전하게 후원할 수 있어요. 버튼을 누르면 결제 페이지로 이동합니다.</p>
     <a class="btn btn-primary btn-block mt16" id="donate-btn" href="#" target="_blank" rel="noopener">💛 Payoneer로 후원하기</a>
     <p class="small muted mt8" id="donate-note"></p>
   </section>
@@ -50,7 +49,7 @@
     <h2 class="mt0">후원 전에 알아두세요</h2>
     <ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px">
       <li>후원은 <b>대가 없는 자발적 후원</b>이에요. 별도의 상품·서비스 제공이나 환불은 없습니다.</li>
-      <li>결제는 각 결제사(토스·Payoneer 등)의 안전한 페이지에서 처리되며, 본 사이트는 <b>카드·계좌 정보를 받지 않습니다</b>.</li>
+      <li>결제는 Payoneer의 안전한 결제 페이지에서 처리되며, 본 사이트는 <b>카드·계좌 정보를 받지 않습니다</b>.</li>
       <li>세금계산서·현금영수증 등은 발행되지 않는 개인 간 후원입니다.</li>
     </ul>
     <div class="chips mt16">
@@ -65,38 +64,18 @@
 <script src="assets/js/app.js" defer></script>
 <script defer>
 document.addEventListener('DOMContentLoaded', () => {
-  const D = (window.SITE && SITE.donate) || {};
-  const dom = ((D.domestic && D.domestic.url) || '').trim();
-  const pay = (D.payoneerUrl || '').trim();
-  const domBtn = document.getElementById('donate-domestic');
-  const payBtn = document.getElementById('donate-btn');
+  const url = (window.SITE && SITE.donate && SITE.donate.payoneerUrl || '').trim();
+  const btn = document.getElementById('donate-btn');
   const note = document.getElementById('donate-note');
-
-  if (dom) {                                   // 국내 후원 = 주력 버튼
-    domBtn.hidden = false;
-    domBtn.href = dom;
-    domBtn.textContent = (D.domestic.label || '💙 국내에서 후원하기');
-  }
-  if (pay) {
-    payBtn.href = pay;
-    if (dom) {                                 // 국내가 있으면 해외는 보조 버튼으로 강등
-      payBtn.classList.remove('btn-primary'); payBtn.classList.add('btn-ghost');
-      payBtn.textContent = '🌏 해외에서 후원하기 (Payoneer · USD)';
-    }
+  if (url) {
+    btn.href = url;
+    note.textContent = 'Payoneer 결제 페이지로 이동합니다.';
   } else {
-    payBtn.hidden = true;
-  }
-  if (!dom && !pay) {                          // 둘 다 없으면 준비 중
-    payBtn.hidden = false;
-    payBtn.href = 'javascript:void(0)';
-    payBtn.classList.remove('btn-primary'); payBtn.classList.add('btn-ghost');
-    payBtn.style.pointerEvents = 'none'; payBtn.style.opacity = '.6';
-    payBtn.textContent = '후원 링크 준비 중이에요';
+    btn.href = 'javascript:void(0)';
+    btn.classList.remove('btn-primary'); btn.classList.add('btn-ghost');
+    btn.style.pointerEvents = 'none'; btn.style.opacity = '.6';
+    btn.textContent = '후원 링크 준비 중이에요';
     note.innerHTML = '곧 열려요! 문의: <a href="mailto:hlee9108@gmail.com">hlee9108@gmail.com</a>';
-  } else {
-    note.textContent = dom
-      ? ((D.domestic && D.domestic.note) || '국내·해외 모두 후원할 수 있어요.')
-      : 'Payoneer 결제 페이지로 이동합니다.';
   }
 });
 </script>
