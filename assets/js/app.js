@@ -101,38 +101,78 @@
   }
   window.renderCmpBar = renderCmpBar;
 
-  /* ── 접수 상태 판정 ──
-     잔여율 = 출고잔여 / 공고. 데이터 기준시각이 오래되면 중립 강등(fail-safe) */
-  window.statusBadge = function (st, statusUpdated) {
-    if (!st) return { cls: 'badge-closed', label: '현황 확인 필요', stale: true };
-    const ageDays = statusUpdated ? (Date.now() - new Date(statusUpdated).getTime()) / 864e5 : 99;
-    if (ageDays > SITE.staleDays) return { cls: 'badge-closed', label: '직접 확인 필요(데이터 오래됨)', stale: true };
-    if (st.left <= 0) return { cls: 'badge-closed', label: '잔여 소진(추가공고 확인)', stale: false };
-    const ratio = st.n ? st.left / st.n : 0;
-    if (st.left < 30 || ratio < 0.06) return { cls: 'badge-low', label: `마감 임박 · 잔여 ${fmt(st.left)}대`, stale: false };
-    return { cls: 'badge-open', label: `접수 중 · 잔여 ${fmt(st.left)}대`, stale: false };
-  };
-
   /* ── HTML 이스케이프 ── */
   window.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  /* ── 잔여물량 항목별(우선순위/법인·기관/택시/일반) 표시 ──
-     d.left 등 배열 순서 = ev.or.kr 표 순서: [우선순위, 법인·기관, 택시, 일반] */
-  window.CAT_INFO = [
-    ['일반', '일반 개인 구매자에게 배정된 물량이에요. 대부분의 신청자가 여기에 해당해요.', 3],
-    ['우선순위', '다자녀·차상위·기초수급, 생애최초 청년 등 우대 대상에게 우선 배정된 물량이에요. 해당 여부는 [자격 진단]에서 확인하세요.', 0],
-    ['법인·기관', '법인·공공기관·단체 명의 구매에 배정된 물량이에요. 개인 구매와는 별도 관리돼요.', 1],
-    ['택시', '전기택시(영업용) 전용 물량이에요. 개인 승용 신청과 무관해요.', 2],
+  /* ── 신청 유형 (잔여물량 배열 인덱스 = ev.or.kr 표 순서 [우선순위,법인·기관,택시,일반]) ──
+     표시 순서는 일반 우선(대부분의 사용자). key/idx로 매핑. */
+  window.CATS = [
+    { key: 'general',  label: '일반',      idx: 3, tip: '일반 개인 구매자에게 배정된 물량이에요. 대부분의 신청자가 여기에 해당해요.' },
+    { key: 'priority', label: '우선순위',  idx: 0, tip: '다자녀·차상위·기초수급, 생애최초 청년 등 우대 대상에게 우선 배정된 물량이에요. 해당 여부는 자격 진단에서 확인하세요.' },
+    { key: 'corp',     label: '법인·기관', idx: 1, tip: '법인·공공기관·단체 명의 구매에 배정된 물량이에요. 개인 구매와는 별도예요.' },
+    { key: 'taxi',     label: '택시',      idx: 2, tip: '전기택시(영업용) 전용 물량이에요. 개인 승용 신청과 무관해요.' },
   ];
-  window.splitHTML = function (d, key) {
-    if (!d || !d[key]) return '';
-    const v = d[key];
-    return '<div class="split-grid">' + CAT_INFO.map(([label, tip, idx]) => {
-      const n = v[idx];
-      const cls = n == null ? '' : (n > 0 ? 'pos' : 'zero');
-      return `<div class="split-item"><div class="split-label">${label}<button class="tip" type="button" data-tip="${esc(tip)}" aria-label="${label} 설명">?</button></div><b class="${cls}">${n == null ? '-' : fmt(n)}</b></div>`;
-    }).join('') + '</div>' +
-    `<p class="small muted" style="margin-top:6px">항목 합계가 '전체'와 다를 수 있어요<button class="tip" type="button" data-tip="본공고·추경 등 공고 회차가 나뉘어 운영되면 이월분 때문에 항목별 수치의 합과 전체 수치가 다를 수 있어요. ev.or.kr 원본 수치를 그대로 보여드립니다." aria-label="합계 차이 설명">?</button></p>`;
+  window.catByKey = k => CATS.find(c => c.key === k) || CATS[0];
+  window.myCategory = {
+    get() { try { return localStorage.getItem('ev.myCat') || 'general'; } catch (e) { return 'general'; } },
+    set(k) { try { localStorage.setItem('ev.myCat', k); } catch (e) {} },
+  };
+
+  /* ── 접수 상태 판정 ──
+     잔여율 = 출고잔여 / 공고. 데이터 기준시각이 오래되면 중립 강등(fail-safe).
+     catKey 지정 시 해당 신청 유형(일반/우선순위/…)의 잔여로 판정. */
+  window.statusBadge = function (st, statusUpdated, catKey) {
+    if (!st) return { cls: 'badge-closed', label: '현황 확인 필요', stale: true };
+    const ageDays = statusUpdated ? (Date.now() - new Date(statusUpdated).getTime()) / 864e5 : 99;
+    if (ageDays > SITE.staleDays) return { cls: 'badge-closed', label: '직접 확인 필요(데이터 오래됨)', stale: true };
+    let left = st.left, quota = st.n, pfx = '';
+    if (catKey && st.d && st.d.left) {
+      const c = catByKey(catKey);
+      left = st.d.left[c.idx];
+      quota = st.d.n ? st.d.n[c.idx] : null;
+      pfx = c.label + ' ';
+    }
+    if (left == null) return { cls: 'badge-closed', label: pfx + '물량 정보 없음', stale: false };
+    if (left <= 0) {
+      // 애초에 배정 물량이 없던 유형(공고량 0)은 '소진'이 아니라 '해당 없음'으로 구분
+      if (catKey && quota != null && quota <= 0) return { cls: 'badge-closed', label: pfx + '해당 물량 없음', stale: false };
+      return { cls: 'badge-closed', label: pfx + '잔여 소진(추가공고 확인)', stale: false };
+    }
+    const ratio = quota ? left / quota : 1;
+    if (left < 30 || ratio < 0.06) return { cls: 'badge-low', label: `${pfx}마감 임박 · 잔여 ${fmt(left)}대`, stale: false };
+    return { cls: 'badge-open', label: `${pfx}접수 중 · 잔여 ${fmt(left)}대`, stale: false };
+  };
+
+  /* ── 신청 유형 선택 바 ──
+     mount에 4개 유형 탭(잔여 미리보기 포함)을 렌더. 선택 시 유형을 저장하고 onChange(catKey) 호출.
+     status.d(항목별 데이터)가 없으면 아무것도 렌더하지 않음(구버전 데이터 호환). */
+  window.categoryBar = function (mount, st, onChange) {
+    if (!mount) return;
+    if (!st || !st.d || !st.d.left) { mount.innerHTML = ''; return; }
+    const cur = myCategory.get();
+    mount.innerHTML = `
+      <div class="cat-head">내 신청 유형 선택<button class="tip" type="button" data-tip="지자체는 물량을 신청 유형별로 나눠 배정해요. 내 유형의 잔여가 중요합니다 — 개인 구매자는 보통 '일반'(우대 대상이면 '우선순위')을 보세요." aria-label="신청 유형 설명">?</button></div>
+      <div class="cat-tabs">${CATS.map(c => {
+        const n = st.d.left[c.idx];
+        const state = n == null ? '' : (n > 0 ? 'has' : 'none');
+        // cat-tab은 div(role=button) — 내부에 tip <button>이 있어 button 중첩(무효 HTML)을 피함
+        return `<div class="cat-tab ${c.key === cur ? 'on' : ''} ${state}" data-cat="${c.key}" role="button" tabindex="0" aria-pressed="${c.key === cur}">
+          <span class="cat-nm">${c.label}<button class="tip" type="button" data-tip="${esc(c.tip)}" aria-label="${c.label} 설명">?</button></span>
+          <b>${n == null ? '-' : fmt(n) + '대'}</b></div>`;
+      }).join('')}</div>
+      <p class="small muted cat-note">숫자는 각 유형의 남은 물량이에요. 항목 합계는 '전체'와 다를 수 있어요<button class="tip" type="button" data-tip="본공고·추경 등 공고 회차가 나뉘면 이월분 때문에 항목 합계와 전체가 다를 수 있어요. ev.or.kr 원본 수치를 그대로 보여드립니다." aria-label="합계 차이 설명">?</button></p>`;
+    function selectTab(tab) {
+      myCategory.set(tab.dataset.cat);
+      mount.querySelectorAll('.cat-tab').forEach(b => { const on = b === tab; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+      onChange && onChange(tab.dataset.cat);
+    }
+    mount.querySelectorAll('.cat-tab').forEach(tab => {
+      tab.addEventListener('click', e => { if (e.target.closest('.tip')) return; selectTab(tab); });
+      tab.addEventListener('keydown', e => {
+        if (e.target.closest('.tip')) return;            // 툴팁에 포커스가 있으면 무시
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectTab(tab); }
+      });
+    });
   };
 
   /* ── 모델 그룹핑 (브랜드→차종→트림 선택용) ── */
@@ -265,8 +305,16 @@
       if (list.length === 1) { guSel.value = list[0][0]; guSel.dispatchEvent(new Event('change')); }
       else if (pick) guSel.value = pick;
     }
-    sidoSel.onchange = () => { fillGu(sidoSel.value); if (guSel.value && opts.onPick) opts.onPick(guSel.value, regions[guSel.value]); };
-    guSel.onchange = () => { if (guSel.value) { window.myRegion.set(guSel.value); opts.onPick && opts.onPick(guSel.value, regions[guSel.value]); } };
+    // 시·도 변경: 단일 지역이면 fillGu가 gu change를 발생시켜 onPick(valid) 호출.
+    // 다지역이면 gu가 미선택(빈값)으로 리셋되므로 onPick(null)로 '선택 해제'를 알려 화면을 갱신.
+    sidoSel.onchange = () => {
+      fillGu(sidoSel.value);
+      if (!guSel.value) opts.onPick && opts.onPick(null);
+    };
+    guSel.onchange = () => {
+      if (guSel.value) { window.myRegion.set(guSel.value); opts.onPick && opts.onPick(guSel.value, regions[guSel.value]); }
+      else opts.onPick && opts.onPick(null);
+    };
     const init = opts.value || window.myRegion.get();
     if (init && regions[init]) { sidoSel.value = regions[init].sido; fillGu(regions[init].sido, init); }
     return { get: () => guSel.value || null };

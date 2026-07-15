@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>지역별 전기차 보조금 | EV보조금</title>
 <meta name="description" content="우리 지역 2026년 전기차 차종별 보조금 — 국비+지방비 합계, 전환지원금, 접수 잔여현황, 담당부서 연락처까지.">
+<meta name="keywords" content="지역별 전기차 보조금, 시도별 전기차 보조금, 시군구 전기차 보조금, 우리동네 전기차 보조금, 지자체 보조금 조회, 전기차 잔여물량 조회">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
 </head>
@@ -93,10 +94,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   tEl.innerHTML = `${r.name} <span class="hl">전기차 보조금</span>`;
   document.getElementById('r-sub').textContent = `2026년 전기승용 기준 · 승용 최대 ${manwon(r.maxP)} · 경·소형 최대 ${manwon(r.maxS)}`;
 
-  const b = statusBadge(status, statusUpdated);
+  const badgeHTML = () => { const b = statusBadge(status, statusUpdated, myCategory.get()); return `<span class="badge ${b.cls}" style="font-size:14px;padding:6px 14px"><span class="dot"></span>${b.label}</span>`; };
   document.getElementById('r-status').innerHTML = `
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-      <span class="badge ${b.cls}" style="font-size:14px;padding:6px 14px"><span class="dot"></span>${b.label}</span>
+      <span id="r-badge">${badgeHTML()}</span>
       ${status ? `<span class="muted small">공고 ${fmt(status.n)}대 · 접수 ${fmt(status.a)} · 출고 ${fmt(status.r)}</span>` : ''}
     </div>
     ${status ? `<p class="small muted mt8">선정 방식: ${status.m}</p>` : ''}
@@ -105,11 +106,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('r-note').innerHTML =
       `<div class="callout callout-warn small" style="margin:10px 0 0">📢 <b>지자체 공지</b> · ${esc(status.note)}${status.note.length >= 140 ? '…' : ''}</div>`;
   }
-  if (status && status.d) {
-    document.getElementById('r-split').innerHTML =
-      `<p class="small" style="font-weight:800;margin-top:12px">항목별 잔여물량<button class="tip" type="button" data-tip="지자체는 물량을 신청 유형별로 나눠 배정해요. 내 유형의 잔여가 중요합니다 — 개인 구매자는 '일반'(우대 대상이면 '우선순위')을 보세요." aria-label="항목별 잔여물량 설명">?</button></p>` +
-      splitHTML(status.d, 'left');
-  }
+  categoryBar(document.getElementById('r-split'), status, () => {
+    const el = document.getElementById('r-badge'); if (el) el.innerHTML = badgeHTML();
+  });
   const telBtn = document.getElementById('r-tel-btn');
   if (/0000-?0000/.test(r.tel) || !r.tel) {
     telBtn.href = 'https://ev.or.kr/nportal/buySupprt/initPsLocalInquiriesAction.do';

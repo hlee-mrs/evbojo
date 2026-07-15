@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>전기차 보조금 2026 — 지자체별·차종별 한눈에 | EV보조금</title>
 <meta name="description" content="2026년 전국 161개 지자체 전기차 구매보조금과 117개 차종 국비·지방비를 한눈에. 접수 잔여현황, 실구매가, 유지비 계산까지 10초 만에 확인하세요.">
-<meta name="keywords" content="전기차 보조금, 전기차 보조금 조회, 2026 전기차 보조금, 지자체 전기차 보조금, 전기차 국비 보조금, 전기차 지방비, 전기차 유지비 계산기, 전기차 충전요금, 아이오닉5 보조금, EV6 보조금, EV3 보조금, 캐스퍼 일렉트릭 보조금, 테슬라 보조금">
+<meta name="keywords" content="전기차 보조금, 전기차 보조금 조회, 2026 전기차 보조금, 지자체 전기차 보조금, 시군구 전기차 보조금, 전기차 국비 보조금, 전기차 지방비, 전기차 보조금 현황, 전기차 잔여물량, 전기차 실구매가, 아이오닉5 보조금, 아이오닉6 보조금, EV6 보조금, EV3 보조금, EV4 보조금, 캐스퍼 일렉트릭 보조금, 코나 일렉트릭 보조금, 테슬라 모델Y 보조금, 테슬라 모델3 보조금, 니로EV 보조금, 토레스EVX 보조금">
 <meta property="og:title" content="전기차 보조금 2026 — 우리 지역 얼마 받나?">
 <meta property="og:description" content="161개 지자체 × 117개 차종 보조금 + 잔여물량 + 유지비 계산기">
 <meta property="og:type" content="website">
@@ -84,10 +84,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   /* ── 내 지역 카드 ── */
   const myBox = document.getElementById('my-region');
+  let currentCd = null;                 // 현재 선택된 지역 (없으면 null)
   function renderMyRegion(cd) {
     const r = regions[cd]; if (!r) { myBox.innerHTML = ''; return; }
     const st = status[cd];
-    const b = statusBadge(st, statusUpdated);
+    const badgeHTML = () => { const b = statusBadge(st, statusUpdated, myCategory.get()); return `<span class="badge ${b.cls}"><span class="dot"></span>${b.label}</span>`; };
     const bestP = Math.max(...r.v.map((v, i) => v && cars[i].cls === 'P' && !cars[i].disc ? cars[i].nat + v[0] : 0));
     myBox.innerHTML = `
       <div class="callout-green callout" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
@@ -95,24 +96,33 @@ document.addEventListener('DOMContentLoaded', async () => {
           <b>${r.name}</b> 승용 최대 <b class="money-l">${manwon(bestP)}</b>
           <div class="small muted mt8">${st ? '접수방법: ' + st.m : ''}</div>
         </div>
-        <span class="badge ${b.cls}"><span class="dot"></span>${b.label}</span>
+        <span id="mr-badge">${badgeHTML()}</span>
       </div>
-      ${st && st.d ? splitHTML(st.d, 'left') : ''}
+      ${st && st.note ? `<div class="callout callout-warn small" style="margin:10px 0 0">📢 <b>지자체 공지</b> · ${esc(st.note)}${st.note.length >= 140 ? '…' : ''}</div>` : ''}
+      <div id="mr-cats"></div>
       <div class="grid2 mt8">
         <a class="btn btn-primary" href="region.html?cd=${cd}">차종별 보조금 전체 보기</a>
         <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">실시간 잔여 확인 ↗</a>
       </div>
       <p class="stamp">📞 ${r.dept}${/0000-?0000/.test(r.tel) ? '' : ' ' + r.tel} · 잔여현황 기준 ${statusUpdated ? new Date(statusUpdated).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'numeric'}) : '-'} · 단가 기준 ${meta.updated}</p>`;
+    categoryBar(document.getElementById('mr-cats'), st, () => {
+      const el = document.getElementById('mr-badge'); if (el) el.innerHTML = badgeHTML();
+    });
   }
-  regionPicker(document.getElementById('region-picker'), { onPick: cd => renderMyRegion(cd) });
-  if (myRegion.get() && regions[myRegion.get()]) renderMyRegion(myRegion.get());
+  // 지역 선택 시: 카드 + 차량 리스트 가격을 함께 갱신 (cd=null이면 초기화)
+  function pickRegion(cd) {
+    currentCd = cd && regions[cd] ? cd : null;
+    renderMyRegion(currentCd);
+    const sb = document.getElementById('car-search');
+    render(sb ? sb.value.trim() : '');   // 현재 검색어 유지한 채 지역가 반영
+  }
+  regionPicker(document.getElementById('region-picker'), { onPick: pickRegion });
 
   /* ── 차종 리스트/검색 ── */
   const listEl = document.getElementById('car-list');
   const moreBtn = document.getElementById('more-cars');
-  const myCd = () => myRegion.get() && regions[myRegion.get()] ? myRegion.get() : null;
   function total(c) {
-    const cd = myCd();
+    const cd = currentCd;
     if (cd && regions[cd].v[c.id]) return { amt: c.nat + regions[cd].v[c.id][0], label: regions[cd].name + ' 기준' };
     return { amt: c.nat, label: '국비만 · 지역 선택 시 합산' };
   }
@@ -152,7 +162,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const q = e.target.dataset && e.target.dataset.q;
     if (q) { document.getElementById('car-search').value = q; render(q); }
   });
-  render('');
+  // 초기 렌더: 저장된 지역이 있으면 지역 카드 + 지역가 리스트, 없으면 국비만 리스트
+  if (myRegion.get() && regions[myRegion.get()]) pickRegion(myRegion.get());
+  else render('');
 
   /* ── TOP10 랭킹 ── */
   const ranked = Object.entries(regions).filter(([cd]) => cd !== '9999')

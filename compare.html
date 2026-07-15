@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>전기차 비교 — 보조금·주행거리·유지비 | EV보조금</title>
 <meta name="description" content="전기차 최대 3대를 나란히 비교 — 지역 보조금 합계, 겨울 주행거리, 배터리, 연간 충전비까지.">
+<meta name="keywords" content="전기차 비교, 전기차 보조금 비교, 전기차 주행거리 비교, 전기차 유지비 비교, 전기차 배터리 비교, 전기차 트림 비교">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
 </head>
@@ -84,7 +85,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       <tr><td></td>${list.map(c => `<td><a class="btn btn-primary btn-s" href="car.html?id=${c.id}&cd=${cd}">상세 →</a></td>`).join('')}</tr>`;
     document.getElementById('cp-note').textContent = `보조금: 2026년 ${regions[cd].name} 단가 기준(${meta.updated}) · 충전비: 집밥60%/급속40%·겨울보정 포함 추정치`;
   }
-  regionPicker(document.getElementById('cp-picker'), { value: cd, onPick: c => { cd = c; render(); } });
+  // 시·도만 바꾸는 중(c=null)에는 기존 지역 유지, 유효한 시·군·구를 고를 때만 갱신
+  regionPicker(document.getElementById('cp-picker'), { value: cd, onPick: c => { if (c) { cd = c; render(); } } });
   addSel.addEventListener('change', () => { if (addSel.value) { cmpBasket.toggle(+addSel.value); addSel.value = ''; render(); } });
   document.getElementById('cp-table').addEventListener('click', e => {
     const d = e.target.dataset && e.target.dataset.del;
