@@ -15,7 +15,7 @@
     ads: {
       enabled: false,
       provider: 'adsense',                    // 'adsense' | 'adfit'
-      client: 'ca-pub-XXXXXXXXXXXXXXXX',      // AdSense 게시자 ID
+      client: 'ca-pub-7688026325140831',      // AdSense 게시자 ID (metlit 계정)
       adfitUnits: {                           // 애드핏: 슬롯이름 → 광고단위 ID (예: 'DAN-xxxxxxxx')
         // 'home-1': 'DAN-XXXXXXXX', 'region-1': 'DAN-XXXXXXXX', ...
       },
