@@ -52,6 +52,13 @@
     <button class="btn btn-ghost btn-block mt8" id="more-cars" hidden>차종 전체 보기</button>
   </section>
 
+  <!-- 승용 보조금 TOP 3 — 순위는 전국 공통(국비 동일), 금액만 지역별로 다름 -->
+  <section class="card" id="top3-card" hidden aria-label="승용 보조금 TOP 3">
+    <h2 class="mt0">🏆 승용 보조금 TOP 3 <span class="sub">국비+지방비 합계</span></h2>
+    <div class="rowlist" id="top3-list"></div>
+    <p class="small muted mt8" id="top3-note"></p>
+  </section>
+
   <div class="ad-slot" data-slot="home-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
 
   <!-- 보조금 랭킹 -->
@@ -98,7 +105,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const myBox = document.getElementById('my-region');
   let currentCd = null;                 // 현재 선택된 지역 (없으면 null)
   function renderMyRegion(cd) {
-    const r = regions[cd]; if (!r) { myBox.innerHTML = ''; return; }
+    const r = regions[cd];
+    if (!r) {                                   // 지역 해제 → 내 지역 카드와 TOP3 카드 모두 정리
+      myBox.innerHTML = '';
+      const t3 = document.getElementById('top3-card'); if (t3) t3.hidden = true;
+      return;
+    }
     const st = status[cd];
     const badgeHTML = () => { const b = statusBadge(st, statusUpdated, myCategory.get()); return `<span class="badge ${b.cls}"><span class="dot"></span>${b.label}</span>`; };
     // 승용 보조금 TOP 3 — 모델 그룹별 최고 트림(국비+지방비 합계)
@@ -124,15 +136,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <span id="mr-badge">${badgeHTML()}</span>
       </div>
-      ${st && st.note ? `<div class="callout callout-warn small" style="margin:10px 0 0">📢 <b>지자체 공지</b> · ${esc(st.note)}${st.note.length >= 140 ? '…' : ''}</div>` : ''}
-      <div style="font-weight:800;font-size:14.5px;margin:14px 0 2px">🏆 ${r.name} 승용 보조금 TOP 3 <span class="small muted" style="font-weight:500">국비+지방비 합계</span></div>
-      <div class="rowlist">${top3HTML}</div>
+      <div id="mr-note"></div>
       <div id="mr-cats"></div>
       <div class="grid2 mt8">
         <a class="btn btn-primary" href="region.html?cd=${cd}">차종별 보조금 전체 보기</a>
         <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">실시간 잔여 확인 ↗</a>
       </div>
       <p class="stamp">📞 ${r.dept}${/0000-?0000/.test(r.tel) ? '' : ' ' + r.tel} · 잔여현황 기준 ${statusUpdated ? new Date(statusUpdated).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'numeric'}) : '-'} · 단가 기준 ${meta.updated}</p>`;
+    // 지자체 공지 — 원문 전체. 긴 글만 더보기/접기 (과거: 140자 이상이면 멀쩡한 글에도 가짜 '…'를 붙였음)
+    if (st && st.note) {
+      const LIMIT = 180, full = st.note, long = full.length > LIMIT, clip = full.slice(0, LIMIT) + '…';
+      document.getElementById('mr-note').innerHTML =
+        `<div class="callout callout-warn small" style="margin:10px 0 0">📢 <b>지자체 공지</b> · <span id="note-body">${esc(long ? clip : full)}</span>` +
+        (long ? `<button type="button" id="note-toggle" style="background:none;border:0;color:var(--primary);font:inherit;font-weight:700;cursor:pointer;padding:0 0 0 6px;text-decoration:underline">더보기</button>` : '') +
+        `</div>`;
+      if (long) {
+        const body = document.getElementById('note-body'), btn = document.getElementById('note-toggle');
+        let open = false;
+        btn.addEventListener('click', () => {
+          open = !open;
+          body.textContent = open ? full : clip;      // textContent = 자동 이스케이프
+          btn.textContent = open ? '접기' : '더보기';
+        });
+      }
+    }
+    // 승용 TOP 3 — '차종으로 찾기' 아래 별도 카드로 분리.
+    // 순위는 국비가 전국 동일해서 84개 분석지역 중 83곳(99%)이 같음 → 지역명을 제목에 붙이지 않음(지역별로 다른 것처럼 오해 유발)
+    document.getElementById('top3-list').innerHTML = top3HTML;
+    document.getElementById('top3-note').textContent =
+      `순위는 전국 대부분 지역이 같아요(국비가 동일해서요). 금액은 ${r.name} 기준 국비+지방비 합계입니다.`;
+    document.getElementById('top3-card').hidden = false;
     categoryBar(document.getElementById('mr-cats'), st, () => {
       const el = document.getElementById('mr-badge'); if (el) el.innerHTML = badgeHTML();
     });
