@@ -25,7 +25,13 @@
     // Payoneer '결제 요청(Request a Payment)' 링크를 넣으면 후원 버튼이 활성화됨.
     //   Payoneer 로그인 → 받기(Get Paid) → 결제 요청 링크 생성 → 그 URL을 아래에 붙여넣기
     donate: {
-      payoneerUrl: 'https://link.payoneer.com/Token?t=BC4B67FF13CD4007A359F1F7E8BB9EA9&src=pl',  // 지급인이 금액 입력(USD)
+      payoneerUrl: 'https://link.payoneer.com/Token?t=BC4B67FF13CD4007A359F1F7E8BB9EA9&src=pl',  // 해외: 지급인이 금액 입력(USD)
+      // 국내 후원(토스/카카오페이 등): url만 채우면 버튼이 자동으로 뜨고, Payoneer는 보조 버튼으로 내려감
+      domestic: {
+        url: '',                               // 예: 'https://toss.me/...'  (비워두면 버튼 숨김)
+        label: '💙 토스로 후원하기',
+        note: '국내는 토스, 해외는 Payoneer로 후원할 수 있어요.',
+      },
     },
     staleDays: 14,
   };
