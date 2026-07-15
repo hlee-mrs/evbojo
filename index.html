@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         <span class="badge ${b.cls}"><span class="dot"></span>${b.label}</span>
       </div>
+      ${st && st.d ? splitHTML(st.d, 'left') : ''}
       <div class="grid2 mt8">
         <a class="btn btn-primary" href="region.html?cd=${cd}">차종별 보조금 전체 보기</a>
         <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">실시간 잔여 확인 ↗</a>
@@ -129,8 +130,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   function render(q) {
     let list = cars.filter(c => !c.disc);
     if (q) {
-      const nq = norm(q);
-      list = list.filter(c => norm(c.name + c.maker + makerShort(c.maker)).includes(nq));
+      const toks = q.split(/\s+/).filter(Boolean).map(norm);
+      list = list.filter(c => { const hay = norm(c.name + c.maker + makerShort(c.maker) + modelGroup(c)); return toks.every(t => hay.includes(t)); });
       listEl.innerHTML = list.slice(0, 30).map(carRow).join('') || '<p class="muted" style="padding:14px 4px">검색 결과가 없어요. 다른 이름으로 검색해보세요 (예: 아이오닉, EV3, 모델Y)</p>';
       moreBtn.hidden = true;
     } else if (expanded) {
