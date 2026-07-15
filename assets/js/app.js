@@ -8,8 +8,19 @@
   const SITE = {
     name: 'EV보조금',
     tagline: '전기차 구매보조금 한눈에',
-    // 광고: AdSense 승인 후 pub ID 입력하고 enabled:true 로 바꾸면 전체 슬롯 활성화
-    ads: { enabled: false, provider: 'adsense', client: 'ca-pub-XXXXXXXXXXXXXXXX' },
+    // ── 광고 설정 ─────────────────────────────────────────
+    // 1) 카카오 애드핏 승인 후: provider:'adfit' + adfitUnits에 슬롯별 광고단위 ID 입력 + enabled:true
+    // 2) AdSense 승인 후:      provider:'adsense' + client에 본인 ca-pub ID 입력 + enabled:true
+    //    (각 페이지 슬롯의 data-ad-slot 번호는 AdSense 광고단위 생성 후 기입)
+    ads: {
+      enabled: false,
+      provider: 'adsense',                    // 'adsense' | 'adfit'
+      client: 'ca-pub-XXXXXXXXXXXXXXXX',      // AdSense 게시자 ID
+      adfitUnits: {                           // 애드핏: 슬롯이름 → 광고단위 ID (예: 'DAN-xxxxxxxx')
+        // 'home-1': 'DAN-XXXXXXXX', 'region-1': 'DAN-XXXXXXXX', ...
+      },
+      adfitSize: { width: 320, height: 100 }, // 애드핏 반응형 미지원 → 모바일 배너 기준
+    },
     staleDays: 14,
   };
   window.SITE = SITE;
@@ -175,10 +186,23 @@
         box.style.border = 'none';
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       });
+    } else if (SITE.ads.enabled && SITE.ads.provider === 'adfit') {
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://t1.daumcdn.net/kas/static/ba.min.js';
+      document.head.appendChild(s);
+      slots.forEach(slot => {
+        const unit = SITE.ads.adfitUnits[slot.dataset.slot];
+        const box = slot.querySelector('.ad-box');
+        if (!unit || !box) return;
+        box.innerHTML = `<ins class="kakao_ad_area" style="display:none" data-ad-unit="${unit}" data-ad-width="${SITE.ads.adfitSize.width}" data-ad-height="${SITE.ads.adfitSize.height}"></ins>`;
+        box.style.border = 'none';
+        box.style.minHeight = SITE.ads.adfitSize.height + 'px';
+      });
     } else {
       slots.forEach(slot => {
         const box = slot.querySelector('.ad-box');
-        if (box && !box.textContent.trim()) box.textContent = '광고 영역 (AdSense 승인 후 표시됩니다)';
+        if (box && !box.textContent.trim()) box.textContent = '광고 영역 (광고 승인 후 표시됩니다)';
       });
     }
   }
