@@ -102,7 +102,7 @@ def scrape_status(page):
       return [...t.querySelectorAll('tbody tr')].map(tr => {
         const c = [...tr.querySelectorAll('td,th')].map(x => x.textContent.replace(/\s+/g,' ').trim());
         const n = parse(c[5]), a = parse(c[6]), r = parse(c[7]), l = parse(c[8]);
-        const note = (c[9]||'').slice(0,140);
+        const note = (c[9]||'').slice(0,2000);   // 원문 보존(과거 140자 절단 버그). 2000자는 비정상 데이터 방어용 상한
         return { name: c[1], m: (c[4]||'').replace('*일반: ','일반 ').replace('*우선: ',' · 우선 '),
                  n: n.t, a: a.t, r: r.t, left: l.t,
                  d: (n.b||a.b||r.b||l.b) ? { n: n.b, a: a.b, r: r.b, left: l.b } : null,
