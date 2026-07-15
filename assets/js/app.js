@@ -232,7 +232,7 @@
         <a href="about.html">사이트 소개</a><a href="privacy.html">개인정보처리방침</a>
         <a href="donate.html">💛 후원하기</a>
         <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
-        <a href="mailto:hlee9108@gmail.com">오류 제보</a>
+        <a href="report.html">오류 제보</a>
       </div>
       <div id="foot-stamp"></div>
       <div class="disclaimer">
