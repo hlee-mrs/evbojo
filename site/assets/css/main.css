@@ -251,3 +251,17 @@ input[type=range]{flex:1;accent-color:var(--primary);height:32px}
 #k-suggest{position:relative;z-index:30}
 #k-suggest .row{cursor:pointer}
 #k-suggest:not(:empty){border:1px solid var(--line);border-radius:var(--radius-s);margin-top:6px;max-height:280px;overflow-y:auto;background:var(--surface)}
+
+/* ── 신청 유형 선택 바 (우선순위/법인·기관/택시/일반 직접 선택) ── */
+.cat-head{font-size:13px;font-weight:800;margin:12px 0 6px;display:flex;align-items:center;color:var(--text2)}
+.cat-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:480px){.cat-tabs{grid-template-columns:repeat(2,1fr)}}
+.cat-tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:11px 8px;border:1.5px solid var(--line);border-radius:var(--radius-s);background:var(--surface);transition:.12s;text-align:center}
+.cat-tab .cat-nm{font-size:12.5px;font-weight:700;color:var(--text2);display:flex;align-items:center;white-space:nowrap}
+.cat-tab b{font-size:16px;font-variant-numeric:tabular-nums;color:var(--text3);font-weight:800}
+.cat-tab.has b{color:var(--money)}
+.cat-tab.none b{color:var(--text3)}
+.cat-tab:hover{border-color:var(--primary)}
+.cat-tab.on{border-color:var(--primary);background:var(--primary-soft);box-shadow:0 0 0 1px var(--primary) inset}
+.cat-tab.on .cat-nm{color:var(--primary)}
+.cat-note{margin-top:6px}
