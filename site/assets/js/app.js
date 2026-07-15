@@ -125,6 +125,7 @@
     if (!st) return { cls: 'badge-closed', label: '현황 확인 필요', stale: true };
     const ageDays = statusUpdated ? (Date.now() - new Date(statusUpdated).getTime()) / 864e5 : 99;
     if (ageDays > SITE.staleDays) return { cls: 'badge-closed', label: '직접 확인 필요(데이터 오래됨)', stale: true };
+    const regionClosed = (st.left != null && st.left <= 0);   // 지역 전체 소진 여부
     let left = st.left, quota = st.n, pfx = '';
     if (catKey && st.d && st.d.left) {
       const c = catByKey(catKey);
@@ -138,6 +139,9 @@
       if (catKey && quota != null && quota <= 0) return { cls: 'badge-closed', label: pfx + '해당 물량 없음', stale: false };
       return { cls: 'badge-closed', label: pfx + '잔여 소진(추가공고 확인)', stale: false };
     }
+    // 지역 전체가 소진됐는데 특정 유형에만 이월 잔여가 남은 경우: 초록 '접수 중'이 아니라 마감 맥락으로 표기.
+    // (ev.or.kr 회차 이월로 항목 잔여 > 0 이지만 실제 접수는 마감된 상태 — 오인 방지)
+    if (catKey && regionClosed) return { cls: 'badge-low', label: `${pfx}전체 마감 · 유형 잔여 ${fmt(left)}대(추가공고 확인)`, stale: false };
     const ratio = quota ? left / quota : 1;
     if (left < 30 || ratio < 0.06) return { cls: 'badge-low', label: `${pfx}마감 임박 · 잔여 ${fmt(left)}대`, stale: false };
     return { cls: 'badge-open', label: `${pfx}접수 중 · 잔여 ${fmt(left)}대`, stale: false };
