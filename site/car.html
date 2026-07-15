@@ -97,6 +97,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   nameEl.classList.remove('skeleton');
   nameEl.textContent = car.name;
 
+  /* SEO: canonical은 지역(cd) 변형을 대표 URL(?id=)로 정규화 + 설명·브레드크럼 주입 */
+  const cid = cars[id] ? id : 0;
+  const pageUrl = `https://evbojo.co.kr/car.html?id=${cid}`;
+  const canon = document.querySelector('link[rel="canonical"]') || document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'canonical' }));
+  canon.href = pageUrl;
+  const descEl = document.querySelector('meta[name="description"]');
+  if (descEl) descEl.content = `${car.name} 2026년 보조금 — 국비 ${manwon(car.nat)}, 지역별 지방비 합계와 실구매가, 접수 현황까지 한눈에.`;
+  const bc = document.createElement('script'); bc.type = 'application/ld+json';
+  bc.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
+    { '@type': 'ListItem', 'position': 1, 'name': '홈', 'item': 'https://evbojo.co.kr/' },
+    { '@type': 'ListItem', 'position': 2, 'name': `${car.name} 보조금`, 'item': pageUrl }] });
+  document.head.appendChild(bc);
+
   /* 보조금 표시 */
   function renderSubsidy() {
     const v = cd && regions[cd].v[id];
