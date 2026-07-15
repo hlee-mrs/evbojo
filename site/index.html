@@ -89,16 +89,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     const r = regions[cd]; if (!r) { myBox.innerHTML = ''; return; }
     const st = status[cd];
     const badgeHTML = () => { const b = statusBadge(st, statusUpdated, myCategory.get()); return `<span class="badge ${b.cls}"><span class="dot"></span>${b.label}</span>`; };
-    const bestP = Math.max(...r.v.map((v, i) => v && cars[i].cls === 'P' && !cars[i].disc ? cars[i].nat + v[0] : 0));
+    // 승용 보조금 TOP 3 — 모델 그룹별 최고 트림(국비+지방비 합계)
+    const byGroup = {};
+    cars.forEach((c, i) => {
+      // 일반 승용만: 단종·미지원 제외, WAV(휠체어 복지차량 특수 보조금)는 일반 TOP에서 제외
+      if (c.cls !== 'P' || c.disc || !r.v[i] || /WAV/i.test(c.name)) return;
+      const g = modelGroup(c), tot = c.nat + r.v[i][0];
+      if (!byGroup[g] || tot > byGroup[g].tot) byGroup[g] = { c, tot };
+    });
+    const top3 = Object.values(byGroup).sort((a, b) => b.tot - a.tot).slice(0, 3);
+    const medal = ['🥇', '🥈', '🥉'];
+    const top3HTML = top3.map((t, i) => `
+      <a class="row" href="car.html?id=${t.c.id}&cd=${cd}">
+        <div class="grow"><div class="tit">${medal[i]} ${t.c.name}</div>
+        <div class="desc">${makerShort(t.c.maker)} · 국비 ${manwon(t.c.nat)} + 지방비 ${manwon(r.v[t.c.id][0])}</div></div>
+        <div class="amt">${manwon(t.tot)}</div></a>`).join('');
     myBox.innerHTML = `
       <div class="callout-green callout" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
         <div style="flex:1;min-width:200px">
-          <b>${r.name}</b> 승용 최대 <b class="money-l">${manwon(bestP)}</b>
+          <b style="font-size:17px">${r.name}</b>
           <div class="small muted mt8">${st ? '접수방법: ' + st.m : ''}</div>
         </div>
         <span id="mr-badge">${badgeHTML()}</span>
       </div>
       ${st && st.note ? `<div class="callout callout-warn small" style="margin:10px 0 0">📢 <b>지자체 공지</b> · ${esc(st.note)}${st.note.length >= 140 ? '…' : ''}</div>` : ''}
+      <div style="font-weight:800;font-size:14.5px;margin:14px 0 2px">🏆 ${r.name} 승용 보조금 TOP 3 <span class="small muted" style="font-weight:500">국비+지방비 합계</span></div>
+      <div class="rowlist">${top3HTML}</div>
       <div id="mr-cats"></div>
       <div class="grid2 mt8">
         <a class="btn btn-primary" href="region.html?cd=${cd}">차종별 보조금 전체 보기</a>
