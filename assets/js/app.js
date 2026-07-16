@@ -13,9 +13,15 @@
     // 2) AdSense 승인 후:      provider:'adsense' + client에 본인 ca-pub ID 입력 + enabled:true
     //    (각 페이지 슬롯의 data-ad-slot 번호는 AdSense 광고단위 생성 후 기입)
     ads: {
-      enabled: false,
+      enabled: true,
       provider: 'adsense',                    // 'adsense' | 'adfit'
       client: 'ca-pub-7688026325140831',      // AdSense 게시자 ID (metlit 계정)
+      // AdSense 광고단위 ID. 슬롯 이름이 '-2'로 끝나면 하단, 그 외는 상단 단위를 씀
+      // (16개 자리마다 단위를 만들면 관리가 불가능 → 상단/하단 2개로 성과만 구분)
+      adUnits: {
+        top: '5347890513',                    // EV보조금 - 본문 상단
+        bottom: '7246727325',                 // EV보조금 - 본문 하단
+      },
       adfitUnits: {                           // 애드핏: 슬롯이름 → 광고단위 ID (예: 'DAN-xxxxxxxx')
         // 'home-1': 'DAN-XXXXXXXX', 'region-1': 'DAN-XXXXXXXX', ...
       },
@@ -265,17 +271,20 @@
     const slots = $$('.ad-slot');
     if (!slots.length) return;
     if (SITE.ads.enabled && SITE.ads.provider === 'adsense') {
-      const s = document.createElement('script');
-      s.async = true;
-      s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${SITE.ads.client}`;
-      s.crossOrigin = 'anonymous';
-      document.head.appendChild(s);
+      // adsbygoogle.js 는 각 페이지 <head> 에 이미 있음 → 여기서 다시 주입하지 않음(중복 로드 방지)
       slots.forEach(slot => {
         const box = slot.querySelector('.ad-box');
-        const adId = slot.dataset.adSlot || '';
+        if (!box) return;
+        const adId = /-2$/.test(slot.dataset.slot || '') ? SITE.ads.adUnits.bottom : SITE.ads.adUnits.top;
+        if (!adId) return;                                   // 단위 ID 없으면 아무것도 안 함
         box.innerHTML = `<ins class="adsbygoogle" style="display:block;width:100%" data-ad-client="${SITE.ads.client}" data-ad-slot="${adId}" data-ad-format="auto" data-full-width-responsive="true"></ins>`;
         box.style.border = 'none';
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+        // 광고가 안 채워지면(미승인·재고없음) 빈 'AD' 박스가 남지 않게 자리째 숨김
+        const ins = box.querySelector('ins');
+        const hideIfUnfilled = () => { if (ins.getAttribute('data-ad-status') === 'unfilled') slot.style.display = 'none'; };
+        new MutationObserver(hideIfUnfilled).observe(ins, { attributes: true, attributeFilter: ['data-ad-status'] });
+        setTimeout(() => { if (!ins.getAttribute('data-ad-status')) slot.style.display = 'none'; }, 4000);
       });
     } else if (SITE.ads.enabled && SITE.ads.provider === 'adfit') {
       const s = document.createElement('script');
