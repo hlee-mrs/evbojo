@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 순위는 국비가 전국 동일해서 84개 분석지역 중 83곳(99%)이 같음 → 지역명을 제목에 붙이지 않음(지역별로 다른 것처럼 오해 유발)
     document.getElementById('top3-list').innerHTML = top3HTML;
     document.getElementById('top3-note').textContent =
-      `순위는 전국 대부분 지역이 같아요(국비가 동일해서요). 금액은 ${r.name} 기준 국비+지방비 합계입니다.`;
+      `${r.name}의 차종별 지방비를 반영해 계산한 국비+지방비 합계예요. 지역을 바꾸면 금액도 그 지역 기준으로 다시 계산됩니다.`;
     document.getElementById('top3-card').hidden = false;
     categoryBar(document.getElementById('mr-cats'), st, () => {
       const el = document.getElementById('mr-badge'); if (el) el.innerHTML = badgeHTML();
