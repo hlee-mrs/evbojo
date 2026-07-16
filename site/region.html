@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   categoryBar(document.getElementById('r-split'), status, () => {
     const el = document.getElementById('r-badge'); if (el) el.innerHTML = badgeHTML();
-  });
+  }, { cd, updated: statusUpdated });
   const telBtn = document.getElementById('r-tel-btn');
   if (/0000-?0000/.test(r.tel) || !r.tel) {
     telBtn.href = 'https://ev.or.kr/nportal/buySupprt/initPsLocalInquiriesAction.do';
