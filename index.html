@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('top3-card').hidden = false;
     categoryBar(document.getElementById('mr-cats'), st, () => {
       const el = document.getElementById('mr-badge'); if (el) el.innerHTML = badgeHTML();
-    });
+    }, { cd, updated: statusUpdated });
   }
   // 지역 선택 시: 카드 + 차량 리스트 가격을 함께 갱신 (cd=null이면 초기화)
   function pickRegion(cd) {
