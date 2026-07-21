@@ -1,0 +1,27 @@
+# EV보조금 자동 수집기 — NAS(Container Manager)용, 24시간 실행
+# 배치 위치: NAS의 /volume1/docker/evbojo/ 아래에 이 파일 + keys/ + logs/ + repo/(자동 생성)
+#
+# 이미지: Playwright 공식(브라우저 내장, x86_64 전용 — ARM 시놀로지 불가)
+# 최초 기동 시 repo가 비어 있으면 GitHub에서 clone 후 루프 시작.
+services:
+  evbojo-updater:
+    image: mcr.microsoft.com/playwright/python:v1.49.1-jammy
+    container_name: evbojo-updater
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Seoul
+      - GIT_SSH_COMMAND=ssh -i /keys/deploy_key -o StrictHostKeyChecking=accept-new
+    volumes:
+      - ./repo:/repo
+      - ./keys:/keys:ro
+      - ./logs:/logs
+    entrypoint:
+      - bash
+      - -c
+      - >
+        if [ ! -d /repo/.git ]; then
+        git clone git@github.com:hlee-mrs/evbojo.git /repo || { echo 'clone 실패'; sleep 60; exit 1; };
+        fi;
+        exec bash /repo/deploy/nas/loop.sh
+    mem_limit: 2g
+    cpus: 1.5
