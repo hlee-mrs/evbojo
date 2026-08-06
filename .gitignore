@@ -1,5 +1,8 @@
 site/data/*.bak
 updater/updater.log
 updater/.last_full
+updater/auto.log
+updater/launchd.log
+updater/.auto.lock/
 .DS_Store
 .claude/

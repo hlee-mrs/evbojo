@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.evbojo.updater</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/hlee/Projects/전기차 보조금 현황/updater/run_auto.sh</string>
+  </array>
+  <!-- 매시 10분. 잠자던 중 놓친 회차는 깨어날 때 1회로 합쳐 실행됨(launchd 기본 동작) -->
+  <key>StartCalendarInterval</key>
+  <dict><key>Minute</key><integer>10</integer></dict>
+  <key>RunAtLoad</key><false/>
+  <key>StandardOutPath</key><string>/Users/hlee/Projects/전기차 보조금 현황/updater/launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/hlee/Projects/전기차 보조금 현황/updater/launchd.log</string>
+</dict>
+</plist>

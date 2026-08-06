@@ -1,7 +1,8 @@
 # ⚡ EV보조금 — 전국 전기차 구매보조금 현황 사이트
 
 2026년 전국 **161개 지자체 × 117개 전기승용 모델**의 구매보조금(국비+지방비+전환지원금)과
-접수 잔여현황을 한눈에 보여주는 정적 웹사이트. NAS에서 서빙하며 **매시간 자동 갱신**됩니다.
+접수 잔여현황을 한눈에 보여주는 정적 웹사이트. **GitHub Pages + Cloudflare(https://evbojo.co.kr)** 로 서빙하며,
+이 Mac의 launchd 잡이 **매시간 자동 수집·배포**합니다(docs/6 참고. NAS/docker 구성은 대안 경로).
 
 - 데이터 출처: 무공해차 통합누리집(ev.or.kr) — 2026-07-15 전량 실측 수집
 - 검증: 계산된 지역별 최대보조금이 ev.or.kr 공식 요약표와 **161/161 일치**
@@ -20,9 +21,9 @@ site/            ← 웹루트 (이 폴더만 서빙하면 됨)
   about.html · privacy.html · 404.html · sitemap.xml · robots.txt · ads.txt
   assets/          css/js (프레임워크 없음, 시스템 폰트 — 빠름)
   data/            cars.json · regions.json · status.json · meta.json
-updater/         자동 갱신기 (Playwright — ev.or.kr 웹방화벽 대응)
-deploy/          docker-compose.yml + nginx.conf (NAS용)
-docs/            1-NAS배포 · 2-도메인연결 · 3-수익화 가이드
+updater/         자동 갱신기 (Playwright — ev.or.kr 웹방화벽 대응) + run_auto.sh (launchd 진입점)
+deploy/          docker-compose.yml + nginx.conf (NAS용) · launchd/ (현행 Mac 자동화 plist)
+docs/            1-NAS배포 · 2-도메인 · 3-수익화 · 4-보안 · 5-검색등록 · 6-자동화 운영
 ```
 
 ## 빠른 시작
