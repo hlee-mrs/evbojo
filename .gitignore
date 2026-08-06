@@ -4,5 +4,10 @@ updater/.last_full
 updater/auto.log
 updater/launchd.log
 updater/.auto.lock/
+updater/secrets/
+updater/reports/
+updater/gsc_report.log
+updater/gsc_launchd.log
+updater/.gsc.lock/
 .DS_Store
 .claude/

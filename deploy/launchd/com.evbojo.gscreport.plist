@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.evbojo.gscreport</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/hlee/Projects/전기차 보조금 현황/updater/run_gsc_report.sh</string>
+  </array>
+  <!-- 매주 월요일 09:20. 창은 "최근 확정 7일"(오늘-3일까지, GSC 지연 반영) = 토~금 -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key><integer>1</integer>
+    <key>Hour</key><integer>9</integer>
+    <key>Minute</key><integer>20</integer>
+  </dict>
+  <key>RunAtLoad</key><false/>
+  <key>StandardOutPath</key><string>/Users/hlee/Projects/전기차 보조금 현황/updater/gsc_launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/hlee/Projects/전기차 보조금 현황/updater/gsc_launchd.log</string>
+</dict>
+</plist>

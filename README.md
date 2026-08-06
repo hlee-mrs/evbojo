@@ -23,7 +23,7 @@ site/            ← 웹루트 (이 폴더만 서빙하면 됨)
   data/            cars.json · regions.json · status.json · meta.json
 updater/         자동 갱신기 (Playwright — ev.or.kr 웹방화벽 대응) + run_auto.sh (launchd 진입점)
 deploy/          docker-compose.yml + nginx.conf (NAS용) · launchd/ (현행 Mac 자동화 plist)
-docs/            1-NAS배포 · 2-도메인 · 3-수익화 · 4-보안 · 5-검색등록 · 6-자동화 운영
+docs/            1-NAS배포 · 2-도메인 · 3-수익화 · 4-보안 · 5-검색등록 · 6-자동화 운영 · 7-주간 GSC 리포트
 ```
 
 ## 빠른 시작
