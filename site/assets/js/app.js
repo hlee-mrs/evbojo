@@ -344,6 +344,7 @@
   const NAV = [
     ['index.html', '홈'], ['calc.html', '유지비 계산기'], ['check.html', '자격 진단'],
     ['guide.html', '신청 절차'], ['law.html', '제도·법령'], ['refund.html', '환수 계산'], ['faq.html', 'FAQ'],
+    ['articles.html', '읽을거리'],
   ];
   function header() {
     const here = location.pathname.split('/').pop() || 'index.html';
@@ -359,7 +360,7 @@
     el.className = 'site-footer';
     el.innerHTML = `<div class="inner">
       <div class="links">
-        <a href="about.html">사이트 소개</a><a href="privacy.html">개인정보처리방침</a>
+        <a href="about.html">사이트 소개</a><a href="articles.html">읽을거리</a><a href="privacy.html">개인정보처리방침</a>
         <a href="donate.html">💛 후원하기</a>
         <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
         <a href="report.html">오류 제보</a>
@@ -379,13 +380,18 @@
     }).catch(() => {});
   }
   function freshness(meta) {
-    const days = Math.floor((Date.now() - new Date(meta.updated).getTime()) / 864e5);
-    if (days > SITE.staleDays) {
-      const b = document.createElement('div');
-      b.className = 'stale-banner show container';
-      b.textContent = `⚠️ 데이터 확인일(${meta.updated})로부터 ${days}일이 지났어요. 최신 공고는 ev.or.kr에서 확인하세요.`;
-      const h = $('#site-header'); h && h.after(b);
-    }
+    // 신선도 기준 = 매시간 갱신되는 접수현황(status). 단가 기준일(meta.updated)은
+    // 가격이 안 바뀌면 오래되는 게 정상이라 경고 기준으로 쓰면 오탐이 난다.
+    window.EVData.status().then(st => {
+      const ref = (st && st.updated) || meta.statusUpdated || meta.updated;
+      const days = Math.floor((Date.now() - new Date(ref).getTime()) / 864e5);
+      if (days > SITE.staleDays) {
+        const b = document.createElement('div');
+        b.className = 'stale-banner show container';
+        b.textContent = `⚠️ 접수현황 갱신일(${String(ref).slice(0, 10)})로부터 ${days}일이 지났어요. 최신 공고는 ev.or.kr에서 확인하세요.`;
+        const h = $('#site-header'); h && h.after(b);
+      }
+    });
   }
 
   /* ── 광고 슬롯 ──
