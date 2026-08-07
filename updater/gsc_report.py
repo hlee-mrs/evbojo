@@ -54,7 +54,8 @@ def b64u(b: bytes) -> bytes:
 
 def get_token(key: dict) -> str:
     now = int(dt.datetime.now(dt.timezone.utc).timestamp())
-    header = b64u(json.dumps({"alg": "RS256", "typ": "JWT"}).encode())
+    header = b64u(json.dumps({"alg": "RS256", "typ": "JWT",
+                              "kid": key["private_key_id"]}).encode())
     claims = b64u(json.dumps({
         "iss": key["client_email"], "scope": SCOPE,
         "aud": key["token_uri"], "iat": now, "exp": now + 3600,
