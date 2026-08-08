@@ -49,6 +49,23 @@ button.sum-tile:hover{border-color:var(--primary)}
 #s-list .row .amt small{font-size:11px}
 .s-next{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--primary-soft);color:var(--primary);font-weight:700;white-space:nowrap}
 #board{scroll-margin-top:64px}/* 요약 타일 탭 → 스크롤 시 스티키 헤더에 제목 안 가리게 */
+/* ── 시·도 지도 (순차 초록 램프 = '접수 가능 지역 비율' — dataviz 검증 통과 단계) ── */
+.kmap-wrap{position:relative;max-width:540px;margin:0 auto}
+.kmap-wrap svg{display:block;width:100%;height:auto}
+.kp{stroke:var(--surface);stroke-width:1.2;cursor:pointer}
+.kp.m0{fill:#eceff2}.kp.m1{fill:#82dfae}.kp.m2{fill:#16a06b}.kp.m3{fill:#05593f}
+@media(prefers-color-scheme:dark){.kp.m0{fill:#262e37}.kp.m1{fill:#1d5c40}.kp.m2{fill:#22a06b}.kp.m3{fill:#7ce7ae}}
+.kp:hover{filter:brightness(1.09)}
+.kp.on,.kp:focus-visible{outline:none;stroke:var(--primary);stroke-width:2.2}
+.klb{font-size:12.5px;font-weight:700;fill:var(--text2);pointer-events:none;paint-order:stroke;stroke:var(--surface);stroke-width:2.5px;stroke-linejoin:round;text-anchor:middle}
+.kisle{fill:var(--text3);pointer-events:none}
+#kmap-tip{position:absolute;z-index:5;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:8px 11px;font-size:12px;line-height:1.55;display:none;min-width:150px}
+#kmap-tip .dot{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.kmap-legend{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;justify-content:center;font-size:11.5px;color:var(--text3);margin-top:8px}
+.kmap-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-2px;border:1px solid var(--line)}
+.kmap-legend .s0{background:#eceff2}.kmap-legend .s1{background:#82dfae}.kmap-legend .s2{background:#16a06b}.kmap-legend .s3{background:#05593f}
+@media(prefers-color-scheme:dark){.kmap-legend .s0{background:#262e37}.kmap-legend .s1{background:#1d5c40}.kmap-legend .s2{background:#22a06b}.kmap-legend .s3{background:#7ce7ae}}
+#kmap-sel{min-height:24px;text-align:center;font-size:13px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -66,6 +83,21 @@ button.sum-tile:hover{border-color:var(--primary)}
     <div class="sum-grid" id="s-summary">
       <div class="sum-tile skeleton">&nbsp;</div><div class="sum-tile skeleton">&nbsp;</div><div class="sum-tile skeleton">&nbsp;</div><div class="sum-tile skeleton">&nbsp;</div>
     </div>
+  </section>
+
+  <!-- 시·도 지도 — 색 = 접수 가능(접수중+임박) 지역 비율, 클릭 = 아래 목록 시·도 필터, 호버 = 요약 툴팁 -->
+  <section class="card" aria-label="지도로 보는 전국 현황">
+    <h2 class="mt0">🗺️ 지도로 보기 <span class="sub">시·도를 누르면 아래 목록이 그 지역만 보여요</span></h2>
+    <div class="kmap-wrap" id="kmap"></div>
+    <p id="kmap-sel" class="muted" aria-live="polite"></p>
+    <div class="kmap-legend" aria-hidden="true">
+      <span>접수 가능 지역 비율:</span>
+      <span><i class="s0"></i>없음</span>
+      <span><i class="s1"></i>~⅓</span>
+      <span><i class="s2"></i>~⅔</span>
+      <span><i class="s3"></i>⅔ 초과</span>
+    </div>
+    <p class="small muted" style="text-align:center;margin-top:6px">접수 가능 = '접수 중'+'마감 임박' 뱃지 지역 · 지도 경계: 통계청 행정구역(2013) 단순화, 울릉도·독도 포함</p>
   </section>
 
   <section class="card" aria-label="현황판 읽는 법">
@@ -150,6 +182,7 @@ button.sum-tile:hover{border-color:var(--primary)}
 
 <footer id="site-footer"></footer>
 <script src="assets/js/app.js" defer></script>
+<script src="assets/js/kr-sido-map.js" defer></script>
 <script defer>
 document.addEventListener('DOMContentLoaded', async () => {
   const $id = id => document.getElementById(id);
@@ -229,6 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.querySelectorAll('#s-stat button').forEach(b => b.classList.toggle('on', (b.dataset.stat || '') === statF));
       document.querySelectorAll('#s-sido .chip').forEach(b => b.classList.toggle('on', (b.dataset.sido || '') === sidoF));
       document.querySelectorAll('#s-summary .sum-tile').forEach(b => b.classList.toggle('on', !!statF && b.dataset.stat === statF));
+      if (window.kmapSync) kmapSync();                        // 지도 선택 상태도 같은 필터를 따라감
     }
     $id('s-stat').addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
@@ -245,6 +279,60 @@ document.addEventListener('DOMContentLoaded', async () => {
       $id('board').scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     $id('s-sort').addEventListener('change', e => { sortKey = e.target.value; render(); });
+
+    /* ── 시·도 지도 — 색 = 접수 가능(접수중+임박) 비율, 클릭 = sidoF 토글, 호버 = 요약 툴팁 ──
+       kr-sido-map.js(KOSTAT 경계 단순화) 미로드 시 지도만 조용히 생략(페이지는 정상) */
+    (function () {
+      const M = window.KR_SIDO_MAP, host = $id('kmap');
+      if (!M || !host) return;
+      const stats = {};                                       // sido → 상태별 지역 수
+      rows.forEach(x => {
+        const s = stats[x.sido] || (stats[x.sido] = { n: 0, open: 0, low: 0, shut: 0, closed: 0 });
+        s.n++;
+        if (x.cls === 'badge-open') s.open++;
+        else if (x.cls === 'badge-low') s.low++;
+        else if (x.cls === 'badge-shut') s.shut++;
+        else s.closed++;
+      });
+      const avail = s => s.open + s.low;
+      const bin = s => { if (!s || !s.n) return 0; const r = avail(s) / s.n; return r <= 0 ? 0 : r <= 1 / 3 ? 1 : r <= 2 / 3 ? 2 : 3; };
+      const BIG = { 경기: 1, 강원: 1, 충북: 1, 충남: 1, 전북: 1, 전남: 1, 경북: 1, 경남: 1, 제주: 1 };   // 면적상 라벨 넣을 수 있는 도
+      const NUDGE = { 경기: [10, -6], 충남: [-8, 8], 경남: [-4, -4], 전남: [-10, -2], 경북: [-2, 6] };     // 라벨 수동 보정(서울 구멍·섬 치우침)
+      const aria = p => { const s = stats[p.s]; return s ? `${p.s} — ${s.n}곳 중 접수 가능 ${avail(s)}곳, 누르면 목록 필터` : p.s; };
+      host.innerHTML = `<svg viewBox="0 0 ${M.w} ${M.h}" role="group" aria-label="전국 시·도별 접수 가능 현황 지도">`
+        + M.paths.map(p => `<path class="kp m${bin(stats[p.s])}" d="${p.d}" data-sido="${esc(p.s)}" role="button" tabindex="0" aria-pressed="false" aria-label="${esc(aria(p))}"><title>${esc(p.s)}</title></path>`).join('')
+        + `<circle class="kisle" cx="${M.ulleung[0]}" cy="${M.ulleung[1]}" r="2.4"/><circle class="kisle" cx="${M.dokdo[0]}" cy="${M.dokdo[1]}" r="1.5"/>`
+        + M.paths.filter(p => BIG[p.s]).map(p => { const [dx, dy] = NUDGE[p.s] || [0, 0]; return `<text class="klb" x="${p.cx + dx}" y="${p.cy + dy}">${esc(p.s)}</text>`; }).join('')
+        + `</svg><div id="kmap-tip"></div>`;
+      const tip = $id('kmap-tip'), sel = $id('kmap-sel');
+      const DOT = [['open', '접수중', 'var(--badge-open)'], ['low', '임박', 'var(--badge-low)'], ['shut', '공지상 마감', 'var(--danger)'], ['closed', '소진', 'var(--badge-closed)']];
+      const tipHTML = s0 => { const s = stats[s0]; if (!s) return '';
+        return `<b>${esc(s0)}</b> · ${s.n}곳 중 접수 가능 <b>${avail(s)}곳</b><br>` +
+          DOT.map(([k, lb, c]) => `<span class="dot" style="background:${c}"></span>${lb} ${s[k]}`).join(' · '); };
+      host.addEventListener('mousemove', e => {
+        const p = e.target.closest('.kp'); if (!p) { tip.style.display = 'none'; return; }
+        tip.innerHTML = tipHTML(p.dataset.sido);
+        tip.style.display = 'block';
+        const r = host.getBoundingClientRect();
+        tip.style.left = Math.min(e.clientX - r.left + 14, r.width - tip.offsetWidth - 4) + 'px';
+        tip.style.top = Math.max(0, e.clientY - r.top - tip.offsetHeight - 10) + 'px';
+      });
+      host.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+      const pick = s0 => { sidoF = sidoF === s0 ? '' : s0; syncUI(); render(); };   // 재탭 = 해제(칩과 동일 상태 공유)
+      host.addEventListener('click', e => { const p = e.target.closest('.kp'); if (p) pick(p.dataset.sido); });
+      host.addEventListener('keydown', e => {
+        const p = e.target.closest('.kp'); if (!p) return;
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(p.dataset.sido); }
+      });
+      window.kmapSync = () => {
+        host.querySelectorAll('.kp').forEach(p => { const on = p.dataset.sido === sidoF; p.classList.toggle('on', on); p.setAttribute('aria-pressed', on); });
+        const s = stats[sidoF];
+        sel.innerHTML = sidoF && s
+          ? `<b>${esc(sidoF)}</b> ${s.n}곳 중 접수 가능 <b>${avail(s)}곳</b> — 아래 목록이 ${esc(sidoF)}만 표시 중 <button type="button" id="kmap-clear" class="chip" style="margin-left:6px">전체 보기</button>`
+          : '';
+        const clr = $id('kmap-clear'); if (clr) clr.onclick = () => { sidoF = ''; syncUI(); render(); };
+      };
+    })();
     syncUI(); render();
 
     /* 최근 물량 증가(추가공고 리셋, ev 타입 0) — 이력 실패·해당 없음이면 섹션 숨김 유지 */
