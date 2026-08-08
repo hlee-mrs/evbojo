@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.evbojo.adsense</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/hlee/Projects/전기차 보조금 현황/updater/run_adsense_watch.sh</string>
+  </array>
+  <!-- 매시 :25 (updater :10과 시차). 승인 감지 후에는 상태 파일 가드로 즉시 종료 -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Minute</key><integer>25</integer>
+  </dict>
+  <key>RunAtLoad</key><false/>
+  <key>StandardOutPath</key><string>/Users/hlee/Projects/전기차 보조금 현황/updater/adsense_launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/hlee/Projects/전기차 보조금 현황/updater/adsense_launchd.log</string>
+</dict>
+</plist>

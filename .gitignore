@@ -11,3 +11,6 @@ updater/gsc_launchd.log
 updater/.gsc.lock/
 .DS_Store
 .claude/
+updater/adsense_watch.log
+updater/adsense_launchd.log
+updater/.adsense_state
