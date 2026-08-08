@@ -37,6 +37,9 @@
     <p class="stamp" id="r-stamp"></p>
   </section>
 
+  <!-- 지역 고유 요약 (데이터 조합 SEO 산문 — JS가 채움, 데이터 없으면 숨김 유지) -->
+  <section class="card" id="r-seo" hidden></section>
+
   <section class="card">
     <h2 class="mt0">차종별 보조금 <span class="sub" id="r-count"></span></h2>
     <div class="grid2">
@@ -49,7 +52,7 @@
       <button data-sort="range">주행거리순</button>
     </div>
     <label class="small muted" style="display:flex;align-items:center;gap:6px;margin:6px 0">
-      <input type="checkbox" id="f-conv"> 내연차 폐차·전환 지원금(＋최대 130만원) 포함해서 보기
+      <input type="checkbox" id="f-conv"> 내연차 폐차·전환 지원금 포함해서 보기
     </label>
     <div class="tbl-wrap">
       <table class="tbl" id="r-table">
@@ -70,6 +73,7 @@
   <section class="card">
     <h2 class="mt0">같은 시·도 다른 지역</h2>
     <div class="chips" id="r-siblings"></div>
+    <p class="small muted mt8"><i class="chip-dot" style="background:var(--badge-open)"></i>접수 중 · <i class="chip-dot" style="background:var(--badge-low)"></i>임박 · <i class="chip-dot" style="background:var(--badge-closed)"></i>마감/소진 — 보조금은 <b>주민등록 주소지</b> 기준이에요</p>
   </section>
 
   <section class="card">
@@ -115,30 +119,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.head.appendChild(bc);
 
   const badgeHTML = () => { const b = statusBadge(status, statusUpdated, myCategory.get()); return `<span class="badge ${b.cls}" style="font-size:14px;padding:6px 14px"><span class="dot"></span>${b.label}</span>`; };
+  /* 소진 진행률 스택바: [출고 | 접수대기 | 잔여], 분모 max(공고, 출고+잔여, 접수, 세그먼트 합)
+     — 이월로 접수>공고인 지역(예: 서울)에서 100% 초과·음수 폭 방지. 데이터 없으면 렌더 안 함 */
+  const progHTML = (() => {
+    if (!status || status.n == null || status.a == null || status.r == null || status.left == null || status.n <= 0) return '';
+    const out = status.r, wait = Math.max(0, status.a - status.r), lf = Math.max(0, status.left);
+    const denom = Math.max(status.n, out + lf, status.a, out + wait + lf);
+    if (!(denom > 0)) return '';
+    const w = x => (x / denom * 100).toFixed(1) + '%';
+    return `<div class="prog">
+      <div class="stack"><i class="seg-r" style="width:${w(out)}"></i><i class="seg-w" style="width:${w(wait)}"></i><i class="seg-l" style="width:${w(lf)}"></i></div>
+      <div class="legend"><span><i style="background:var(--text3)"></i>출고 ${fmt(out)}</span><span><i style="background:var(--warn)"></i>접수대기 ${fmt(wait)}</span><span><i style="background:var(--money)"></i>잔여 ${fmt(lf)}</span><span>공고 ${fmt(status.n)}대</span></div>
+    </div>`;
+  })();
   document.getElementById('r-status').innerHTML = `
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
       <span id="r-badge">${badgeHTML()}</span>
       ${status ? `<span class="muted small">공고 ${fmt(status.n)}대 · 접수 ${fmt(status.a)} · 출고 ${fmt(status.r)}</span>` : ''}
     </div>
+    ${progHTML}
     ${status ? `<p class="small muted mt8">선정 방식: ${status.m}</p>` : ''}
     ${r.rep ? '<p class="small muted mt8">ℹ️ 이 지역 단가는 도(道) 공통 단가 기준입니다. 시·군 자체 추가 지원은 공고문을 확인하세요.</p>' : ''}`;
-  if (status && status.note) {
-    const LIMIT = 180, full = status.note, long = full.length > LIMIT;
-    const clip = full.slice(0, LIMIT) + '…';
-    document.getElementById('r-note').innerHTML =
-      `<div class="callout callout-warn small" style="margin:10px 0 0">📢 <b>지자체 공지</b> · <span id="note-body">${esc(long ? clip : full)}</span>` +
-      (long ? `<button type="button" id="note-toggle" style="background:none;border:0;color:var(--primary);font:inherit;font-weight:700;cursor:pointer;padding:0 0 0 6px;text-decoration:underline">더보기</button>` : '') +
-      `</div>`;
-    if (long) {
-      const body = document.getElementById('note-body'), btn = document.getElementById('note-toggle');
-      let open = false;
-      btn.addEventListener('click', () => {
-        open = !open;
-        body.textContent = open ? full : clip;      // textContent = 자동 이스케이프
-        btn.textContent = open ? '접기' : '더보기';
-      });
-    }
-  }
+  // 지자체 공지 콜아웃 — 공지상 마감이면 danger 승격 + 마감/다음공고 라인 (app.js 공용)
+  noteCallout(document.getElementById('r-note'), status);
   categoryBar(document.getElementById('r-split'), status, () => {
     const el = document.getElementById('r-badge'); if (el) el.innerHTML = badgeHTML();
   }, { cd, updated: statusUpdated });
@@ -154,10 +157,39 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('r-stamp').innerHTML =
     `잔여현황 기준 ${statusUpdated ? new Date(statusUpdated).toLocaleString('ko-KR') : '-'} · 단가 기준일 ${meta.updated} · 출처 ev.or.kr`;
 
-  /* 형제 지역 */
+  /* 형제 지역 — 칩에 상태 점(접수중 초록·임박 주황·마감/소진·데이터없음 회색, 소음 최소화) */
+  const sibDot = k => {
+    const b = statusBadge(statusFile && statusFile.data && statusFile.data[k], statusUpdated);
+    const col = b.cls === 'badge-open' ? 'var(--badge-open)' : b.cls === 'badge-low' ? 'var(--badge-low)' : 'var(--badge-closed)';
+    return `<i class="chip-dot" style="background:${col}"></i>`;
+  };
   document.getElementById('r-siblings').innerHTML = Object.entries(regions)
     .filter(([k, v]) => v.sido === r.sido && k !== cd)
-    .map(([k, v]) => `<a class="chip" href="region.html?cd=${k}">${v.name} ${manwon(v.maxP)}</a>`).join('') || '<span class="muted small">단일 지역</span>';
+    .map(([k, v]) => `<a class="chip" href="region.html?cd=${k}">${sibDot(k)}${v.name} ${manwon(v.maxP)}</a>`).join('') || '<span class="muted small">단일 지역</span>';
+
+  /* 지역 고유 요약(SEO 산문) — 랭킹·모델수·최고액·접수상태를 데이터로 조합(지역마다 다른 문장), 기준시각 명기 */
+  (() => {
+    const el = document.getElementById('r-seo');
+    if (!el || !r.maxP) return;
+    const all = Object.entries(regions).filter(([k]) => k !== '9999');
+    const rank = all.filter(([, v]) => v.maxP > r.maxP).length + 1;
+    const pct = Math.max(1, Math.round(rank / all.length * 100));
+    const models = cars.filter(c => !c.disc && r.v[c.id]);
+    if (!models.length) return;
+    let best = null;
+    models.forEach(c => { const tot = c.nat + r.v[c.id][0]; if (!best || tot > best.tot) best = { c, tot }; });
+    const b = statusBadge(status, statusUpdated), ci = closedInfo(status);
+    const s = [];
+    s.push(`${esc(r.name)}의 2026년 전기승용 보조금은 국비+지방비 합계 최대 ${manwon(r.maxP)}으로, 전국 ${all.length}개 지자체 중 ${rank}위(상위 ${pct}%)입니다.`);
+    s.push(`이 지역에서 지원되는 ${models.length}개 모델 중 보조금이 가장 큰 차종은 ${esc(best.c.name)}(${manwon(best.tot)})입니다.`);
+    if (status && status.n != null) s.push(`올해 공고 물량은 전체 ${fmt(status.n)}대이며, 현재까지 접수 ${fmt(status.a)}건·출고 ${fmt(status.r)}대입니다.`);
+    s.push(ci
+      ? `지자체 공지 기준으로 이번 회차 접수는 마감 안내된 상태${ci.partial ? '이며, 일부 차종·유형은 접수 가능할 수 있습니다' : '이고, 잔여 수치는 미출고분일 수 있습니다'}.`
+      : `현재 접수 상태는 '${esc(b.label)}'입니다.`);
+    s.push(`잔여현황 기준 ${statusUpdated ? esc(new Date(statusUpdated).toLocaleString('ko-KR')) : '기준시각 미확인'} · 단가 기준일 ${esc(meta.updated)}.`);
+    el.innerHTML = `<h2 class="mt0">📝 ${esc(r.name)} 보조금 요약</h2><p class="small" style="color:var(--text2);line-height:1.7">${s.join(' ')}</p>`;
+    el.hidden = false;
+  })();
 
   /* 표 */
   const makerSel = document.getElementById('f-maker');

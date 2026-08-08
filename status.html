@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');</script>
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7688026325140831" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전국 전기차 보조금 접수 현황판 — 160개 지자체 · 매시간 갱신 | EV보조금</title>
+<meta name="description" content="전국 160개 지자체의 전기승용 보조금 접수 상태를 한 페이지에서 — 접수 중·마감 임박·공지상 마감·잔여 소진 분류, 시·도 필터, 일반유형 잔여와 소진율까지. ev.or.kr 실측, 매시간 갱신.">
+<meta name="keywords" content="전기차 보조금 접수 현황, 전기차 보조금 잔여대수, 전기차 보조금 마감 지역, 전기차 보조금 남은 지역, 지자체별 전기차 보조금 현황, 전기차 보조금 실시간, 전기차 보조금 소진">
+<meta property="og:title" content="전국 전기차 보조금 접수 현황판">
+<meta property="og:description" content="160개 지자체 접수 상태 · 일반유형 잔여 · 소진율 — 매시간 갱신 실측 데이터">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://evbojo.co.kr/status.html">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="canonical" href="https://evbojo.co.kr/status.html">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"홈","item":"https://evbojo.co.kr/"},
+{"@type":"ListItem","position":2,"name":"전국 접수 현황판","item":"https://evbojo.co.kr/status.html"}]},
+{"@type":"WebPage","@id":"https://evbojo.co.kr/status.html","url":"https://evbojo.co.kr/status.html","name":"전국 전기차 보조금 접수 현황판","description":"전국 160개 지자체 전기승용 보조금 접수 상태·잔여 물량·소진율을 매시간 갱신 실측 데이터로 제공합니다.","inLanguage":"ko-KR","isPartOf":{"@id":"https://evbojo.co.kr/#website"},"about":{"@id":"https://evbojo.co.kr/#dataset"}}
+]}
+</script>
+<meta name="naver-site-verification" content="29413de3319d0b4b5a504cdbb92084043d6d663b" />
+<meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
+<meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
+<style>
+/* 현황판 전용 스타일 — main.css는 코어 UI 에이전트 소유(수정 금지)라 페이지 안에만 둠 */
+.badge-shut{background:var(--danger-soft);color:var(--danger)}/* app.js·main.css의 badge-shut 배포 전에도 안 깨지게 계약과 동일 정의를 폴백(중복 무해) */
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:520px){.sum-grid{grid-template-columns:repeat(2,1fr)}}
+.sum-tile{display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:70px;padding:10px 6px;border:1.5px solid var(--line);border-radius:var(--radius-s);background:var(--surface);text-align:center;transition:.12s}
+button.sum-tile:hover{border-color:var(--primary)}
+.sum-tile.on{border-color:var(--primary);background:var(--primary-soft);box-shadow:0 0 0 1px var(--primary) inset}
+.sum-tile b{font-size:19px;line-height:1.2;font-variant-numeric:tabular-nums}
+.sum-tile .lb{font-size:11.5px;font-weight:700;color:var(--text3);white-space:nowrap}
+.sum-open b{color:var(--badge-open)}.sum-low b{color:var(--badge-low)}.sum-shut b{color:var(--danger)}.sum-closed b{color:var(--badge-closed)}
+.mini{display:inline-block;width:52px;height:6px;border-radius:4px;background:var(--line2);overflow:hidden;vertical-align:1px}
+.mini i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),color-mix(in srgb,var(--primary) 60%,var(--money)))}/* hbar 막대 그라데이션 재사용 */
+#s-list .tit{white-space:normal;display:flex;flex-wrap:wrap;align-items:center;gap:3px 8px}/* 지역명+뱃지 줄바꿈 허용 — 모바일 행 컴팩트 유지 */
+#s-list .badge{white-space:normal;text-align:left;font-size:11px;padding:2px 8px;line-height:1.35}/* 마감 안내 등 긴 뱃지 문구가 잘리지 않게 내부 줄바꿈 허용 */
+#s-list .row .amt{font-size:15px}
+#s-list .row .amt .cat{font-size:11px;font-weight:600;color:var(--text3)}
+#s-list .row .amt small{font-size:11px}
+.s-next{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--primary-soft);color:var(--primary);font-weight:700;white-space:nowrap}
+#board{scroll-margin-top:64px}/* 요약 타일 탭 → 스크롤 시 스티키 헤더에 제목 안 가리게 */
+</style>
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="container">
+  <div class="hero">
+    <h1>전국 <span class="hl">접수 현황판</span></h1>
+    <p id="s-sub">전국 160개 지자체 · 전기승용 보조금 접수 상태 · 매시간 갱신</p>
+  </div>
+
+  <!-- 요약 스트립 — 아래 목록과 같은 statusBadge 판정을 집계(화면 간 숫자 불일치 방지) -->
+  <section class="card" aria-label="전국 접수 상태 요약">
+    <h2 class="mt0">📊 전국 한눈에 <span class="sub">타일을 누르면 해당 상태만 보여요</span></h2>
+    <div class="sum-grid" id="s-summary">
+      <div class="sum-tile skeleton">&nbsp;</div><div class="sum-tile skeleton">&nbsp;</div><div class="sum-tile skeleton">&nbsp;</div><div class="sum-tile skeleton">&nbsp;</div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="현황판 읽는 법">
+    <h2 class="mt0">📖 이 현황판 읽는 법</h2>
+    <p>여기 나오는 숫자는 무공해차 통합누리집(ev.or.kr)이 공개하는 지자체별 <b>공고·접수·출고·잔여</b> 수치예요. 공고는 지자체가 올해 내놓은 전기승용 보급 물량, 접수는 신청서가 들어간 대수, 출고는 실제로 차가 나가 보조금이 집행된 대수입니다. 이 페이지는 지역 전체 잔여와 함께, 개인 구매자 대부분이 해당하는 <b>'일반' 유형 잔여</b>를 나란히 보여드려요.</p>
+    <p><b>주의할 점이 하나 있어요.</b> 많은 지역에서 잔여는 신청 접수 순간이 아니라 <b>차가 출고·등록되는 시점</b>에 줄어듭니다. 그래서 잔여가 남아 보여도 접수 자체는 이미 마감됐을 수 있어요. 지자체가 공지문에 마감을 명시한 지역은 <b>'공지상 마감'</b>으로 따로 구분해 표시하고, 반대로 추경·추가공고가 나오면 잔여가 다시 늘어납니다.</p>
+    <p class="small muted">모든 수치는 ev.or.kr 잔여대수 조회 화면을 매시간 실측해 기록한 값이고, 기준시각을 페이지 위·아래에 함께 표시해요. 참고용 정보이니 계약·신청 전 최종 확인은 지자체 공고문과 담당부서로 하세요.</p>
+    <div class="chips mt8">
+      <a class="chip" href="quota-reading.html">잔여현황 읽는 법</a>
+      <a class="chip" href="buyer-types.html">유형별 물량 구조</a>
+      <a class="chip" href="second-round.html">추경·2차 공고 패턴</a>
+      <a class="chip" href="sold-out.html">소진됐을 때 할 일</a>
+    </div>
+  </section>
+
+  <!-- 지역 목록 + 필터/정렬 -->
+  <section class="card" id="board" aria-label="지역별 접수 현황">
+    <h2 class="mt0">🗺️ 지역별 접수 현황 <span class="sub" id="s-count"></span></h2>
+    <div class="chips" id="s-sido" style="min-height:44px" aria-label="시·도 필터"></div>
+    <div class="pill-tabs" id="s-stat" aria-label="상태 필터">
+      <button type="button" class="on" data-stat="">전체</button>
+      <button type="button" data-stat="open">접수중</button>
+      <button type="button" data-stat="low">임박</button>
+      <button type="button" data-stat="shut">공지마감</button>
+      <button type="button" data-stat="closed">소진</button>
+    </div>
+    <select class="select" id="s-sort" aria-label="정렬 기준">
+      <option value="leftDesc">잔여 많은 순</option>
+      <option value="leftAsc">잔여 적은 순</option>
+      <option value="rate">소진율 높은 순</option>
+      <option value="name">지역명 순</option>
+    </select>
+    <div class="rowlist mt8" id="s-list" style="min-height:340px" aria-live="polite">
+      <p class="muted" style="padding:14px 4px">접수 현황을 불러오는 중…</p>
+    </div>
+    <a class="btn btn-ghost btn-block mt8" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">ev.or.kr 원본에서 직접 확인 ↗</a>
+  </section>
+
+  <div class="ad-slot" data-slot="status-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+
+  <!-- 최근 물량 증가(추가공고) 감지 — 이력 없거나 해당 없으면 통째로 숨김(무소음) -->
+  <section class="card" id="s-fresh" hidden aria-label="최근 물량이 늘어난 지역">
+    <h2 class="mt0">📈 최근 물량이 늘어난 지역 <span class="sub">최근 14일 · 잔여 이력에서 자동 감지</span></h2>
+    <div class="rowlist" id="s-fresh-list"></div>
+    <p class="small muted mt8">추가공고 직후에는 며칠 안에 다시 마감되는 지역이 많아요. 신청 계획이 있다면 지자체 공고문부터 확인하세요.</p>
+  </section>
+
+  <section class="card" aria-label="자주 묻는 질문">
+    <h2 class="mt0">❓ 자주 묻는 질문</h2>
+    <details class="acc">
+      <summary>잔여가 있는데 왜 '공지상 마감'인가요?</summary>
+      <div class="acc-body">
+        <p>많은 지자체에서 ev.or.kr의 잔여 숫자는 신청 접수 시점이 아니라 <b>차량이 출고·등록되는 시점</b>에 줄어들어요. 그래서 접수는 이미 마감됐어도 아직 출고되지 않은 물량만큼 잔여가 남아 보일 수 있습니다. 지자체 공지문에 마감이 명시된 지역은 잔여가 남아 있어도 '공지상 마감'으로 구분해 표시해요.</p>
+        <p>또 본공고·추경처럼 공고가 회차로 나뉘면 이월분 때문에 유형별 합계와 전체 숫자가 서로 다를 수 있어요. 이건 오류가 아니라 ev.or.kr 원본 수치를 그대로 보여드리는 것입니다.</p>
+      </div>
+    </details>
+    <details class="acc">
+      <summary>숫자는 얼마나 자주 갱신되나요?</summary>
+      <div class="acc-body">
+        <p>무공해차 통합누리집(ev.or.kr)의 접수·출고·잔여 수치를 <b>매시간 자동 수집</b>해요. 페이지 위·아래에 표시된 기준시각이 마지막 수집 시각입니다. 지자체가 원본 수치를 늦게 반영하면 실제 상황과 하루 이틀 차이가 날 수 있으니, 계약 직전에는 지자체 공고와 담당부서로 최종 확인하세요.</p>
+      </div>
+    </details>
+    <details class="acc">
+      <summary>여기 없는 유형(택시·법인·우선순위)은 어디서 보나요?</summary>
+      <div class="acc-body">
+        <p>이 현황판의 잔여 숫자는 지역 전체와 개인 구매자 대부분이 해당하는 <b>'일반' 유형</b> 기준이에요. 택시·법인·기관, 우선순위(다자녀·차상위·생애최초 청년 등) 물량은 지역 이름을 눌러 들어가는 지역 상세 페이지에서 유형 탭으로 확인할 수 있어요.</p>
+      </div>
+    </details>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"잔여가 있는데 왜 '공지상 마감'인가요?","acceptedAnswer":{"@type":"Answer","text":"많은 지자체에서 ev.or.kr의 잔여 숫자는 신청 접수 시점이 아니라 차량이 출고·등록되는 시점에 줄어듭니다. 그래서 접수는 이미 마감됐어도 아직 출고되지 않은 물량만큼 잔여가 남아 보일 수 있습니다. 지자체 공지문에 마감이 명시된 지역은 잔여가 남아 있어도 '공지상 마감'으로 구분해 표시합니다. 또 본공고·추경처럼 공고가 회차로 나뉘면 이월분 때문에 유형별 합계와 전체 숫자가 다를 수 있습니다."}},
+    {"@type":"Question","name":"숫자는 얼마나 자주 갱신되나요?","acceptedAnswer":{"@type":"Answer","text":"무공해차 통합누리집(ev.or.kr)의 접수·출고·잔여 수치를 매시간 자동 수집하며, 페이지에 표시된 기준시각이 마지막 수집 시각입니다. 지자체가 원본 수치를 늦게 반영하면 실제 상황과 하루 이틀 차이가 날 수 있으니 계약 직전에는 지자체 공고와 담당부서로 최종 확인하세요."}},
+    {"@type":"Question","name":"여기 없는 유형(택시·법인·우선순위)은 어디서 보나요?","acceptedAnswer":{"@type":"Answer","text":"이 현황판의 잔여 숫자는 지역 전체와 개인 구매자 대부분이 해당하는 '일반' 유형 기준입니다. 택시·법인·기관, 우선순위(다자녀·차상위·생애최초 청년 등) 물량은 각 지역 상세 페이지의 유형 탭에서 확인할 수 있습니다."}}
+    ]}
+    </script>
+  </section>
+
+  <div class="ad-slot" data-slot="status-2"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+
+  <p class="stamp" id="s-stamp">잔여현황 기준시각은 데이터 로드 후 표시됩니다 · 출처 무공해차 통합누리집(ev.or.kr)</p>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/js/app.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', async () => {
+  const $id = id => document.getElementById(id);
+  const FAIL = '접수 현황 데이터를 일시적으로 불러오지 못했어요. 잠시 후 새로고침해 주세요. 원본은 <a href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">ev.or.kr ↗</a>에서 바로 확인할 수 있어요.';
+  const degrade = msg => {   // 어떤 실패에서도 페이지 골격·정적 콘텐츠는 유지(무소음 강등)
+    const box = `<div class="callout callout-warn small" style="margin:0">${msg}</div>`;
+    $id('s-summary').innerHTML = `<div style="grid-column:1/-1">${box}</div>`;
+    $id('s-list').innerHTML = box;
+  };
+  if (!window.EVData || !window.statusBadge) { degrade(FAIL); return; }   // app.js 로드 실패까지 방어
+  try {
+    const [statusFile, regions] = await Promise.all([
+      EVData.status(),                       // 실패 시 null 강등은 EVData가 처리
+      EVData.regions().catch(() => null),
+    ]);
+    const status = statusFile && statusFile.data || null;
+    const updated = statusFile && statusFile.updated || null;
+
+    // 스탬프·히어로 부제 — 목록 성패와 무관하게 채움
+    EVData.meta().catch(() => null).then(meta => {
+      $id('s-stamp').textContent = `잔여현황 기준 ${updated ? new Date(updated).toLocaleString('ko-KR') : '-'} · 단가 기준일 ${meta && meta.updated || '-'} · 출처 무공해차 통합누리집(ev.or.kr) 실측`;
+    });
+    if (!regions || !status) { degrade(FAIL); return; }
+
+    // closedInfo는 코어 UI 에이전트가 병렬 배포 중 — 부재·예외 시에도 페이지는 동작해야 함(계약)
+    const ciSafe = st => { try { return st && typeof window.closedInfo === 'function' ? window.closedInfo(st) : null; } catch (e) { return null; } };
+
+    /* 전 지역을 1회만 판정해 요약·목록이 같은 배열을 소비 → 화면 간 숫자 불일치 방지
+       한국환경공단(9999)은 지자체가 아니므로 현황판 모수에서 제외 */
+    const rows = Object.keys(regions).filter(cd => cd !== '9999').map(cd => {
+      const r = regions[cd], st = status[cd] || null;
+      const b = statusBadge(st, updated);                       // 전체(유형 미지정) 기준 뱃지
+      const c = ciSafe(st);
+      const left = st ? st.left : null, n = st ? st.n : null;
+      const gen = st && st.d && st.d.left ? st.d.left[3] : null;  // 일반유형 잔여
+      const pct = (n > 0 && left != null) ? Math.max(0, Math.min(100, Math.round((n - left) / n * 100))) : null;
+      const next = c && c.nextRound ? String(c.nextRound) : '';
+      const html = `<a class="row" href="region.html?cd=${cd}">
+        <div class="grow">
+          <div class="tit">${esc(r.name)} <span class="badge ${b.cls}"><span class="dot"></span>${b.label}</span>${next ? ` <span class="s-next" title="${esc(next)}">🔜 재공고 예고</span>` : ''}</div>
+          <div class="desc">${pct != null ? `<span class="mini"><i style="width:${pct}%"></i></span> 소진 ${pct}%` : '소진율 -'}${n != null ? ` · 공고 ${fmt(n)}대` : ''}</div>
+        </div>
+        <div class="amt"><span class="cat">일반</span> ${gen == null ? '-' : fmt(gen) + '대'}<small>전체 ${left == null ? '-' : fmt(left) + '대'}</small></div>
+      </a>`;
+      return { cd, name: r.name, sido: r.sido, left, n, cls: b.cls, html };
+    });
+
+    $id('s-sub').textContent = `전국 ${rows.length}개 지자체 전기승용 접수 상태 · ${updated ? new Date(updated).toLocaleString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + ' 기준 · ' : ''}매시간 갱신`;
+
+    /* 요약 스트립 — statusBadge 반환 cls로 버킷 집계(closedInfo 미배포면 shut=0일 뿐 정상 동작) */
+    const tally = { 'badge-open': 0, 'badge-low': 0, 'badge-shut': 0, 'badge-closed': 0 };
+    rows.forEach(x => { if (tally[x.cls] != null) tally[x.cls]++; });
+    const TILES = [['open', '접수 중', 'sum-open'], ['low', '마감 임박', 'sum-low'], ['shut', '공지상 마감', 'sum-shut'], ['closed', '잔여 소진', 'sum-closed']];
+    $id('s-summary').innerHTML = TILES.map(([k, lb, cls]) =>
+      `<button type="button" class="sum-tile ${cls}" data-stat="${k}" aria-label="${lb} 지역만 보기"><b>${fmt(tally['badge-' + k])}곳</b><span class="lb">${lb}</span></button>`).join('');
+
+    /* 시·도 chips — 목록(rows)과 같은 모수에서 도출(공단 제외가 자동 반영) */
+    const sidos = [];
+    rows.forEach(x => { if (sidos.indexOf(x.sido) < 0) sidos.push(x.sido); });
+    $id('s-sido').innerHTML = `<button type="button" class="chip on" data-sido="">전체</button>` +
+      sidos.map(s => `<button type="button" class="chip" data-sido="${esc(s)}">${esc(s)}</button>`).join('');
+
+    /* 필터·정렬 */
+    let sidoF = '', statF = '', sortKey = 'leftDesc';
+    const byName = (a, b) => a.name.localeCompare(b.name, 'ko');
+    const rate = x => (x.n > 0 && x.left != null) ? Math.max(0, Math.min(1, (x.n - x.left) / x.n)) : -1;  // 판정불가는 맨 뒤
+    function render() {
+      const list = rows.filter(x => (!sidoF || x.sido === sidoF) && (!statF || x.cls === 'badge-' + statF));
+      if (sortKey === 'name') list.sort(byName);
+      else if (sortKey === 'leftAsc') list.sort((a, b) => ((a.left == null ? Infinity : a.left) - (b.left == null ? Infinity : b.left)) || byName(a, b));
+      else if (sortKey === 'rate') list.sort((a, b) => (rate(b) - rate(a)) || byName(a, b));
+      else list.sort((a, b) => ((b.left == null ? -1 : b.left) - (a.left == null ? -1 : a.left)) || byName(a, b));   // 잔여 많은 순(잔여 미상은 맨 뒤)
+      $id('s-count').textContent = `${list.length}곳`;
+      $id('s-list').innerHTML = list.map(x => x.html).join('') || '<p class="muted" style="padding:14px 4px">조건에 맞는 지역이 없어요.</p>';
+    }
+    function syncUI() {
+      document.querySelectorAll('#s-stat button').forEach(b => b.classList.toggle('on', (b.dataset.stat || '') === statF));
+      document.querySelectorAll('#s-sido .chip').forEach(b => b.classList.toggle('on', (b.dataset.sido || '') === sidoF));
+      document.querySelectorAll('#s-summary .sum-tile').forEach(b => b.classList.toggle('on', !!statF && b.dataset.stat === statF));
+    }
+    $id('s-stat').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      statF = b.dataset.stat || ''; syncUI(); render();
+    });
+    $id('s-sido').addEventListener('click', e => {
+      const b = e.target.closest('.chip'); if (!b) return;
+      sidoF = b.dataset.sido || ''; syncUI(); render();
+    });
+    $id('s-summary').addEventListener('click', e => {
+      const t = e.target.closest('.sum-tile'); if (!t || !t.dataset.stat) return;
+      statF = statF === t.dataset.stat ? '' : t.dataset.stat;   // 같은 타일 재탭 = 전체로 해제
+      syncUI(); render();
+      $id('board').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    $id('s-sort').addEventListener('change', e => { sortKey = e.target.value; render(); });
+    syncUI(); render();
+
+    /* 최근 물량 증가(추가공고 리셋, ev 타입 0) — 이력 실패·해당 없음이면 섹션 숨김 유지 */
+    EVData.history().then(hist => {
+      try {
+        if (!hist || hist.v !== 1 || !hist.r || !updated) return;
+        const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(updated); if (!m) return;
+        const DAY0 = Date.UTC(2026, 0, 1);                    // history.d0=2026-01-01 (app.js와 동일 규약)
+        const asOf = Math.round((Date.UTC(+m[1], +m[2] - 1, +m[3]) - DAY0) / 864e5);
+        const md = d => { const t = new Date(DAY0 + d * 864e5); return `${t.getUTCMonth() + 1}/${t.getUTCDate()}`; };
+        const latest = {};                                    // cd → 가장 최근 리셋 감지일(중복 이벤트 dedupe)
+        Object.keys(hist.r).forEach(cd => {
+          ((hist.r[cd].L || {}).ev || []).forEach(v => {
+            if (v[1] === 0 && v[0] <= asOf && asOf - v[0] <= 14 && (latest[cd] == null || v[0] > latest[cd])) latest[cd] = v[0];
+          });
+        });
+        const items = Object.keys(latest).filter(cd => cd !== '9999' && regions[cd])   // 공단 제외(모수 규칙 통일)
+          .map(cd => ({ cd, d: latest[cd], name: regions[cd].name, left: status[cd] ? status[cd].left : null }))
+          .sort((a, b) => (b.d - a.d) || byName(a, b));
+        if (!items.length) return;
+        $id('s-fresh-list').innerHTML = items.map(x => `<a class="row" href="region.html?cd=${x.cd}">
+          <div class="grow"><div class="tit">${esc(x.name)}</div><div class="desc">${md(x.d)} 물량 증가 감지</div></div>
+          <div class="amt">${x.left == null ? '-' : fmt(x.left) + '대'}<small>현재 전체 잔여</small></div>
+        </a>`).join('');
+        $id('s-fresh').hidden = false;
+      } catch (e) {}
+    }).catch(() => {});
+  } catch (e) { degrade(FAIL); }
+});
+</script>
+</body>
+</html>

@@ -20,7 +20,7 @@
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 <link rel="canonical" href="https://evbojo.co.kr/buyer-types.html">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"우선순위·법인·택시·일반 — 전기차 보조금 유형별 물량의 구조","description":"지자체 물량이 유형별로 나뉘어 운영되는 구조와 읽는 법을 정리했습니다.","datePublished":"2026-08-07","dateModified":"2026-08-07","inLanguage":"ko","author":{"@type":"Organization","name":"EV보조금"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/buyer-types.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"우선순위·법인·택시·일반 — 전기차 보조금 유형별 물량의 구조","description":"지자체 물량이 유형별로 나뉘어 운영되는 구조와 읽는 법을 정리했습니다.","datePublished":"2026-08-07","dateModified":"2026-08-08","inLanguage":"ko","author":{"@type":"Organization","name":"EV보조금"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/buyer-types.html"}</script>
 </head>
 <body>
 <header id="site-header"></header>
@@ -30,7 +30,7 @@
     <h1>내 물량은 <span class="hl">어느 칸</span>에 있나 — 유형별 배분 구조</h1>
     <p>'전체 잔여 0'이어도 내가 해당하는 유형 칸에는 물량이 남아있을 수 있습니다.</p>
   </div>
-  <p class="stamp">📌 무공해차 통합누리집(ev.or.kr) 공표 데이터 기준 · 유형 정의·배분은 지자체 공고 우선 · 확인일 2026-08-07</p>
+  <p class="stamp">📌 무공해차 통합누리집(ev.or.kr) 공표 데이터 기준 · 유형 정의·배분은 지자체 공고 우선 · 확인일 2026-08-08</p>
 
   <section class="card">
     <h2>물량은 '한 통'이 아닙니다</h2>
@@ -44,6 +44,19 @@
         <tr><td><b>일반</b></td><td>위에 해당하지 않는 개인</td><td>보통 가장 빨리 소진되는 칸</td></tr>
       </tbody>
     </table></div>
+  </section>
+
+  <section class="card">
+    <h2>실측 — '전체 잔여 0'인데 유형 칸에는 남아 있는 지역</h2>
+    <!-- status.json d(유형별) 배열 전수 집계 — 접속 시 JS가 최신 수치로 갱신, 실패 시 아래 수집 시점 수치 유지(무소음) -->
+    <div id="bt-live" style="min-height:88px">
+      <p style="font-size:14.5px;color:var(--text2);margin:0">
+        이 글의 핵심 주장을 데이터로 확인해 봤습니다. 이 사이트가 매시간 수집하는 ev.or.kr 접수현황 기준으로,
+        승용 <b>전체 잔여가 0인데 특정 유형 칸에는 잔여가 남아 있는 지역이 39곳</b>입니다(대구광역시·인천광역시·대전광역시 등,
+        2026-08-08 07시 수집 기준). 다만 이 숫자에는 회차 이월분(실제로는 접수가 마감된 물량)이 섞여 있을 수 있으니,
+        '내 유형 칸에 숫자가 보인다'가 곧 '신청 가능'은 아니에요 — 반드시 지자체 공지·공고문으로 확인하세요.
+      </p>
+    </div>
   </section>
 
   <section class="card">
@@ -67,6 +80,24 @@
     <p class="muted small">유형별 수치는 ev.or.kr 원본을 매시간 그대로 수집한 값입니다. 유형의 '정의'(누가 우선순위인가)는 데이터에 없고 공고문에만 있으니, 최종 판단 전 공고문 원문 확인은 꼭 필요합니다.</p>
   </section>
 
+  <section class="card">
+    <h2>자주 묻는 질문</h2>
+    <details class="acc">
+      <summary>개인사업자는 어느 칸으로 신청하나요?</summary>
+      <div class="acc-body">
+        <p>보통은 <b>구매 명의</b>가 기준이에요. 개인사업자가 개인 명의로 차를 산다면 대체로 '일반'(우대 요건에 해당하면 '우선순위') 칸으로 접수되는 경우가 많아요. 반면 법인 명의 구매는 '법인·기관' 칸이에요.</p>
+        <p>다만 사업자 구매를 별도 항목으로 묶거나 물량·요건을 다르게 두는 지자체도 있어서, 일률적으로 단정할 수 없어요. 접수 전에 우리 지역 공고문의 신청 유형 구분을 확인하고, 애매하면 담당부서에 '개인사업자 + (개인/사업자) 명의' 조합을 그대로 물어보는 게 가장 정확해요.</p>
+      </div>
+    </details>
+    <details class="acc">
+      <summary>택시 단가는 왜 일반과 다른가요?</summary>
+      <div class="acc-body">
+        <p>택시는 운행거리가 길어 전환 효과가 크다고 보고, 많은 공고가 택시를 <b>별도 물량·별도 지원 단가</b>로 운영해요. 그래서 같은 차종이라도 택시용 지원액이 일반 승용과 다르게 표시될 수 있어요.</p>
+        <p>구체적인 단가·자격(개인택시/법인택시, 면허 요건 등)은 지자체 공고마다 달라요 <span class="notice-badge">지자체별 다름</span>. 택시 구매를 검토 중이라면 일반 승용 기준 금액으로 판단하지 말고, 공고문의 택시 항목을 직접 확인하세요.</p>
+      </div>
+    </details>
+  </section>
+
   <p class="muted mt24">함께 보면 좋은 페이지</p>
   <div class="chips">
     <a class="chip" href="check.html">자격 자가진단</a>
@@ -78,5 +109,27 @@
 </main>
 <footer id="site-footer"></footer>
 <script src="assets/js/app.js" defer></script>
+<script defer>
+/* '전체 0인데 유형 잔여 있음' 자동 집계 — status.json d 배열 전수. 실패 시 정적 스냅샷 유지(무소음) */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window.EVData) return;
+  Promise.all([EVData.status(), EVData.regions()]).then(([st, reg]) => {
+    if (!st || !st.data || !reg) return;
+    const mixed = Object.entries(st.data).filter(([cd, r]) => cd !== '9999' &&
+      r.left != null && r.left <= 0 && r.d && r.d.left && r.d.left.some(x => (x || 0) > 0));
+    const when = String(st.updated || '').replace('T', ' ').slice(0, 16);
+    const el = document.getElementById('bt-live');
+    if (!el || !when) return;
+    const names = mixed.slice(0, 3).map(([cd]) => reg[cd] && reg[cd].name).filter(Boolean);
+    el.innerHTML = `
+      <p style="font-size:14.5px;color:var(--text2);margin:0">
+        이 글의 핵심 주장을 데이터로 확인해 봤습니다. 이 사이트가 매시간 수집하는 ev.or.kr 접수현황 기준으로,
+        승용 <b>전체 잔여가 0인데 특정 유형 칸에는 잔여가 남아 있는 지역이 ${fmt(mixed.length)}곳</b>입니다${names.length ? `(${esc(names.join('·'))} 등,` : '('}
+        ${esc(when)} 수집 기준). 다만 이 숫자에는 회차 이월분(실제로는 접수가 마감된 물량)이 섞여 있을 수 있으니,
+        '내 유형 칸에 숫자가 보인다'가 곧 '신청 가능'은 아니에요 — 반드시 지자체 공지·공고문으로 확인하세요.
+      </p>`;
+  }).catch(() => {});
+});
+</script>
 </body>
 </html>

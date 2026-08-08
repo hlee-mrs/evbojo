@@ -56,6 +56,17 @@ input,select{font:inherit;color:inherit}
 .hero h1 .hl{color:var(--primary)}
 .hero p{color:var(--text2);margin-top:8px;font-size:15px}
 
+/* ── 인덱스 요약 스탯 스트립 (고정 높이 → CLS 방지, 로드 실패 시 숨김) ── */
+.stat-strip{display:flex;align-items:stretch;gap:8px;margin:14px 0 0;min-height:64px;color:inherit}
+.stat-strip[hidden]{display:none}
+.st-tile{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line2);border-radius:var(--radius-s);box-shadow:var(--shadow);padding:8px 4px;text-align:center}
+.st-tile b{display:block;font-size:19px;font-variant-numeric:tabular-nums;letter-spacing:-.5px;line-height:1.3;min-height:25px}
+.st-tile span{font-size:11px;color:var(--text3);font-weight:700;white-space:nowrap}
+.st-tile.t-open b{color:var(--badge-open)}
+.st-tile.t-low b{color:var(--badge-low)}
+.st-tile.t-closed b{color:var(--badge-closed)}
+.stat-strip .st-go{display:flex;align-items:center;font-size:12.5px;font-weight:700;color:var(--primary);white-space:nowrap}
+
 /* ── cards ── */
 .card{background:var(--surface);border:1px solid var(--line2);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:14px 0}
 .card h2,.section-title{font-size:17px;font-weight:800;margin-bottom:12px;letter-spacing:-.2px}
@@ -91,6 +102,7 @@ input,select{font:inherit;color:inherit}
 .badge-closed{background:var(--line2);color:var(--badge-closed)}
 .badge-info{background:var(--primary-soft);color:var(--primary)}
 .badge-warn{background:var(--warn-soft);color:var(--warn)}
+.badge-shut{background:var(--danger-soft);color:var(--danger)} /* 공지상 접수 마감(잔여>0) — 소진 회색과 구분되는 danger 톤 */
 .dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
 
 /* ── money display ── */
@@ -125,6 +137,14 @@ table.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:480px}
 .legend{display:flex;gap:14px;font-size:12px;color:var(--text3)}
 .legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:4px}
 
+/* ── 소진 진행률 스택바 (출고/접수대기/잔여 — region 상태 카드) ── */
+.prog{margin-top:10px}
+.prog .stack{margin:0 0 5px}
+.prog .seg-r{background:var(--text3)}
+.prog .seg-w{background:var(--warn)}
+.prog .seg-l{background:var(--money)}
+.prog .legend{flex-wrap:wrap;gap:6px 14px}
+
 /* ── callouts ── */
 .callout{border-radius:var(--radius-s);padding:13px 15px;font-size:13.5px;margin:12px 0;background:var(--primary-soft);color:var(--text2);border:1px solid color-mix(in srgb,var(--primary) 18%,transparent)}
 .callout b{color:var(--text)}
@@ -158,6 +178,7 @@ details.acc .acc-body{padding:0 16px 16px;color:var(--text2);font-size:14.5px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{padding:7px 13px;border-radius:999px;border:1.5px solid var(--line);font-size:13.5px;font-weight:600;color:var(--text2);background:var(--surface)}
 .chip:hover,.chip.on{border-color:var(--primary);color:var(--primary);background:var(--primary-soft)}
+.chip-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:1px;flex-shrink:0} /* 형제 지역 칩 상태 점 */
 
 /* ── ad slots (CLS 방지 고정 높이 · 라벨 명시) ── */
 .ad-slot{margin:20px 0;text-align:center}
