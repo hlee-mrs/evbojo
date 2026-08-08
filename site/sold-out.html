@@ -20,7 +20,7 @@
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 <link rel="canonical" href="https://evbojo.co.kr/sold-out.html">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"우리 지역 전기차 보조금이 소진됐다면 — 할 수 있는 것과 하면 안 되는 것","description":"소진 이후의 현실적 선택지와 피해야 할 행동을 정리했습니다.","datePublished":"2026-08-07","dateModified":"2026-08-07","inLanguage":"ko","author":{"@type":"Organization","name":"EV보조금"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/sold-out.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"우리 지역 전기차 보조금이 소진됐다면 — 할 수 있는 것과 하면 안 되는 것","description":"소진 이후의 현실적 선택지와 피해야 할 행동을 정리했습니다.","datePublished":"2026-08-07","dateModified":"2026-08-08","inLanguage":"ko","author":{"@type":"Organization","name":"EV보조금"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/sold-out.html"}</script>
 </head>
 <body>
 <header id="site-header"></header>
@@ -30,7 +30,20 @@
     <h1>보조금이 <span class="hl">소진</span>됐다면 — 지금 할 일</h1>
     <p>패닉은 금물. 선택지는 생각보다 많고, 함정도 명확합니다.</p>
   </div>
-  <p class="stamp">📌 무공해차 통합누리집(ev.or.kr) 데이터·지자체 공고 관행 기준 · 확인일 2026-08-07 · 세부는 지자체 공고 우선</p>
+  <p class="stamp">📌 무공해차 통합누리집(ev.or.kr) 데이터·지자체 공고 관행 기준 · 확인일 2026-08-08 · 세부는 지자체 공고 우선</p>
+
+  <section class="card">
+    <h2>지금 전국은 얼마나 소진됐나</h2>
+    <!-- status.json 전수 집계 — 접속 시 JS가 최신 수치로 갱신, 실패 시 아래 수집 시점 수치 유지(무소음) -->
+    <div id="so-live" style="min-height:96px">
+      <p style="font-size:14.5px;color:var(--text2);margin:0 0 8px">
+        이 사이트가 매시간 수집하는 ev.or.kr 접수현황 기준으로, 전국 160개 지자체 중
+        승용 <b>잔여가 0인 지역이 49곳</b>, 지자체 공지에서 <b>접수 마감·종료 안내가 확인되는 지역이 104곳</b>입니다
+        (일부 차종·유형만 마감인 지역 포함, 2026-08-08 07시 수집 기준). 드문 일이 아니라는 뜻이에요 — 이 글이 그 다음 수를 다룹니다.
+      </p>
+      <p class="small muted" style="margin:0">최신 수치와 지역별 목록은 <a href="status.html">전국 현황판</a>에서 확인하세요.</p>
+    </div>
+  </section>
 
   <section class="card">
     <h2>먼저 확인 — 정말 '끝'인지부터</h2>
@@ -79,5 +92,34 @@
 </main>
 <footer id="site-footer"></footer>
 <script src="assets/js/app.js" defer></script>
+<script defer>
+/* '지금 전국 소진 현황' 자동 갱신 — status.json 전수 집계. 실패 시 정적 스냅샷 유지(무소음) */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window.EVData) return;
+  EVData.status().then(st => {
+    if (!st || !st.data) return;
+    // 한국환경공단(9999)은 지자체가 아니라 모수에서 제외
+    const rows = Object.entries(st.data).filter(([cd]) => cd !== '9999').map(([, r]) => r);
+    if (!rows.length) return;
+    const zero = rows.filter(r => r.left != null && r.left <= 0).length;
+    // 마감 감지: 코어 closedInfo(정밀) 우선, 없으면 보수적 정규식 폴백
+    const RE = /접수\s*마감|조기\s*마감|접수\s*종료|접수\s*중단|신청\s*마감/;
+    const shut = rows.filter(r => {
+      try { if (window.closedInfo) { const c = closedInfo(r); return !!(c && c.closed); } } catch (e) {}
+      return RE.test(r.note || '');
+    }).length;
+    const when = String(st.updated || '').replace('T', ' ').slice(0, 16);
+    const el = document.getElementById('so-live');
+    if (!el || !when) return;
+    el.innerHTML = `
+      <p style="font-size:14.5px;color:var(--text2);margin:0 0 8px">
+        이 사이트가 매시간 수집하는 ev.or.kr 접수현황 기준으로, 전국 ${fmt(rows.length)}개 지자체 중
+        승용 <b>잔여가 0인 지역이 ${fmt(zero)}곳</b>, 지자체 공지에서 <b>접수 마감·종료 안내가 확인되는 지역이 ${fmt(shut)}곳</b>입니다
+        (일부 차종·유형만 마감인 지역 포함, ${esc(when)} 수집 기준). 드문 일이 아니라는 뜻이에요 — 이 글이 그 다음 수를 다룹니다.
+      </p>
+      <p class="small muted" style="margin:0">최신 수치와 지역별 목록은 <a href="status.html">전국 현황판</a>에서 확인하세요.</p>`;
+  }).catch(() => {});
+});
+</script>
 </body>
 </html>

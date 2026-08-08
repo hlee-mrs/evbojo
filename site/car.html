@@ -62,6 +62,9 @@
     <div class="callout callout-warn small" id="c-winter"></div>
   </section>
 
+  <!-- 모델 고유 요약 (데이터 조합 SEO 산문 — JS가 채움, 데이터 없으면 숨김 유지) -->
+  <section class="card" id="c-seo" hidden></section>
+
   <!-- 유지비 미리보기 -->
   <section class="card">
     <h2 class="mt0">⛽ 연료비 미리보기 <span class="sub">연 15,000km 기준</span></h2>
@@ -142,8 +145,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     warn.innerHTML = '';
     if (!p) { box.hidden = true; return; }
     let natEff = car.nat, note = '';
-    if (p >= meta.priceBands.half) { natEff = 0; note = `<div class="callout-danger callout small"><b>가격 ${manwonLong(meta.priceBands.half)} 이상</b> — 국비 보조금 0원 구간입니다.</div>`; }
-    else if (p >= meta.priceBands.full) { natEff = Math.round(car.nat / 2); note = `<div class="callout-warn callout small"><b>가격 ${manwonLong(meta.priceBands.full)}~${manwonLong(meta.priceBands.half)} 구간</b> — 국비가 50%로 줄어요. 표시된 단가가 이미 반영분일 수 있으니 공고 기준으로 확인하세요.</div>`; }
+    if (p >= meta.priceBands.half) { natEff = 0; note = `<div class="callout-danger callout small"><b>가격 ${manwonLong(meta.priceBands.half)} 이상</b> — 국비 보조금 0원 구간입니다. 아래 지방비도 0원으로 <b>가정</b>했어요(지자체별 기준은 공고 확인).</div>`; }
+    else if (p >= meta.priceBands.full) { natEff = Math.round(car.nat / 2); note = `<div class="callout-warn callout small"><b>가격 ${manwonLong(meta.priceBands.full)}~${manwonLong(meta.priceBands.half)} 구간</b> — 국비가 50%로 줄어요. 아래 지방비도 같은 비율로 줄어든다고 <b>가정</b>한 금액이에요 — 지방비 감액 방식은 지자체마다 다를 수 있으니 공고 기준으로 확인하세요.</div>`; }
     warn.innerHTML = note;
     const v = cd && regions[cd].v[id];
     const loc = v ? (natEff === car.nat ? v[0] : Math.floor(v[0] * (natEff / car.nat || 0))) : 0;
@@ -166,8 +169,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="kv"><span>배터리 용량</span><b>${car.batt ? car.batt + ' kWh' : '미공개'}</b></div>
     <div class="kv"><span>추정 전비 <span class="notice-badge">주행거리÷배터리</span></span><b>${eff ? eff + ' km/kWh' : '-'}</b></div>`;
   document.getElementById('c-winter').innerHTML = cr
-    ? `❄️ 겨울(저온) 주행거리는 상온의 <b>${cr}%</b> 수준이에요. ${cr >= 85 ? '저온 효율이 좋은 편입니다.' : cr >= 75 ? '평균적인 수준입니다.' : '겨울 감소폭이 큰 편이니 장거리 출퇴근이라면 참고하세요.'} <span class="small muted">(환경부 인증값 기준)</span>`
+    ? `❄️ 겨울(저온) 주행거리는 상온의 <b>${cr}%</b> 수준이에요. ${cr >= 85 ? '저온 효율이 좋은 편입니다.' : cr >= 75 ? '평균적인 수준입니다.' : '겨울 감소폭이 큰 편이니 장거리 출퇴근이라면 참고하세요.'} <span class="small muted">(국내 인증값 기준)</span>`
     : '저온 인증값이 공개되지 않은 모델입니다.';
+
+  /* 모델 고유 요약(SEO 산문) — 제원·전비·저온비·국비 + 보조금 최고/최저 지역 예시. 데이터 없으면 미렌더 */
+  (() => {
+    const el = document.getElementById('c-seo');
+    if (!el || !car.range || !car.nat) return;
+    let hi = null, lo = null;
+    Object.entries(regions).forEach(([k, rg]) => {
+      if (k === '9999' || !rg.v || !rg.v[id]) return;
+      const tot = car.nat + rg.v[id][0];
+      if (!hi || tot > hi.tot) hi = { name: rg.name, tot };
+      if (!lo || tot < lo.tot) lo = { name: rg.name, tot };
+    });
+    const s = [];
+    s.push(`${esc(car.name)}은(는) 1회 충전 주행거리(상온) ${fmt(car.range)}km${car.rangeCold ? `, 겨울(저온) ${fmt(car.rangeCold)}km${cr ? ` — 상온의 ${cr}% 수준` : ''}` : ''}${car.batt ? `, 배터리 ${car.batt}kWh` : ''}의 전기승용 모델입니다.`);
+    if (eff) s.push(`인증 주행거리를 배터리 용량으로 나눈 추정 전비는 ${eff}km/kWh입니다.`);
+    s.push(`2026년 국비 보조금은 ${manwon(car.nat)}이며, 지방비는 주민등록 주소지 지자체에 따라 달라집니다.`);
+    if (hi && lo && hi.tot !== lo.tot) s.push(`예를 들어 ${esc(hi.name)}에서는 국비+지방비 합계 ${manwon(hi.tot)}까지 받을 수 있고, ${esc(lo.name)}에서는 ${manwon(lo.tot)} 수준입니다.`);
+    if (s.length < 3) return;
+    s.push(`금액은 ${esc(meta.updated)} 단가 기준이며, 실제 지급액과 접수 가능 여부는 지자체 공고로 확정됩니다.`);
+    el.innerHTML = `<h2 class="mt0">📝 ${esc(car.name)} 요약</h2><p class="small" style="color:var(--text2);line-height:1.7">${s.join(' ')}</p>`;
+    el.hidden = false;
+  })();
 
   /* 연료비 미리보기: 15,000km, 집밥 60%/급속 40%, 충전손실 10% */
   function renderFuel() {

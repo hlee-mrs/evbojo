@@ -20,7 +20,7 @@
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 <link rel="canonical" href="https://evbojo.co.kr/quota-reading.html">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"전기차 보조금 잔여대수 읽는 법 — 공고·접수·출고·잔여의 진짜 의미","description":"네 숫자의 정확한 의미와 초과접수, 유형 합계 불일치의 이유를 실데이터 기준으로 설명합니다.","datePublished":"2026-08-07","dateModified":"2026-08-07","inLanguage":"ko","author":{"@type":"Organization","name":"EV보조금"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/quota-reading.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"전기차 보조금 잔여대수 읽는 법 — 공고·접수·출고·잔여의 진짜 의미","description":"네 숫자의 정확한 의미와 초과접수, 유형 합계 불일치의 이유를 실데이터 기준으로 설명합니다.","datePublished":"2026-08-07","dateModified":"2026-08-08","inLanguage":"ko","author":{"@type":"Organization","name":"EV보조금"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/quota-reading.html"}</script>
 </head>
 <body>
 <header id="site-header"></header>
@@ -30,7 +30,7 @@
     <h1><span class="hl">잔여 대수</span>, 제대로 읽는 법</h1>
     <p>"잔여 3대"는 지금 신청하면 3등 안에 든다는 뜻이 아닙니다.</p>
   </div>
-  <p class="stamp">📌 무공해차 통합누리집(ev.or.kr) 공표 데이터 기준 · 이 사이트는 동일 데이터를 매시간 자동 수집 · 확인일 2026-08-07</p>
+  <p class="stamp">📌 무공해차 통합누리집(ev.or.kr) 공표 데이터 기준 · 이 사이트는 동일 데이터를 매시간 자동 수집 · 확인일 2026-08-08</p>
 
   <section class="card">
     <h2>네 가지 숫자의 정의</h2>
@@ -48,12 +48,34 @@
 
   <section class="card">
     <h2>접수가 공고보다 많다? — '초과접수'는 정상입니다</h2>
-    <p>실제 데이터를 보면 <b>접수 대수가 공고 대수를 넘는 지역이 매우 흔합니다.</b> 2026년 8월 기준으로도 전국 수십 개 지자체에서 접수가 공고를 넘고 있고, 접수가 공고의 두 배 가까운 지역도 있습니다. 오류가 아니라 운영 방식입니다.</p>
+    <p>실제 데이터를 보면 <b>접수 대수가 공고 대수를 넘는 지역이 매우 흔합니다.</b> 얼마나 흔한지는 바로 아래 '오늘 데이터로 보는 초과접수'에 실측 집계를 실어 뒀어요 — 접수가 공고의 몇 배에 이르는 지역도 보일 겁니다. 오류가 아니라 운영 방식입니다.</p>
     <ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px">
       <li>신청 중 일부는 <b>취소·미출고로 이탈</b>합니다. 지자체는 이 이탈분을 대비해 접수를 계속 받아두는 경우가 많아요.</li>
       <li>따라서 "접수가 꽉 찼다"가 곧 "신청 불가"는 아닙니다 — <b>예비 순번</b>으로 접수해 두면 이탈분이 돌아올 수 있습니다.</li>
       <li>반대로 접수가 공고 안쪽이라도, 선정 방식이 추첨이면 접수 순서가 의미 없을 수 있습니다. <b>우리 지역의 선정 방식</b>(선착순/출고순/추첨)부터 확인하세요 — 지역 페이지 상단에 표기해 두었습니다.</li>
     </ul>
+  </section>
+
+  <section class="card">
+    <h2>오늘 데이터로 보는 초과접수</h2>
+    <!-- status.json 전수 집계 — 접속 시 JS가 최신 수치로 갱신, 실패 시 아래 수집 시점 수치 유지(무소음) -->
+    <div id="qr-live" style="min-height:300px">
+      <p style="font-size:14.5px;color:var(--text2);margin:0 0 8px">
+        이 사이트가 매시간 수집하는 ev.or.kr 접수현황 기준으로, <b>160개 지자체 중 74곳</b>에서 접수가 공고 물량을 넘어 있습니다
+        <span class="muted small">(2026-08-08 07시 수집 기준)</span>. 접수÷공고 배수가 큰 상위 5곳:
+      </p>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>지역</th><th class="num">공고</th><th class="num">접수</th><th class="num">접수÷공고</th></tr></thead>
+        <tbody>
+          <tr><td>전남 보성군</td><td class="num">20</td><td class="num">191</td><td class="num"><b>9.6배</b></td></tr>
+          <tr><td>충북 진천군</td><td class="num">64</td><td class="num">595</td><td class="num"><b>9.3배</b></td></tr>
+          <tr><td>전남 영광군</td><td class="num">92</td><td class="num">333</td><td class="num"><b>3.6배</b></td></tr>
+          <tr><td>경북 봉화군</td><td class="num">50</td><td class="num">161</td><td class="num"><b>3.2배</b></td></tr>
+          <tr><td>강원 속초시</td><td class="num">58</td><td class="num">166</td><td class="num"><b>2.9배</b></td></tr>
+        </tbody>
+      </table></div>
+      <p class="small muted" style="margin-top:8px">주의해서 읽기: 일부 지역의 '공고'는 현재 차수 기준이라 접수 누계와 단순 비교가 안 될 수 있어요(회차 이월 — ev.or.kr 원본 특성). 그래도 '접수가 공고를 넘는 상태'가 전국적으로 흔하다는 사실 자체는 그대로입니다.</p>
+    </div>
   </section>
 
   <div class="ad-slot" data-slot="art-quota-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
@@ -77,6 +99,20 @@
     </ul>
   </section>
 
+  <section class="card">
+    <h2>용어 한 줄 사전</h2>
+    <p class="sub">접수현황 화면에 나오는 다섯 단어, 헷갈릴 때 여기만 보세요.</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <tbody>
+        <tr><td><b>공고</b></td><td>지자체가 이번 공고에서 지원하겠다고 밝힌 물량. 추경·차수 추가로 연중 늘 수 있어요.</td></tr>
+        <tr><td><b>접수</b></td><td>지금까지 들어온 신청 건수. 공고보다 많아질 수 있어요(초과접수).</td></tr>
+        <tr><td><b>출고</b></td><td>실제 출고·등록까지 이어진 건수. 접수보다 한 박자 늦게 움직여요.</td></tr>
+        <tr><td><b>잔여</b></td><td>공고 물량 중 아직 소진되지 않은 몫. 실시간 대기 순번이 아니에요.</td></tr>
+        <tr><td><b>차수</b></td><td>물량을 나눠 내는 공고 회차(1차·2차·추경 등). 회차가 바뀌면 수치가 리셋되거나 이월돼요.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
   <p class="muted mt24">함께 보면 좋은 페이지</p>
   <div class="chips">
     <a class="chip" href="index.html">지역별 보조금 현황</a>
@@ -88,5 +124,36 @@
 </main>
 <footer id="site-footer"></footer>
 <script src="assets/js/app.js" defer></script>
+<script defer>
+/* '오늘 데이터로 보는 초과접수' 자동 갱신 — status.json 전수 집계. 실패 시 정적 스냅샷 유지(무소음) */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window.EVData) return;
+  Promise.all([EVData.status(), EVData.regions()]).then(([st, reg]) => {
+    if (!st || !st.data || !reg) return;
+    const entries = Object.entries(st.data).filter(([cd]) => cd !== '9999');   // 공단은 지자체 아님
+    if (!entries.length) return;
+    const over = entries.filter(([, r]) => r.n != null && r.a != null && r.a > r.n);
+    // 상위 5곳: 한국환경공단(9999·지자체 아님) 제외, 소규모 공고(10대 미만)의 배수 착시 제외
+    const top = over.filter(([cd, r]) => cd !== '9999' && r.n >= 10 && reg[cd])
+      .sort((a, b) => (b[1].a / b[1].n) - (a[1].a / a[1].n)).slice(0, 5);
+    const when = String(st.updated || '').replace('T', ' ').slice(0, 16);
+    const el = document.getElementById('qr-live');
+    if (!el || !when || top.length < 3) return;
+    const name = cd => { const r = reg[cd]; return r.name.indexOf(r.sido) === 0 ? r.name : r.sido + ' ' + r.name; };
+    el.innerHTML = `
+      <p style="font-size:14.5px;color:var(--text2);margin:0 0 8px">
+        이 사이트가 매시간 수집하는 ev.or.kr 접수현황 기준으로, <b>${fmt(entries.length)}개 지자체 중 ${fmt(over.length)}곳</b>에서 접수가 공고 물량을 넘어 있습니다
+        <span class="muted small">(${esc(when)} 수집 기준)</span>. 접수÷공고 배수가 큰 상위 ${top.length}곳:
+      </p>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>지역</th><th class="num">공고</th><th class="num">접수</th><th class="num">접수÷공고</th></tr></thead>
+        <tbody>${top.map(([cd, r]) =>
+          `<tr><td><a href="region.html?cd=${esc(cd)}" style="color:inherit">${esc(name(cd))}</a></td><td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.a)}</td><td class="num"><b>${(r.a / r.n).toFixed(1)}배</b></td></tr>`).join('')}
+        </tbody>
+      </table></div>
+      <p class="small muted" style="margin-top:8px">주의해서 읽기: 일부 지역의 '공고'는 현재 차수 기준이라 접수 누계와 단순 비교가 안 될 수 있어요(회차 이월 — ev.or.kr 원본 특성). 그래도 '접수가 공고를 넘는 상태'가 전국적으로 흔하다는 사실 자체는 그대로입니다.</p>`;
+  }).catch(() => {});
+});
+</script>
 </body>
 </html>

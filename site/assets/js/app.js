@@ -131,9 +131,93 @@
     set(k) { try { localStorage.setItem('ev.myCat', k); } catch (e) {} },
   };
 
+  /* ── 공지문 마감 감지 ──
+     지자체 공지(note)에서 "이번 회차 접수/선정 종료"를 감지. 161개 공지 전수 분류로 검증(오탐 0) —
+     패턴·가드는 검증본이라 동작 변경 금지. ES2018 안전: 룩비하인드 금지(구형 iOS Safari 파스 에러).
+     원칙: 완료형 선언("마감되었습니다")만 신뢰, 조건부/미래형("예산 소진 시 조기 마감", "마감 예정")은 무시.
+     최악의 오류는 열린 지역을 마감으로 오판 — 애매하면 closed:false(놓치는 쪽)를 택한다. */
+  function detectClosed(note) {
+    const res = { closed: false, partial: false, closedDate: null, nextRound: null, evidence: null };
+    if (!note) return res;
+    const t = String(note).replace(/\s+/g, ' ');
+    const COND_PRE = /(소진\s?시|소진시|될\s?수|경우|한\s?때|시\s?조기\s?$)/;               // 조건부 문맥(직전 20자)
+    const ALLOC = /(우선\s?순위|우선순위|우선\s?배정|택시|택배|이륜|어린이|버스|승합|수소)/;   // 특수물량 한정 마감
+    const OPEN_SIG = /(접수\s?중|접수중|신청\s?가능|접수\s?시작|접수시작|접수\s?재개|접수\s?가능|선정\s?가능|추진\s?중)/; // 열림 신호(부분마감 판단)
+    const patterns = [                                                   // 완료형 마감 선언
+      /(마감|종료|소진)\s?(되었|됐|하였|했)/g,
+      /마감\s?[(（][^()（）]{0,26}[)）]\s?(되었|됐)/g,                     // "마감(2026. 8. 7. 13:00)되었"
+      /(마감|종료)\s?(입니다|임을|합니다|함)/g,
+      /(전량|모두|전체\s?물량|물량\s?모두|전\s?물량)\s?(마감|소진)/g,
+      /(대상자\s?)?선정[이은는]?\s?(모두\s?)?(마감|완료|끝났)/g,
+      /추진\s?완료/g,
+      /접수\s?종료/g,
+      /(더\s?이상|현재)\s?접수\s?불가/g,
+      /(본예산|예산|국비)\s?(조기\s?)?소진(되어|으로)/g,                    // 완료 사실 서술만
+    ];
+    const hits = [];
+    const consider = (idx, len) => {
+      const pre = t.slice(Math.max(0, idx - 20), idx), post = t.slice(idx + len, idx + len + 8);
+      if (COND_PRE.test(pre)) return;                                      // ① 조건부 문맥
+      if (/^\s?안\s?되|^\s?되지\s?않/.test(post)) return;                   // ② 부정형("마감 안내"는 부정 아님)
+      if (ALLOC.test(pre) && !/(승용|화물|전체|전량|모두|사업|민간)/.test(pre)) return; // ③ 특수물량만의 마감
+      if (/상반기/.test(pre) && OPEN_SIG.test(t)) return;                   // ④ 과거 회차 마감 + 새 회차 열림
+      const fr = t.slice(idx + len, idx + len + 60).match(/([2-9])\s?차[^.]{0,10}(신청|접수)\s?기간/);
+      if (fr) {                                                            // ⑤ "1차 마감" 직후 더 높은 회차 신청기간 = 과거 회차
+        const pr = pre.match(/([1-9])\s?차(?![가-힣])/);
+        if (pr && parseInt(fr[1], 10) > parseInt(pr[1], 10)) return;
+      }
+      hits.push({ idx, len, hasPass: /승용/.test(pre), hasTruck: /화물/.test(pre), isGlobal: !/승용|화물/.test(pre) });
+    };
+    let m;
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      while ((m = re.exec(t)) !== null) { consider(m.index, m[0].length); if (m.index === re.lastIndex) re.lastIndex++; }
+    }
+    const BARE = /마감/g;    // 맨몸 "마감"(어미 없음) — 강한 가드 하에서만 (예: "보급기간 : 마감", "★ 전기승용 마감")
+    while ((m = BARE.exec(t)) !== null) {
+      const idx = m.index, next = t.slice(idx + 2, idx + 8);
+      if (/^(되|될|돼|됐|하|함|입|임|안)/.test(next)) continue;              // 어미형은 위 패턴 소관
+      if (/^\s?(예정|임박|시|또는|여부|대수|일|기한|이후|전|후)/.test(next)) continue; // 미래·조건·명사수식
+      if (!/(접수|공고|물량|사업|승용|화물|기간|신청|모집)/.test(t.slice(Math.max(0, idx - 12), idx))) continue; // 주어 단서 필수
+      consider(idx, 2);
+    }
+    if (!hits.length) return res;
+    hits.sort((a, b) => a.idx - b.idx);                                    // 공지 관행상 최신 내용이 맨 앞(★ 첫 줄) → 첫 매치가 대표
+    res.closed = true;
+    let anyGlobal = false, pass = false, truck = false;
+    for (const h of hits) { if (h.isGlobal) anyGlobal = true; if (h.hasPass) pass = true; if (h.hasTruck) truck = true; }
+    res.partial = (!anyGlobal && pass !== truck) || OPEN_SIG.test(t);       // 승용만/화물만 마감 or 열림 신호 공존
+    const h0 = hits[0];
+    res.evidence = t.slice(Math.max(0, h0.idx - 30), Math.min(t.length, h0.idx + h0.len + 20)).trim();
+    if (res.evidence.length > 80) res.evidence = res.evidence.slice(res.evidence.length - 80);
+    const win = t.slice(Math.max(0, h0.idx - 40), Math.min(t.length, h0.idx + h0.len + 40)); // 마감 시점(베스트에포트)
+    let dm = win.match(/(?:(20\d{2})|['’`]?(\d{2}))\s?[.년]\s?(\d{1,2})\s?[.월/]\s?(\d{1,2})[일.]?(?:\s?\([월화수목금토일]\))?(?:\s?기준)?(?:\s?(\d{1,2}:\d{2}))?/);
+    if (!dm) dm = win.match(/()(?:^|[^\d.])(\d{1,2})()\s?[.\/]\s?(\d{1,2})\.?(?:\s?\([월화수목금토일]\))?(?:\s?(\d{1,2}:\d{2}))?/); // "7.16" "6/30"
+    if (dm) {
+      let y = dm[1] ? dm[1] : (dm[2] ? '20' + dm[2] : '2026'), mo = dm[3] || dm[2], dd = dm[4];
+      if (!dm[3] && dm[2] && dm[4]) { mo = dm[2]; dd = dm[4]; y = '2026'; } // 연도 없는 형태: 그룹 재배치
+      mo = ('0' + parseInt(mo, 10)).slice(-2); dd = ('0' + parseInt(dd, 10)).slice(-2);
+      if (+mo >= 1 && +mo <= 12 && +dd >= 1 && +dd <= 31) res.closedDate = y + '-' + mo + '-' + dd + (dm[5] ? ' ' + dm[5] : '');
+    }
+    const nr = t.match(/(추경|추가\s?공고|다음\s?공고|[3-9]\s?차\s?(?:공고|접수|사업|보급)|하반기\s?공고|추가\s?모집)[^.★☆※]{0,36}(예정|예상|계획|가능)/); // 다음 회차 예고
+    if (nr) { res.nextRound = nr[0].trim(); if (res.nextRound.length > 60) res.nextRound = res.nextRound.slice(0, 60); }
+    return res;
+  }
+  /* closedInfo(st): note 문자열 기준 캐시. 마감 감지 시 결과 객체, 아니면 null(기존 잔여 기준 동작 유지) — 계약 API */
+  const ciCache = new Map();
+  window.closedInfo = function (st) {
+    const note = st && st.note;
+    if (!note) return null;
+    if (!ciCache.has(note)) { const r = detectClosed(note); ciCache.set(note, r.closed ? r : null); }
+    return ciCache.get(note);
+  };
+  // closedDate 'YYYY-MM-DD[ HH:MM]' → 'M/D[ HH:MM]'
+  const fmtMD = (iso, withTime) => { const m2 = /^(\d{4})-(\d{2})-(\d{2})(?:\s(\d{1,2}:\d{2}))?/.exec(iso || ''); return m2 ? `${+m2[2]}/${+m2[3]}${withTime && m2[4] ? ' ' + m2[4] : ''}` : ''; };
+
   /* ── 접수 상태 판정 ──
      잔여율 = 출고잔여 / 공고. 데이터 기준시각이 오래되면 중립 강등(fail-safe).
-     catKey 지정 시 해당 신청 유형(일반/우선순위/…)의 잔여로 판정. */
+     catKey 지정 시 해당 신청 유형(일반/우선순위/…)의 잔여로 판정.
+     우선순위: ① stale ② 잔여≤0 ③ 공지상 마감(closedInfo — 잔여>0이어도 초록 금지) ④ 임박/접수중. */
   window.statusBadge = function (st, statusUpdated, catKey) {
     if (!st) return { cls: 'badge-closed', label: '현황 확인 필요', stale: true };
     const ageDays = statusUpdated ? (Date.now() - new Date(statusUpdated).getTime()) / 864e5 : 99;
@@ -155,9 +239,46 @@
     // 지역 전체가 소진됐는데 특정 유형에만 이월 잔여가 남은 경우: 초록 '접수 중'이 아니라 마감 맥락으로 표기.
     // (ev.or.kr 회차 이월로 항목 잔여 > 0 이지만 실제 접수는 마감된 상태 — 오인 방지)
     if (catKey && regionClosed) return { cls: 'badge-low', label: `${pfx}전체 마감 · 유형 잔여 ${fmt(left)}대(추가공고 확인)`, stale: false };
+    // 공지상 접수 마감인데 잔여>0 (예: 서울 8/7 마감·잔여 2,703대) — 잔여는 미출고분일 수 있음, 초록 금지
+    const ci = window.closedInfo(st);
+    if (ci) {
+      if (catKey) return ci.partial     // 유형 탭: 유형 잔여 숫자는 유지하되 마감 맥락 표기(regionClosed 분기와 동일 철학)
+        ? { cls: 'badge-low', label: `${pfx}공지상 마감 안내 · 잔여 ${fmt(left)}대(유형별 확인)`, stale: false }
+        : { cls: 'badge-shut', label: `${pfx}공지상 접수 마감 · 잔여 ${fmt(left)}대는 미출고분일 수 있음`, stale: false };
+      return ci.partial                 // partial=일부 차종·유형만 마감일 수 있음 → 단정 금지 톤
+        ? { cls: 'badge-shut', label: '공지상 마감 안내 · 유형별 확인 필요', stale: false }
+        : { cls: 'badge-shut', label: `공지상 접수 마감${ci.closedDate ? ` (${fmtMD(ci.closedDate)})` : ''} · 잔여 ${fmt(left)}대는 미출고분일 수 있음`, stale: false };
+    }
     const ratio = quota ? left / quota : 1;
     if (left < 30 || ratio < 0.06) return { cls: 'badge-low', label: `${pfx}마감 임박 · 잔여 ${fmt(left)}대`, stale: false };
     return { cls: 'badge-open', label: `${pfx}접수 중 · 잔여 ${fmt(left)}대`, stale: false };
+  };
+
+  /* ── 지자체 공지 콜아웃 (region/index 공용) ──
+     원문 + 긴 글만 더보기/접기. 공지상 마감(closedInfo)이면 danger 승격 + 마감/다음공고 라인.
+     note는 신뢰 불가 입력 → 전부 esc() 경유. id 대신 data-속성(한 페이지 다중 렌더에도 안전). */
+  window.noteCallout = function (mount, st) {
+    if (!mount) return;
+    if (!st || !st.note) { mount.innerHTML = ''; return; }
+    const LIMIT = 180, full = String(st.note), long = full.length > LIMIT, clip = full.slice(0, LIMIT) + '…';
+    const ci = window.closedInfo(st);
+    const head = ci
+      ? `<div style="margin-bottom:6px"><b>🚫 공지상 접수 마감${ci.closedDate ? ` (${esc(fmtMD(ci.closedDate, true))})` : ''}</b>${ci.partial ? ' · 일부 차종·유형은 접수 가능할 수 있어요' : ''}</div>` +
+        (ci.nextRound ? `<div style="margin-bottom:6px"><b>🔜 다음 공고 예고:</b> ${esc(ci.nextRound)}</div>` : '')
+      : '';
+    mount.innerHTML =
+      `<div class="callout ${ci ? 'callout-danger' : 'callout-warn'} small" style="margin:10px 0 0">${head}📢 <b>지자체 공지</b> · <span data-note-body>${esc(long ? clip : full)}</span>` +
+      (long ? `<button type="button" data-note-toggle style="background:none;border:0;color:var(--primary);font:inherit;font-weight:700;cursor:pointer;padding:0 0 0 6px;text-decoration:underline">더보기</button>` : '') +
+      `</div>`;
+    if (long) {
+      const body = mount.querySelector('[data-note-body]'), btn = mount.querySelector('[data-note-toggle]');
+      let open = false;
+      btn.addEventListener('click', () => {
+        open = !open;
+        body.textContent = open ? full : clip;      // textContent = 자동 이스케이프
+        btn.textContent = open ? '접기' : '더보기';
+      });
+    }
   };
 
   /* ── 예측 소진 시기 (전체 잔여 기준) ──
@@ -168,7 +289,6 @@
                MIN_OBS: 4, MIN_BDAYS: 3, MIN_SOLD: 5, MIN_DECR: 2, // 정식 예측 최소조건 4종
                GRADE_FAST: 5, GRADE_LONG: 40, RELAX_DAYS: 14,      // 등급 경계(영업일)·낙관 해금
                STALE_TAG: 48, STALE_ALERT: 24, STALE_HIDE: 120 };  // 신선도(시간)
-  const CLOSED_RE = /접수\s*마감|조기\s*마감|접수\s*종료|접수\s*중단|신청\s*마감/;
   const DAY0 = Date.UTC(2026, 0, 1);                               // d0=2026-01-01(목)
   const isoToDay = iso => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? Math.round((Date.UTC(+m[1], +m[2] - 1, +m[3]) - DAY0) / 864e5) : null; };
   const dayDate = d => new Date(DAY0 + d * 864e5);
@@ -195,7 +315,7 @@
       lines.push(P(`이 지역은 신청 순서가 아니라 <b>출고 순서</b>로 보조금이 배정돼요.`));
     // ── 게이트 결정 트리 (순서 고정, 첫 매치에서 종료) ──
     if (st.left == null || st.left <= 0) return done();                        // ① 마감: 예측 없음(뱃지가 담당)
-    if (CLOSED_RE.test(st.note || '')) {                                       // ② 공지상 마감(잔여>0이어도)
+    if (window.closedInfo(st)) {                                               // ② 공지상 마감(잔여>0이어도 — 전수검증 감지)
       lines.push(P(`지자체 공지상 접수가 마감된 지역이에요. 남은 숫자는 아직 출고되지 않은 물량일 수 있어요 — 예측을 표시하지 않아요.`));
       return done();
     }
@@ -342,7 +462,7 @@
 
   /* ── 헤더/푸터 주입 ── */
   const NAV = [
-    ['index.html', '홈'], ['calc.html', '유지비 계산기'], ['check.html', '자격 진단'],
+    ['index.html', '홈'], ['status.html', '전국 현황판'], ['calc.html', '유지비 계산기'], ['check.html', '자격 진단'],
     ['guide.html', '신청 절차'], ['law.html', '제도·법령'], ['refund.html', '환수 계산'], ['faq.html', 'FAQ'],
     ['articles.html', '읽을거리'],
   ];

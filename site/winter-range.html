@@ -20,7 +20,7 @@
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 <link rel="canonical" href="https://evbojo.co.kr/winter-range.html">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"겨울 전기차 주행거리, 왜 줄고 얼마나 줄까 — 저온 인증거리 읽는 법","description":"저온 인증거리의 의미, 차종별 차이, 겨울 통근거리 계산법을 정리했습니다.","datePublished":"2026-08-07","dateModified":"2026-08-07","inLanguage":"ko","author":{"@type":"Organization","name":"EV보조금"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/winter-range.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"겨울 전기차 주행거리, 왜 줄고 얼마나 줄까 — 저온 인증거리 읽는 법","description":"저온 인증거리의 의미, 차종별 차이, 겨울 통근거리 계산법을 정리했습니다.","datePublished":"2026-08-07","dateModified":"2026-08-08","inLanguage":"ko","author":{"@type":"Organization","name":"EV보조금"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/winter-range.html"}</script>
 </head>
 <body>
 <header id="site-header"></header>
@@ -30,7 +30,7 @@
     <h1>겨울이 오면 <span class="hl">주행거리</span>는 얼마나 줄까</h1>
     <p>카탈로그의 큰 숫자 말고, '저온 인증거리'를 보세요. 차종별로 차이가 꽤 큽니다.</p>
   </div>
-  <p class="stamp">📌 국내 인증(상온·저온) 주행거리 데이터 기준 · 차종별 수치는 본 사이트 차종 페이지에서 확인 · 확인일 2026-08-07</p>
+  <p class="stamp">📌 국내 인증(상온·저온) 주행거리 데이터 기준 · 차종별 수치는 본 사이트 차종 페이지에서 확인 · 확인일 2026-08-08</p>
 
   <section class="card">
     <h2>전기차는 주행거리를 '두 번' 인증받습니다</h2>
@@ -39,6 +39,31 @@
     <div class="callout">
       <b>내가 보는 차의 저온 비율은?</b> 저희 <a href="index.html">차종 검색</a>에서 차를 고르면 상온·저온 인증거리와 그 비율을 함께 보여줍니다. <a href="compare.html">비교 페이지</a>에 후보를 3대까지 나란히 놓고 저온 거리로 비교해 보세요.
     </div>
+  </section>
+
+  <section class="card">
+    <h2>실측 분포 — 이 사이트 등록 모델 전수 집계</h2>
+    <!-- cars.json 전수 집계(rangeCold/range) — 접속 시 JS가 최신 데이터로 갱신, 실패 시 아래 기준일 수치 유지(무소음) -->
+    <div id="wr-live" style="min-height:320px">
+      <p style="font-size:14.5px;color:var(--text2);margin:0 0 8px">
+        상온·저온 인증거리가 모두 등록된 <b>106개 모델</b>을 전수 집계하면, 저온 유지율(저온÷상온)은
+        <b>최저 70% ~ 최고 94%</b>, 중간값은 <b>80%</b>입니다(데이터 기준일 2026-07-15). 같은 전기차인데
+        겨울에 4분의 1 넘게 줄어드는 차와 10%도 안 줄어드는 차가 공존한다는 뜻이에요. 양 끝의 실명은 이렇습니다.
+      </p>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>구분</th><th>차종(트림)</th><th class="num">상온</th><th class="num">저온</th><th class="num">유지율</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="3">상위 3</td><td>GV60 스탠다드 AWD 19인치</td><td class="num">403km</td><td class="num">378km</td><td class="num"><b>94%</b></td></tr>
+          <tr><td>GV60 스탠다드 AWD 20인치</td><td class="num">386km</td><td class="num">358km</td><td class="num"><b>93%</b></td></tr>
+          <tr><td>iX3 50 xDrive</td><td class="num">615km</td><td class="num">568km</td><td class="num"><b>92%</b></td></tr>
+          <tr><td rowspan="3">하위 3</td><td>ID.4 Pro</td><td class="num">424km</td><td class="num">296km</td><td class="num"><b>70%</b></td></tr>
+          <tr><td>Q4 Sportback 45 e-tron</td><td class="num">406km</td><td class="num">285km</td><td class="num"><b>70%</b></td></tr>
+          <tr><td>Q4 45 e-tron</td><td class="num">406km</td><td class="num">285km</td><td class="num"><b>70%</b></td></tr>
+        </tbody>
+      </table></div>
+      <p class="small muted" style="margin-top:8px">유지율은 인증값 기준 계산치이며, 실제 겨울 소모는 온도·주행 패턴에 따라 더 벌어질 수 있어요.</p>
+    </div>
+    <p style="font-size:14.5px;color:var(--text2)">내 후보 차종이 몇 등인지 궁금하다면 <a href="winter-range-ranking.html"><b>겨울 주행거리 랭킹 — 전 모델 저온 유지율 전수표</b></a>에서 확인하세요.</p>
   </section>
 
   <section class="card">
@@ -84,5 +109,39 @@
 </main>
 <footer id="site-footer"></footer>
 <script src="assets/js/app.js" defer></script>
+<script defer>
+/* 저온 유지율 실측 분포 자동 갱신 — cars.json 전수(rangeCold/range). 실패 시 정적 스냅샷 유지(무소음) */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window.EVData) return;
+  Promise.all([EVData.cars(), EVData.meta()]).then(([cars, meta]) => {
+    if (!cars || !cars.length || !meta) return;
+    const rows = cars.filter(c => c.range && c.rangeCold)
+      .map(c => ({ c, raw: c.rangeCold / c.range, pct: Math.round(c.rangeCold / c.range * 100) }))
+      .sort((a, b) => b.raw - a.raw);
+    if (rows.length < 10) return;
+    const pcts = rows.map(r => r.pct).sort((a, b) => a - b);
+    const mid = pcts.length % 2 ? pcts[(pcts.length - 1) / 2] : Math.round((pcts[pcts.length / 2 - 1] + pcts[pcts.length / 2]) / 2);
+    const top = rows.slice(0, 3), bot = rows.slice(-3).reverse();   // 하위는 최저부터
+    const tr = (r, i, label, span) =>
+      `<tr>${i === 0 ? `<td rowspan="${span}">${label}</td>` : ''}<td>${esc(r.c.name)}</td><td class="num">${fmt(r.c.range)}km</td><td class="num">${fmt(r.c.rangeCold)}km</td><td class="num"><b>${r.pct}%</b></td></tr>`;
+    const el = document.getElementById('wr-live');
+    if (!el) return;
+    el.innerHTML = `
+      <p style="font-size:14.5px;color:var(--text2);margin:0 0 8px">
+        상온·저온 인증거리가 모두 등록된 <b>${fmt(rows.length)}개 모델</b>을 전수 집계하면, 저온 유지율(저온÷상온)은
+        <b>최저 ${pcts[0]}% ~ 최고 ${pcts[pcts.length - 1]}%</b>, 중간값은 <b>${mid}%</b>입니다(데이터 기준일 ${esc(meta.updated || '')}).
+        같은 전기차인데 겨울 감소 폭이 모델에 따라 이만큼 벌어진다는 뜻이에요. 양 끝의 실명은 이렇습니다.
+      </p>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>구분</th><th>차종(트림)</th><th class="num">상온</th><th class="num">저온</th><th class="num">유지율</th></tr></thead>
+        <tbody>
+          ${top.map((r, i) => tr(r, i, '상위 3', 3)).join('')}
+          ${bot.map((r, i) => tr(r, i, '하위 3', 3)).join('')}
+        </tbody>
+      </table></div>
+      <p class="small muted" style="margin-top:8px">유지율은 인증값 기준 계산치이며, 실제 겨울 소모는 온도·주행 패턴에 따라 더 벌어질 수 있어요.</p>`;
+  }).catch(() => {});
+});
+</script>
 </body>
 </html>
