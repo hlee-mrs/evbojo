@@ -9,6 +9,16 @@ LOG="$DIR/adsense_watch.log"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG"; }
 
+# 1순위: 공식 API 폴링(양방향 — 승인 READY·반려류 NEEDS_ATTENTION 모두 감지)
+if [ -f "$DIR/secrets/adsense-oauth.json" ]; then
+  OUT="$(/usr/bin/python3 "$DIR/check_adsense_api.py" 2>>"$LOG")"
+  RC=$?
+  log "api rc=$RC $OUT"
+  [ "$RC" -eq 0 ] && exit 0
+  log "API 실패 → 광고 게재 감지 방식으로 폴백"
+fi
+
+# 2순위(폴백): 광고 실게재 감지 — 승인만 감지 가능
 # 이미 승인 감지됨 → 할 일 없음
 [ "$(cat "$STATE" 2>/dev/null)" = "approved" ] && exit 0
 
