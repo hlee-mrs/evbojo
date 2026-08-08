@@ -318,7 +318,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         tip.style.top = Math.max(0, e.clientY - r.top - tip.offsetHeight - 10) + 'px';
       });
       host.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
-      const pick = s0 => { sidoF = sidoF === s0 ? '' : s0; syncUI(); render(); };   // 재탭 = 해제(칩과 동일 상태 공유)
+      const pick = s0 => {
+        sidoF = sidoF === s0 ? '' : s0; syncUI(); render();                        // 재탭 = 해제(칩과 동일 상태 공유)
+        if (sidoF) $id('board').scrollIntoView({ behavior: 'smooth', block: 'start' });   // 선택 시에만 목록으로 이동(해제 땐 제자리)
+      };
       host.addEventListener('click', e => { const p = e.target.closest('.kp'); if (p) pick(p.dataset.sido); });
       host.addEventListener('keydown', e => {
         const p = e.target.closest('.kp'); if (!p) return;
