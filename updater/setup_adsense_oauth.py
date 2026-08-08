@@ -50,8 +50,8 @@ class H(http.server.BaseHTTPRequestHandler):
 
 srv = http.server.HTTPServer(('127.0.0.1', PORT), H)
 threading.Thread(target=srv.serve_forever, daemon=True).start()
-if not done.wait(timeout=600):
-    print('TIMEOUT: 10분 내 동의가 완료되지 않음', flush=True)
+if not done.wait(timeout=3600):
+    print('TIMEOUT: 1시간 내 동의가 완료되지 않음', flush=True)
     sys.exit(1)
 srv.shutdown()
 
