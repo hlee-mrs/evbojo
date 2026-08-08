@@ -52,7 +52,8 @@ button.sum-tile:hover{border-color:var(--primary)}
 /* ── 시·도 지도 (순차 초록 램프 = '접수 가능 지역 비율' — dataviz 검증 통과 단계) ── */
 .kmap-wrap{position:relative;max-width:540px;margin:0 auto}
 .kmap-wrap svg{display:block;width:100%;height:auto}
-.kp{stroke:var(--surface);stroke-width:1.2;cursor:pointer}
+.kp{stroke:var(--surface);stroke-width:1.2;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.khit{fill:#000;fill-opacity:0;pointer-events:all;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}/* 소형 광역시 탭 확장(모바일에서 세종 등은 수 px라 직접 탭 불가) */
 .kp.m0{fill:#eceff2}.kp.m1{fill:#82dfae}.kp.m2{fill:#16a06b}.kp.m3{fill:#05593f}
 @media(prefers-color-scheme:dark){.kp.m0{fill:#262e37}.kp.m1{fill:#1d5c40}.kp.m2{fill:#22a06b}.kp.m3{fill:#7ce7ae}}
 .kp:hover{filter:brightness(1.09)}
@@ -303,6 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         + M.paths.map(p => `<path class="kp m${bin(stats[p.s])}" d="${p.d}" data-sido="${esc(p.s)}" role="button" tabindex="0" aria-pressed="false" aria-label="${esc(aria(p))}"><title>${esc(p.s)}</title></path>`).join('')
         + `<circle class="kisle" cx="${M.ulleung[0]}" cy="${M.ulleung[1]}" r="2.4"/><circle class="kisle" cx="${M.dokdo[0]}" cy="${M.dokdo[1]}" r="1.5"/>`
         + M.paths.filter(p => BIG[p.s]).map(p => { const [dx, dy] = NUDGE[p.s] || [0, 0]; return `<text class="klb" x="${p.cx + dx}" y="${p.cy + dy}">${esc(p.s)}</text>`; }).join('')
+        + M.paths.filter(p => !BIG[p.s]).map(p => `<circle class="khit" cx="${p.cx}" cy="${p.cy}" r="13" data-sido="${esc(p.s)}" aria-hidden="true"><title>${esc(p.s)}</title></circle>`).join('')
         + `</svg><div id="kmap-tip"></div>`;
       const tip = $id('kmap-tip'), sel = $id('kmap-sel');
       const DOT = [['open', '접수중', 'var(--badge-open)'], ['low', '임박', 'var(--badge-low)'], ['shut', '공지상 마감', 'var(--danger)'], ['closed', '소진', 'var(--badge-closed)']];
@@ -310,7 +312,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `<b>${esc(s0)}</b> · ${s.n}곳 중 접수 가능 <b>${avail(s)}곳</b><br>` +
           DOT.map(([k, lb, c]) => `<span class="dot" style="background:${c}"></span>${lb} ${s[k]}`).join(' · '); };
       host.addEventListener('mousemove', e => {
-        const p = e.target.closest('.kp'); if (!p) { tip.style.display = 'none'; return; }
+        const p = e.target.closest('.kp,.khit'); if (!p) { tip.style.display = 'none'; return; }
         tip.innerHTML = tipHTML(p.dataset.sido);
         tip.style.display = 'block';
         const r = host.getBoundingClientRect();
@@ -322,9 +324,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         sidoF = sidoF === s0 ? '' : s0; syncUI(); render();                        // 재탭 = 해제(칩과 동일 상태 공유)
         if (sidoF) $id('board').scrollIntoView({ behavior: 'smooth', block: 'start' });   // 선택 시에만 목록으로 이동(해제 땐 제자리)
       };
-      host.addEventListener('click', e => { const p = e.target.closest('.kp'); if (p) pick(p.dataset.sido); });
+      host.addEventListener('click', e => { const p = e.target.closest('.kp,.khit'); if (p) pick(p.dataset.sido); });
       host.addEventListener('keydown', e => {
-        const p = e.target.closest('.kp'); if (!p) return;
+        const p = e.target.closest('.kp'); if (!p) return;   // 키보드는 path만(프록시는 aria-hidden)
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(p.dataset.sido); }
       });
       window.kmapSync = () => {
