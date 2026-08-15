@@ -107,10 +107,11 @@
     let bar = $('#cmp-bar');
     const arr = window.cmpBasket.get();
     if (!bar) { bar = document.createElement('div'); bar.id = 'cmp-bar'; document.body.appendChild(bar); }
-    if (!arr.length || location.pathname.endsWith('compare.html')) { bar.classList.remove('show'); return; }
+    if (!arr.length || location.pathname.endsWith('compare.html')) { bar.classList.remove('show'); document.body.style.paddingBottom = ''; return; }
     bar.innerHTML = `🚗 ${arr.length}대 담김 <a href="compare.html">비교하기 →</a> <button class="x" aria-label="비우기">✕</button>`;
     bar.querySelector('.x').onclick = () => window.cmpBasket.clear();
     bar.classList.add('show');
+    document.body.style.paddingBottom = '68px';   // 하단 고정 비교바가 페이지 말미 콘텐츠·광고를 가리지 않게 여백 확보
   }
   window.renderCmpBar = renderCmpBar;
 
@@ -517,9 +518,20 @@
   /* ── 광고 슬롯 ──
      data-slot 이름별 슬롯. SITE.ads.enabled=false 면 자리표시(고정 높이 유지 → CLS 없음).
      AdSense 승인 후: client 설정 + enabled:true + 각 슬롯 data-ad-slot 번호 입력. */
-  function renderAds() {
+  function renderAds(isRetry) {
     const slots = $$('.ad-slot');
     if (!slots.length) return;
+    // 본문 게이트: main 텍스트가 1,200자 미만이면 광고 슬롯 자체를 렌더하지 않음(저가치·빈 페이지 광고 차단).
+    // JS가 본문을 채우는 페이지(비교표·레거시 region/car 등)를 위해 2.5초 뒤 1회만 재평가 —
+    // 재평가 시점에도 미달이면 그대로 미렌더. 게이트에 걸린 동안은 ins 주입이 없어 재호출해도 중복 push 없음.
+    const mainEl = $('main');
+    const bodyLen = mainEl ? mainEl.textContent.replace(/\s+/g, ' ').trim().length : 0;
+    if (bodyLen < 1200) {
+      slots.forEach(slot => { slot.style.display = 'none'; slot.dataset.gated = '1'; });
+      if (!isRetry) setTimeout(() => renderAds(true), 2500);
+      return;
+    }
+    slots.forEach(slot => { if (slot.dataset.gated) { delete slot.dataset.gated; slot.style.display = ''; } });
     if (SITE.ads.enabled && SITE.ads.provider === 'adsense') {
       // adsbygoogle.js 는 각 페이지 <head> 에 이미 있음 → 여기서 다시 주입하지 않음(중복 로드 방지)
       slots.forEach(slot => {
@@ -530,7 +542,7 @@
         box.innerHTML = `<ins class="adsbygoogle" style="display:block;width:100%" data-ad-client="${SITE.ads.client}" data-ad-slot="${adId}" data-ad-format="auto" data-full-width-responsive="true"></ins>`;
         box.style.border = 'none';
         try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
-        // 광고가 안 채워지면(미승인·재고없음) 빈 'AD' 박스가 남지 않게 자리째 숨김
+        // 광고가 안 채워지면(미승인·재고없음) 빈 '광고' 박스가 남지 않게 자리째 숨김
         const ins = box.querySelector('ins');
         const hideIfUnfilled = () => { if (ins.getAttribute('data-ad-status') === 'unfilled') slot.style.display = 'none'; };
         new MutationObserver(hideIfUnfilled).observe(ins, { attributes: true, attributeFilter: ['data-ad-status'] });

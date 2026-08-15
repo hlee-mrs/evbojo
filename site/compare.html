@@ -46,7 +46,7 @@
     <p class="small muted" id="cp-note"></p>
   </section>
 
-  <div class="ad-slot" data-slot="compare-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+  <div class="ad-slot" data-slot="compare-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
 
   <section class="card">
     <h2>비교표 읽는 법 — 숫자마다 성격이 다릅니다</h2>
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const [cars, regions, meta] = await EVData.all();
   let cd = qs('cd') || myRegion.get(); if (!regions[cd]) cd = '1100';
   // URL ?cars=1,5,9 지원
-  const urlCars = (qs('cars') || '').split(',').map(Number).filter(n => cars[n]);
+  const urlCars = (qs('cars') || '').split(',').filter(Boolean).map(Number).filter(n => cars[n]);   // filter(Boolean): 빈 문자열이 Number('')===0으로 차 id 0을 주입하던 버그 방지
   if (urlCars.length) { try { localStorage.setItem('ev.compare', JSON.stringify(urlCars.slice(0, 3))); } catch (e) {} }
 
   const addSel = document.getElementById('cp-add');
@@ -97,12 +97,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const effY = eff * ((8.5 + 3.5 * cr) / 12);
     return 15000 / effY * 1.1 * (150 * 0.6 + 350 * 0.4);
   }
+  // 바구니가 비면 인기 2종을 기본 비교로 렌더(바구니에는 저장하지 않음 — 담기 시작하면 내 선택으로 대체)
+  // 기본 비교 2종: id 고정(이름은 연식변경으로 바뀔 수 있음) → 무효 시 국비 상위 비단종으로 폴백
+  const DEFAULT_IDS = [42, 88];
+  let defIds = DEFAULT_IDS.filter(i => cars[i] && !cars[i].disc);
+  if (defIds.length < 2) defIds = cars.filter(c => c && !c.disc).sort((a, b) => b.nat - a.nat).slice(0, 2).map(c => c.id);
+  const adSlot = document.querySelector('.ad-slot[data-slot="compare-1"]');
   function render() {
-    const ids = cmpBasket.get();
-    document.getElementById('cp-count').textContent = ids.length + ' / 3';
-    setQs({ cars: ids.join(',') || null, cd });
+    const basket = cmpBasket.get();
+    const isDefault = !basket.length && defIds.length >= 2;
+    const ids = basket.length ? basket : (isDefault ? defIds : []);
+    document.getElementById('cp-count').textContent = basket.length + ' / 3';
+    setQs({ cars: basket.join(',') || null, cd });
+    if (adSlot && !adSlot.dataset.gated) adSlot.style.display = ids.length ? '' : 'none';   // 빈 상태에선 광고 숨김(본문 게이트로 꺼진 슬롯은 되살리지 않음)
     const tbl = document.getElementById('cp-table');
-    if (!ids.length) { tbl.innerHTML = '<tr><td class="muted" style="padding:20px">아직 담은 차가 없어요. 위에서 추가하거나, 차종 페이지에서 "비교 담기"를 눌러보세요.</td></tr>'; return; }
+    if (!ids.length) { tbl.innerHTML = '<tr><td class="muted" style="padding:20px">아직 담은 차가 없어요. 위에서 추가하거나, 차종 페이지에서 "비교 담기"를 눌러보세요.</td></tr>'; document.getElementById('cp-note').textContent = ''; return; }
     const list = ids.map(i => cars[i]);
     const val = (arr, best, fmtFn) => arr.map(v => `<td class="num" style="${v != null && v === best ? 'color:var(--money);font-weight:800' : ''}">${v == null ? '-' : fmtFn(v)}</td>`).join('');
     const tot = list.map(c => regions[cd].v[c.id] ? c.nat + regions[cd].v[c.id][0] : c.nat);
@@ -111,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const effs = list.map(c => carEff(c));
     const fuels = list.map(c => fuelCost(c));
     tbl.innerHTML = `
-      <tr><th></th>${list.map(c => `<th style="min-width:130px">${c.name}<br><button class="btn-s btn btn-ghost mt8" data-del="${c.id}">빼기</button></th>`).join('')}</tr>
+      <tr><th></th>${list.map(c => `<th style="min-width:130px">${c.name}${isDefault ? '' : `<br><button class="btn-s btn btn-ghost mt8" data-del="${c.id}">빼기</button>`}</th>`).join('')}</tr>
       <tr><td>보조금 합계<br><span class="small muted">${regions[cd].name}</span></td>${val(tot, Math.max(...tot), manwon)}</tr>
       <tr><td>국비 / 지방비</td>${list.map(c => { const v = regions[cd].v[c.id]; return `<td class="num">${fmt(c.nat)} / ${v ? fmt(v[0]) : '-'}</td>`; }).join('')}</tr>
       <tr><td>주행거리(상온)</td>${val(rng, Math.max(...rng.filter(Boolean)), v => v + 'km')}</tr>
@@ -120,8 +129,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       <tr><td>배터리</td>${list.map(c => `<td class="num">${c.batt || '-'}kWh</td>`).join('')}</tr>
       <tr><td>추정 전비</td>${val(effs, Math.max(...effs.filter(Boolean)), v => v + 'km/kWh')}</tr>
       <tr><td>연간 충전비<br><span class="small muted">15,000km</span></td>${val(fuels, Math.min(...fuels.filter(Boolean)), v => won(v))}</tr>
-      <tr><td></td>${list.map(c => `<td><a class="btn btn-primary btn-s" href="car.html?id=${c.id}&cd=${cd}">상세 →</a></td>`).join('')}</tr>`;
-    document.getElementById('cp-note').textContent = `보조금: 2026년 ${regions[cd].name} 단가 기준(${meta.updated}) · 충전비: 집밥60%/급속40%·겨울보정 포함 추정치`;
+      <tr><td></td>${list.map(c => `<td><a class="btn btn-primary btn-s" href="/car/${c.id}.html">상세 →</a></td>`).join('')}</tr>`;
+    document.getElementById('cp-note').textContent = (isDefault ? '지금은 인기 2종 기본 비교예요 — 위에서 차량을 추가하면 내 선택으로 바뀝니다. · ' : '') + `보조금: 2026년 ${regions[cd].name} 단가 기준(${meta.updated}) · 충전비: 집밥60%/급속40%·겨울보정 포함 추정치`;
   }
   // 시·도만 바꾸는 중(c=null)에는 기존 지역 유지, 유효한 시·군·구를 고를 때만 갱신
   regionPicker(document.getElementById('cp-picker'), { value: cd, onPick: c => { if (c) { cd = c; render(); } } });

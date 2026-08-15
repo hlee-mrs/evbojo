@@ -33,6 +33,14 @@ fi
 # 변경 없으면 종료 (불필요한 커밋·배포 방지)
 if git diff --quiet -- site/data; then log "OK 변경 없음"; exit 0; fi
 
+# 프리렌더 (지역·차종·시도 정적 페이지 + sitemap 전량 재생성)
+# 실패해도 데이터 갱신·배포는 계속한다 — 기존 정적 페이지가 유지되므로 안전(fail-safe).
+if /usr/bin/python3 updater/prerender.py >> "$LOG" 2>&1; then
+  git add site/region site/car site/sido site/sitemap.xml >> "$LOG" 2>&1 || log "WARN prerender 산출물 add 실패"
+else
+  log "WARN prerender 실패 — 기존 정적 페이지 유지, 데이터만 배포"
+fi
+
 git add site/data
 git commit -q -m "data: 자동 갱신($MODE) $(date '+%F %H:%M')" || { log "FAIL commit"; exit 1; }
 git push origin HEAD:main >> "$LOG" 2>&1 || { log "FAIL push main — 다음 시간 재시도"; exit 1; }
