@@ -20,7 +20,7 @@
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 <link rel="canonical" href="https://evbojo.co.kr/quota-reading.html">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"전기차 보조금 잔여대수 읽는 법 — 공고·접수·출고·잔여의 진짜 의미","description":"네 숫자의 정확한 의미와 초과접수, 유형 합계 불일치의 이유를 실데이터 기준으로 설명합니다.","datePublished":"2026-08-07","dateModified":"2026-08-08","inLanguage":"ko","author":{"@type":"Organization","name":"EV보조금"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/quota-reading.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"전기차 보조금 잔여대수 읽는 법 — 공고·접수·출고·잔여의 진짜 의미","description":"네 숫자의 정확한 의미와 초과접수, 유형 합계 불일치의 이유를 실데이터 기준으로 설명합니다.","datePublished":"2026-08-07","dateModified":"2026-08-08","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/quota-reading.html"}</script>
 </head>
 <body>
 <header id="site-header"></header>
@@ -31,6 +31,7 @@
     <p>"잔여 3대"는 지금 신청하면 3등 안에 든다는 뜻이 아닙니다.</p>
   </div>
   <p class="stamp">📌 무공해차 통합누리집(ev.or.kr) 공표 데이터 기준 · 이 사이트는 동일 데이터를 매시간 자동 수집 · 확인일 2026-08-08</p>
+  <p class="small muted" style="margin:4px 0 0">글: <b>HyeongHun Lee</b> · EV보조금 운영자 — 160개 지자체 보조금 데이터를 매시간 직접 수집·검증합니다. <a href="/about.html#operator">소개</a></p>
 
   <section class="card">
     <h2>네 가지 숫자의 정의</h2>
@@ -78,7 +79,7 @@
     </div>
   </section>
 
-  <div class="ad-slot" data-slot="art-quota-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+  <div class="ad-slot" data-slot="art-quota-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
 
   <section class="card">
     <h2>잔여는 언제 줄어드나 — '접수 속도'가 아니라 '출고 흐름'</h2>
@@ -148,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="tbl-wrap"><table class="tbl">
         <thead><tr><th>지역</th><th class="num">공고</th><th class="num">접수</th><th class="num">접수÷공고</th></tr></thead>
         <tbody>${top.map(([cd, r]) =>
-          `<tr><td><a href="region.html?cd=${esc(cd)}" style="color:inherit">${esc(name(cd))}</a></td><td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.a)}</td><td class="num"><b>${(r.a / r.n).toFixed(1)}배</b></td></tr>`).join('')}
+          `<tr><td><a href="/region/${esc(cd)}.html" style="color:inherit">${esc(name(cd))}</a></td><td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.a)}</td><td class="num"><b>${(r.a / r.n).toFixed(1)}배</b></td></tr>`).join('')}
         </tbody>
       </table></div>
       <p class="small muted" style="margin-top:8px">주의해서 읽기: 일부 지역의 '공고'는 현재 차수 기준이라 접수 누계와 단순 비교가 안 될 수 있어요(회차 이월 — ev.or.kr 원본 특성). 그래도 '접수가 공고를 넘는 상태'가 전국적으로 흔하다는 사실 자체는 그대로입니다.</p>`;

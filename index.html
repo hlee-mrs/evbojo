@@ -69,7 +69,7 @@
     <p class="small muted mt8" id="top3-note"></p>
   </section>
 
-  <div class="ad-slot" data-slot="home-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+  <div class="ad-slot" data-slot="home-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
 
   <!-- 보조금 랭킹 -->
   <section class="card">
@@ -108,25 +108,25 @@
     <h3 class="mt16">지역별 전기차 보조금 바로가기</h3>
     <p class="muted small">전국 160개 지자체 페이지에서 차종별 금액과 매시간 갱신되는 접수 현황을 확인할 수 있어요.</p>
     <div class="chips mt8">
-      <a class="chip" href="region.html?cd=1100">서울</a>
-      <a class="chip" href="region.html?cd=2600">부산</a>
-      <a class="chip" href="region.html?cd=2700">대구</a>
-      <a class="chip" href="region.html?cd=2800">인천</a>
-      <a class="chip" href="region.html?cd=2900">광주</a>
-      <a class="chip" href="region.html?cd=3000">대전</a>
-      <a class="chip" href="region.html?cd=3100">울산</a>
-      <a class="chip" href="region.html?cd=3611">세종</a>
-      <a class="chip" href="region.html?cd=4111">수원</a>
-      <a class="chip" href="region.html?cd=4113">성남</a>
-      <a class="chip" href="region.html?cd=4128">고양</a>
-      <a class="chip" href="region.html?cd=4146">용인</a>
-      <a class="chip" href="region.html?cd=4159">화성</a>
-      <a class="chip" href="region.html?cd=4311">청주</a>
-      <a class="chip" href="region.html?cd=4413">천안</a>
-      <a class="chip" href="region.html?cd=4511">전주</a>
-      <a class="chip" href="region.html?cd=4711">포항</a>
-      <a class="chip" href="region.html?cd=4812">창원</a>
-      <a class="chip" href="region.html?cd=5000">제주</a>
+      <a class="chip" href="/region/1100.html">서울</a>
+      <a class="chip" href="/region/2600.html">부산</a>
+      <a class="chip" href="/region/2700.html">대구</a>
+      <a class="chip" href="/region/2800.html">인천</a>
+      <a class="chip" href="/region/2900.html">광주</a>
+      <a class="chip" href="/region/3000.html">대전</a>
+      <a class="chip" href="/region/3100.html">울산</a>
+      <a class="chip" href="/region/3611.html">세종</a>
+      <a class="chip" href="/region/4111.html">수원</a>
+      <a class="chip" href="/region/4113.html">성남</a>
+      <a class="chip" href="/region/4128.html">고양</a>
+      <a class="chip" href="/region/4146.html">용인</a>
+      <a class="chip" href="/region/4159.html">화성</a>
+      <a class="chip" href="/region/4311.html">청주</a>
+      <a class="chip" href="/region/4413.html">천안</a>
+      <a class="chip" href="/region/4511.html">전주</a>
+      <a class="chip" href="/region/4711.html">포항</a>
+      <a class="chip" href="/region/4812.html">창원</a>
+      <a class="chip" href="/region/5000.html">제주</a>
     </div>
     <h3 class="mt16">읽을거리 — 지침 원문으로 검증한 해설</h3>
     <p class="muted small">블로그에 떠도는 이야기가 아니라, 보조금 업무처리지침 원문과 실측 데이터로 확인한 내용만 담았습니다.</p>
@@ -151,9 +151,13 @@
     </div>
   </section>
 
-  <div class="ad-slot" data-slot="home-2"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+  <div class="ad-slot" data-slot="home-2"><div class="ad-label">광고</div><div class="ad-box"></div></div>
 </main>
 
+<!-- 정적 필수 링크(JS 미실행 크롤러 대비 — JS 푸터가 뜨면 중복 없이 위에 놓임) -->
+<div class="container small muted" style="padding:10px 16px">
+  <a href="about.html">사이트 소개</a> · <a href="privacy.html">개인정보처리방침</a> · <a href="report.html">오류 제보</a> · <a href="articles.html">읽을거리</a> · <a href="status.html">전국 현황판</a>
+</div>
 <footer id="site-footer"></footer>
 <script src="assets/js/app.js" defer></script>
 <script defer>
@@ -202,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const top3 = Object.values(byGroup).sort((a, b) => b.tot - a.tot).slice(0, 3);
     const medal = ['🥇', '🥈', '🥉'];
     const top3HTML = top3.map((t, i) => `
-      <a class="row" href="car.html?id=${t.c.id}&cd=${cd}">
+      <a class="row" href="/car/${t.c.id}.html">
         <div class="grow"><div class="tit">${medal[i]} ${t.c.name}</div>
         <div class="desc">${makerShort(t.c.maker)} · 국비 ${manwon(t.c.nat)} + 지방비 ${manwon(r.v[t.c.id][0])}</div></div>
         <div class="amt">${manwon(t.tot)}</div></a>`).join('');
@@ -217,7 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div id="mr-note"></div>
       <div id="mr-cats"></div>
       <div class="grid2 mt8">
-        <a class="btn btn-primary" href="region.html?cd=${cd}">차종별 보조금 전체 보기</a>
+        <a class="btn btn-primary" href="/region/${cd}.html">차종별 보조금 전체 보기</a>
         <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">실시간 잔여 확인 ↗</a>
       </div>
       <p class="stamp">📞 ${r.dept}${/0000-?0000/.test(r.tel) ? '' : ' ' + r.tel} · 잔여현황 기준 ${statusUpdated ? new Date(statusUpdated).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'numeric'}) : '-'} · 단가 기준 ${meta.updated}</p>`;
@@ -254,7 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const ALIAS = { '아이오닉': 'ioniq', 'ev': 'ev', '모델': 'model' };
   function carRow(c) {
     const t = total(c);
-    return `<a class="row" href="car.html?id=${c.id}">
+    return `<a class="row" href="/car/${c.id}.html">
       <div class="grow"><div class="tit">${c.name}</div>
       <div class="desc">${makerShort(c.maker)} · ${c.range ? c.range + 'km' : '제원 미공개'}${c.batt ? ' · ' + c.batt + 'kWh' : ''}</div></div>
       <div class="amt">${manwon(t.amt)}<small>${t.label}</small></div></a>`;
@@ -297,7 +301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .sort((a, b) => b[1].maxP - a[1].maxP).slice(0, 10);
   const maxAmt = ranked[0][1].maxP;
   document.getElementById('rank').innerHTML = ranked.map(([cd, r], i) =>
-    `<a class="hbar ${i === 0 ? 'top' : ''}" href="region.html?cd=${cd}" style="color:inherit">
+    `<a class="hbar ${i === 0 ? 'top' : ''}" href="/region/${cd}.html" style="color:inherit">
       <span class="nm">${i + 1}. ${r.name.replace('특별자치도','').replace('특별자치시','')}</span>
       <span class="bar"><i style="width:${Math.round(r.maxP / maxAmt * 100)}%"></i></span>
       <span class="val">${manwon(r.maxP)}</span></a>`).join('');

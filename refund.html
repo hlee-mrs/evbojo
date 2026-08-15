@@ -54,14 +54,25 @@
 
   <section class="card">
     <h2 class="mt0">운행기간별 환수 요율표 <span class="sub">승용 · 국내 처분 기준</span></h2>
+    <!-- 정적 요율표 — law.html '운행 기간별 환수 요율' 표와 수치 동일해야 함(대조 필수). 아래 스크립트 RATES와도 일치 -->
     <div class="tbl-wrap"><table class="tbl" id="rf-table">
       <thead><tr><th>운행 기간</th><th class="num">환수 요율</th><th class="num">예시(보조금 1,000만원)</th></tr></thead>
-      <tbody></tbody>
+      <tbody>
+        <tr><td>3개월 미만</td><td class="num">70%</td><td class="num">700만원</td></tr>
+        <tr><td>3개월 이상 ~ 6개월 미만</td><td class="num">65%</td><td class="num">650만원</td></tr>
+        <tr><td>6개월 이상 ~ 9개월 미만</td><td class="num">60%</td><td class="num">600만원</td></tr>
+        <tr><td>9개월 이상 ~ 12개월 미만</td><td class="num">55%</td><td class="num">550만원</td></tr>
+        <tr><td>12개월 이상 ~ 15개월 미만</td><td class="num">50%</td><td class="num">500만원</td></tr>
+        <tr><td>15개월 이상 ~ 18개월 미만</td><td class="num">40%</td><td class="num">400만원</td></tr>
+        <tr><td>18개월 이상 ~ 21개월 미만</td><td class="num">30%</td><td class="num">300만원</td></tr>
+        <tr><td>21개월 이상 ~ 24개월 미만</td><td class="num">20%</td><td class="num">200만원</td></tr>
+        <tr><td><b>24개월 이후</b></td><td class="num"><b>0%</b></td><td class="num"><b>환수 없음</b></td></tr>
+      </tbody>
     </table></div>
     <p class="small muted">근거: 전기자동차 보급사업 보조금 업무처리지침의 운행기간별 회수요율(2026 기준). 지자체 운영에 따라 세부 적용이 다를 수 있으니 최종 금액은 관할 지자체·한국환경공단에 확인하세요. <b>수출 목적 말소는 의무기간이 5년</b>이며 별도 요율이 적용됩니다.</p>
   </section>
 
-  <div class="ad-slot" data-slot="refund-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+  <div class="ad-slot" data-slot="refund-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
 
   <section class="card">
     <h2 class="mt0">환수 없이 처분하는 방법</h2>
@@ -76,7 +87,7 @@
 <script src="assets/js/app.js" defer></script>
 <script defer>
 document.addEventListener('DOMContentLoaded', () => {
-  // 운행기간(개월)별 회수요율 — 2026 지침 기준
+  // 운행기간(개월)별 회수요율 — 2026 지침 기준. 위 정적 요율표(#rf-table)·law.html 표와 수치 동일해야 함
   const RATES = [
     { max: 3,  rate: 0.70, label: '3개월 미만' },
     { max: 6,  rate: 0.65, label: '3~6개월' },
@@ -87,9 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
     { max: 21, rate: 0.30, label: '18~21개월' },
     { max: 24, rate: 0.20, label: '21~24개월' },
   ];
-  document.querySelector('#rf-table tbody').innerHTML = RATES.map(r =>
-    `<tr><td>${r.label}</td><td class="num">${Math.round(r.rate * 100)}%</td><td class="num">${fmt(1000 * r.rate)}만원</td></tr>`
-  ).join('') + '<tr><td><b>24개월 이후</b></td><td class="num"><b>0%</b></td><td class="num"><b>환수 없음</b></td></tr>';
 
   const $id = x => document.getElementById(x);
   function calc() {

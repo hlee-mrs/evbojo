@@ -137,7 +137,7 @@ button.sum-tile:hover{border-color:var(--primary)}
     <a class="btn btn-ghost btn-block mt8" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">ev.or.kr 원본에서 직접 확인 ↗</a>
   </section>
 
-  <div class="ad-slot" data-slot="status-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+  <div class="ad-slot" data-slot="status-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
 
   <!-- 최근 물량 증가(추가공고) 감지 — 이력 없거나 해당 없으면 통째로 숨김(무소음) -->
   <section class="card" id="s-fresh" hidden aria-label="최근 물량이 늘어난 지역">
@@ -176,7 +176,7 @@ button.sum-tile:hover{border-color:var(--primary)}
     </script>
   </section>
 
-  <div class="ad-slot" data-slot="status-2"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+  <div class="ad-slot" data-slot="status-2"><div class="ad-label">광고</div><div class="ad-box"></div></div>
 
   <p class="stamp" id="s-stamp">잔여현황 기준시각은 데이터 로드 후 표시됩니다 · 출처 무공해차 통합누리집(ev.or.kr)</p>
 </main>
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const gen = st && st.d && st.d.left ? st.d.left[3] : null;  // 일반유형 잔여
       const pct = (n > 0 && left != null) ? Math.max(0, Math.min(100, Math.round((n - left) / n * 100))) : null;
       const next = c && c.nextRound ? String(c.nextRound) : '';
-      const html = `<a class="row" href="region.html?cd=${cd}">
+      const html = `<a class="row" href="/region/${cd}.html">
         <div class="grow">
           <div class="tit">${esc(r.name)} <span class="badge ${b.cls}"><span class="dot"></span>${b.label}</span>${next ? ` <span class="s-next" title="${esc(next)}">🔜 재공고 예고</span>` : ''}</div>
           <div class="desc">${pct != null ? `<span class="mini"><i style="width:${pct}%"></i></span> 소진 ${pct}%` : '소진율 -'}${n != null ? ` · 공고 ${fmt(n)}대` : ''}</div>
@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           .map(cd => ({ cd, d: latest[cd], name: regions[cd].name, left: status[cd] ? status[cd].left : null }))
           .sort((a, b) => (b.d - a.d) || byName(a, b));
         if (!items.length) return;
-        $id('s-fresh-list').innerHTML = items.map(x => `<a class="row" href="region.html?cd=${x.cd}">
+        $id('s-fresh-list').innerHTML = items.map(x => `<a class="row" href="/region/${x.cd}.html">
           <div class="grow"><div class="tit">${esc(x.name)}</div><div class="desc">${md(x.d)} 물량 증가 감지</div></div>
           <div class="amt">${x.left == null ? '-' : fmt(x.left) + '대'}<small>현재 전체 잔여</small></div>
         </a>`).join('');

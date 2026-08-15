@@ -16,6 +16,7 @@
 <meta name="naver-site-verification" content="29413de3319d0b4b5a504cdbb92084043d6d663b" />
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
+<link rel="canonical" href="https://evbojo.co.kr/status.html"><!-- 파라미터 없는 레거시 접근의 정본 = 전국 현황판(파라미터 접근은 JS가 /region/{cd}.html로 이동) -->
 </head>
 <body>
 <header id="site-header"></header>
@@ -68,7 +69,7 @@
     </div>
   </section>
 
-  <div class="ad-slot" data-slot="region-1"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+  <div class="ad-slot" data-slot="region-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
 
   <section class="card">
     <h2 class="mt0">같은 시·도 다른 지역</h2>
@@ -85,7 +86,7 @@
     </div>
   </section>
 
-  <div class="ad-slot" data-slot="region-2"><div class="ad-label">AD</div><div class="ad-box"></div></div>
+  <div class="ad-slot" data-slot="region-2"><div class="ad-label">광고</div><div class="ad-box"></div></div>
 </main>
 
 <footer id="site-footer"></footer>
@@ -93,6 +94,8 @@
 <script defer>
 document.addEventListener('DOMContentLoaded', async () => {
   const [cars, regions, meta, statusFile] = await EVData.all();
+  // 신규 정적 URL로 이전 — ?cd= 지정 접근은 /region/{cd}.html이 정본(CF 301의 JS 폴백)
+  if (qs('cd') && regions[qs('cd')]) { location.replace('/region/' + qs('cd') + '.html'); return; }
   const cd = qs('cd') || myRegion.get() || '1100';
   const r = regions[cd];
   if (!r) { location.replace('index.html'); return; }
@@ -107,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('r-sub').textContent = `2026년 전기승용 기준 · 승용 최대 ${manwon(r.maxP)} · 경·소형 최대 ${manwon(r.maxS)}`;
 
   /* SEO: JS 렌더 페이지라 canonical·설명·브레드크럼을 여기서 주입 (파라미터 없는 URL은 ?cd=로 정규화) */
-  const pageUrl = `https://evbojo.co.kr/region.html?cd=${cd}`;
+  const pageUrl = `https://evbojo.co.kr/region/${cd}.html`;
   const canon = document.querySelector('link[rel="canonical"]') || document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'canonical' }));
   canon.href = pageUrl;
   const descEl = document.querySelector('meta[name="description"]');
@@ -165,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   document.getElementById('r-siblings').innerHTML = Object.entries(regions)
     .filter(([k, v]) => v.sido === r.sido && k !== cd)
-    .map(([k, v]) => `<a class="chip" href="region.html?cd=${k}">${sibDot(k)}${v.name} ${manwon(v.maxP)}</a>`).join('') || '<span class="muted small">단일 지역</span>';
+    .map(([k, v]) => `<a class="chip" href="/region/${k}.html">${sibDot(k)}${v.name} ${manwon(v.maxP)}</a>`).join('') || '<span class="muted small">단일 지역</span>';
 
   /* 지역 고유 요약(SEO 산문) — 랭킹·모델수·최고액·접수상태를 데이터로 조합(지역마다 다른 문장), 기준시각 명기 */
   (() => {
@@ -220,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('r-count').textContent = `${list.length}개 모델`;
     document.querySelector('#r-table tbody').innerHTML = list.slice(0, limit).map(x => `
       <tr class="${x.tot === best && sortKey === 'total' ? 'best' : ''}">
-        <td><a href="car.html?id=${x.c.id}&cd=${cd}" style="color:inherit;font-weight:700">${x.c.name}</a>
+        <td><a href="/car/${x.c.id}.html" style="color:inherit;font-weight:700">${x.c.name}</a>
           <div class="small muted">${makerShort(x.c.maker)}${x.c.range ? ' · ' + x.c.range + 'km' : ''}${x.c.disc ? ' · <span class="notice-badge">단종/이월</span>' : ''}</div></td>
         <td class="num">${fmt(x.nat)}</td>
         <td class="num">${fmt(x.loc)}${includeConv && x.conv ? `<div class="small" style="color:var(--money)">+전환 ${fmt(x.conv)}</div>` : ''}</td>
