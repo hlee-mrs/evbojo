@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 """EV보조금 정적 프리렌더 엔진 (stdlib 전용, /usr/bin/python3)
 
-site/data/*.json + updater/templates/*.tpl (+ updater/content/sido/*.md) →
+site/data/*.json + updater/templates/*.tpl (+ updater/content/{sido,model}/*.md) →
   site/region/{cd}.html × 161 (9999 한국환경공단은 noindex)
   site/car/{id}.html   × 117 (단종 disc=true 는 noindex)
   site/sido/{slug}.html × 17
-  site/sitemap.xml      (noindex 페이지 제외, lastmod=오늘)
+  site/model/{slug}.html (모델 시리즈 — md의 publish가 KST 오늘 이하인 편만) + site/model/index.html (허브)
+  site/sitemap.xml      (noindex·미발행 페이지 제외, lastmod=오늘)
 
 원칙:
 - 전량 재생성·멱등. 모든 페이지를 메모리에서 완성한 뒤에만 파일에 씀(임시파일 → os.replace 원자 교체).
@@ -30,7 +31,9 @@ SITE = os.path.join(ROOT, 'site')
 DATA = os.path.join(SITE, 'data')
 TPL_DIR = os.path.join(HERE, 'templates')
 SIDO_MD_DIR = os.path.join(HERE, 'content', 'sido')
+MODEL_MD_DIR = os.path.join(HERE, 'content', 'model')
 BASE = 'https://evbojo.co.kr'
+KST = datetime.timezone(datetime.timedelta(hours=9))   # 발행 게이트는 서버 로컬이 아니라 KST 기준
 AD_MIN = 1200          # 광고 게이팅: 정적 산문+공지 합계 최소 자수
 D0 = datetime.date(2026, 1, 1)   # history.json d0
 
@@ -52,6 +55,12 @@ SIDO_FULL = {
 MAKER_SHORT = {'현대자동차': '현대', '테슬라코리아': '테슬라', '메르세데스벤츠코리아': '벤츠',
                '볼보자동차코리아': '볼보', '케이지모빌리티': 'KGM', '폭스바겐그룹코리아': '폭스바겐그룹',
                '비와이디코리아': 'BYD'}
+
+# ── 모델 시리즈 (slug 고정 8 — model_group 라벨과 1:1, 슬러그는 ^[a-z0-9-]+$만) ──
+MODEL_SERIES = {
+    'ioniq5': '아이오닉5', 'ioniq6': '아이오닉6', 'ev6': 'EV6', 'ev3': 'EV3',
+    'model-y': '모델Y', 'casper': '캐스퍼 일렉트릭', 'kona': '코나 일렉트릭', 'ray': '레이 EV',
+}
 
 # 정적 핵심 페이지(30) — sitemap 상단. (region.html/car.html 레거시·파라미터 URL은 신규 경로로 대체돼 제외)
 CORE_PAGES = [
@@ -1320,6 +1329,10 @@ def build_car(car, cars, regions, meta, status, ctx):
                '<a class="chip" href="guide.html">📋 신청 절차 총정리</a>']
     if car.get('rangeCold'):
         related.append('<a class="chip" href="winter-range.html">❄️ 겨울 주행거리의 진실</a>')
+    # 모델 시리즈 상호링크 — 발행 게이트를 통과해 실제 생성된 편만(미발행 시리즈로의 깨진 링크 금지)
+    pub_slug = (ctx.get('model_pub') or {}).get(grp)
+    if pub_slug:
+        related.append('<a class="chip" href="model/%s.html">🔍 %s 보조금 심층 분석</a>' % (pub_slug, esc(grp)))
 
     canonical = '%s/car/%d.html' % (BASE, cid)
     ld = [{'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
@@ -1744,8 +1757,8 @@ def car_prose(car, cars, rows, eff, cr, meta, status, ctx):
 # ══════════════════════════════════════════════════════════
 def md_to_html(md_text):
     """산문 md(W2 작성) → (HTML, 프런트매터 dict).
-    지원: --- YAML 프런트매터(title/description), ## 소제목, **굵게**, 빈 줄 문단,
-    내부 링크 [텍스트](region:4180 | car:12 | sido:seoul | https://…)."""
+    지원: --- YAML 프런트매터(title/description/publish), ## 소제목, **굵게**, 빈 줄 문단,
+    내부 링크 [텍스트](region:4180 | car:12 | sido:seoul | model:ioniq5 | https://…)."""
     fm = {}
     m = re.match(r'\s*---\s*\n(.*?)\n---\s*\n', md_text, re.S)
     if m:
@@ -1763,6 +1776,8 @@ def md_to_html(md_text):
             href = '/car/%s.html' % tgt[4:]
         elif tgt.startswith('sido:'):
             href = '/sido/%s.html' % tgt[5:]
+        elif tgt.startswith('model:'):
+            href = '/model/%s.html' % tgt[6:]
         elif tgt.startswith('http'):
             return '<a href="%s" target="_blank" rel="noopener">%s</a>' % (tgt, txt)
         else:
@@ -1902,9 +1917,212 @@ def build_sido(sido, regions, meta, status, ctx):
 
 
 # ══════════════════════════════════════════════════════════
+#  model 시리즈 (시차 발행 게이트 — publish가 KST 오늘보다 미래면 전면 제외)
+# ══════════════════════════════════════════════════════════
+def load_model_entries(today_kst):
+    """updater/content/model/{slug}.md 로드 — W2 작성 전(md 없음)·미래 publish는 조용히 스킵(빌드 성공).
+    발행 게이트를 통과한 편만 반환하므로 페이지·허브·사이트맵·car 상호링크가 전부 같은 집합을 본다."""
+    entries = []
+    for slug, group in MODEL_SERIES.items():
+        if not re.fullmatch(r'[a-z0-9-]+', slug):
+            print('경고: model 슬러그 형식 불일치 %r — 제외' % slug, file=sys.stderr)
+            continue                                    # 고정 슬러그지만 경로 이중 방어
+        path = os.path.join(MODEL_MD_DIR, slug + '.md')
+        if not os.path.exists(path):
+            continue                                    # 에세이 미작성 — 무소음 강등
+        with open(path, encoding='utf-8') as f:
+            prose, fm = md_to_html(f.read())
+        pub = (fm.get('publish') or '').strip()
+        if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', pub):
+            print('경고: model/%s.md publish 형식 불일치 %r — 제외' % (slug, pub), file=sys.stderr)
+            continue
+        if pub > today_kst:
+            continue                                    # 시차 발행 — 도래 전엔 어디에도 노출하지 않음
+        entries.append({'slug': slug, 'group': group, 'prose': prose, 'fm': fm, 'publish': pub})
+    entries.sort(key=lambda e: (e['publish'], e['slug']))
+    return entries
+
+
+def build_model(entry, cars, regions, meta, status, ctx):
+    """모델 시리즈 한 편 — 에세이(md) + 매시간 갱신 데이터 섹션(트림 표·대표 트림 지역 분포)."""
+    slug, group, fm = entry['slug'], entry['group'], entry['fm']
+    updated = status.get('updated', '')
+    asof = updated[:10]
+    # 현행 트림만, WAV·'미지원' 사양은 표·대표 트림에서 제외(일반 구매와 조건이 다름)
+    trims = sorted((c for c in cars if not c['disc'] and model_group(c) == group
+                    and 'WAV' not in c['name'] and '미지원' not in c['name']),
+                   key=lambda c: (-c['nat'], c['id']))
+    if not trims:
+        print('경고: model/%s — 현행 트림 없음, 페이지 제외' % slug, file=sys.stderr)
+        return None
+    rep = trims[0]                                      # 대표 트림 = 그룹 내 국비 최고 비단종
+    nat_lo = min(c['nat'] for c in trims)
+    nat_hi = max(c['nat'] for c in trims)
+
+    trs = []
+    for c in trims:
+        eff = round(c['range'] / c['batt'], 1) if c.get('range') and c.get('batt') else None
+        trs.append('<tr><td><a href="/car/%d.html" style="color:inherit;font-weight:700">%s</a></td>'
+                   '<td class="num">%s</td><td class="num">%s / %s</td><td class="num">%s</td></tr>'
+                   % (c['id'], esc(c['name']), fmt(c['nat']),
+                      fmt(c['range']) if c.get('range') else '-',
+                      fmt(c['rangeCold']) if c.get('rangeCold') else '-',
+                      eff if eff else '-'))
+
+    # 대표 트림 기준 지역별 합계(9999 제외) + 상태 뱃지(detect_closed 재사용 — closed_map)
+    rows = []
+    for k, r in regions.items():
+        if k == '9999':
+            continue
+        v = car_v(r, rep['id'])
+        if not v:
+            continue
+        rows.append((k, r, rep['nat'] + v[0]))
+    rows.sort(key=lambda x: (-x[2], x[1]['name']))
+    rtrs = []
+    for k, r, tot in rows[:15]:
+        stt = status['data'].get(k) or {}
+        cls, label = badge_of(stt, ctx['closed_map'][k])
+        rtrs.append('<tr><td><a href="/region/%s.html" style="color:inherit;font-weight:700">%s</a>'
+                    '<div class="small muted">%s</div></td>'
+                    '<td class="num" style="font-weight:800;color:var(--money)">%s</td>'
+                    '<td><span class="badge %s"><span class="dot"></span>%s</span></td></tr>'
+                    % (k, esc(r['name']), esc(r.get('sido', '')), fmt(tot), cls, esc(label)))
+    dist = ''
+    if rows:
+        tots = sorted(t for _, _, t in rows)
+        n = len(tots)
+        # 표준 중앙값(짝수면 가운데 두 값 평균) — 에세이(md) 계산 관례와 통일
+        med = tots[n // 2] if n % 2 else round((tots[n // 2 - 1] + tots[n // 2]) / 2)
+        dist = ('<p class="small" style="line-height:1.7;margin-top:10px">%s 수집 기준 %d개 지자체에서 '
+                '%s의 국비+지방비 합계는 최고 %s만원(%s), 최저 %s만원(%s), 중앙값 %s만원입니다. '
+                '표의 금액은 공고 단가 기준이라 접수 마감 여부와는 별개이며, 실제 접수 가능 여부는 '
+                '각 지역 페이지의 상태 뱃지와 공지 원문으로 확인하세요.</p>'
+                % (esc(asof), len(rows), esc(rep['name']), fmt(rows[0][2]), esc(rows[0][1]['name']),
+                   fmt(rows[-1][2]), esc(rows[-1][1]['name']), fmt(med)))
+
+    related = ['<a class="chip" href="winter-range-ranking.html">❄️ 겨울 주행거리 랭킹</a>',
+               '<a class="chip" href="price-tiers.html">💰 가격구간(기본가격) 바로 알기</a>',
+               '<a class="chip" href="status.html">🗺 전국 현황판</a>',
+               '<a class="chip" href="model/">📚 모델별 시리즈 전체 보기</a>']
+
+    title = fm.get('title') or '%s 보조금 2026 — 트림·지역·겨울 성능 심층 분석' % group
+    desc = fm.get('description') or ('%s 2026년 보조금 심층 분석: 현행 트림 %d종 국비 %s만~%s만원, 지역별 국비+지방비 합계 분포와 접수 상태, 저온(겨울) 주행거리까지 실측 데이터 기준.'
+                                     % (group, len(trims), fmt(nat_lo), fmt(nat_hi)))
+    canonical = '%s/model/%s.html' % (BASE, slug)
+    ld = [{'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
+        {'@type': 'ListItem', 'position': 1, 'name': '홈', 'item': BASE + '/'},
+        {'@type': 'ListItem', 'position': 2, 'name': '모델별 보조금 심층 시리즈', 'item': BASE + '/model/'},
+        {'@type': 'ListItem', 'position': 3, 'name': '%s 보조금' % group, 'item': canonical}]},
+        {'@context': 'https://schema.org', '@type': 'Article',
+         'headline': title, 'datePublished': entry['publish'], 'dateModified': asof, 'inLanguage': 'ko',
+         'author': {'@type': 'Person', 'name': 'HyeongHun Lee', 'url': BASE + '/about.html#operator'},
+         'publisher': {'@type': 'Organization', 'name': 'EV보조금'},
+         'mainEntityOfPage': canonical}]
+
+    mapping = {
+        'NAME': esc(title.split(' — ')[0] if ' — ' in title else title),
+        'GROUP': esc(group),
+        'SUB': '2026년 전기승용 기준 · 현행 트림 %d종 · 국비 %s만~%s만원' % (len(trims), fmt(nat_lo), fmt(nat_hi)),
+        'PUBLISHED': esc(entry['publish']), 'ASOF': esc(asof),
+        'PROSE': entry['prose'],
+        'AD1': '', 'AD2': '',
+        'TRIM_SUB': '%d개 트림 · 국비 순' % len(trims),
+        'TRIM_ROWS': ''.join(trs),
+        'REP_NAME': esc(rep['name']),
+        'REGION_SUB': '상위 %d개 / 전체 %d개 지역 · %s 수집 기준' % (min(15, len(rows)), len(rows), esc(asof)),
+        'REGION_ROWS': ''.join(rtrs),
+        'DIST': dist,
+        'RELATED': ''.join(related),
+    }
+    gate = len(strip_tags(render(ctx['tpl_model'], mapping)))   # app.js와 동일: <main> 전체 텍스트 기준
+    mapping['AD1'] = ad_slot('model-1', gate, False)
+    mapping['AD2'] = ad_slot('model-2', gate, False)
+    main = render(ctx['tpl_model'], mapping)
+    return render(ctx['tpl_page'], {
+        'TITLE': esc('%s | EV보조금' % title),
+        'DESC': esc(desc),
+        'ROBOTS': '',
+        'CANONICAL': canonical,
+        'JSONLD': jsonld_script(ld),
+        'BREADCRUMB': '<a href="/">홈</a> › <a href="/model/">모델별 시리즈</a> › <b>%s</b>' % esc(group),
+        'MAIN': main,
+        'META_UPDATED': esc(meta['updated']),
+    })
+
+
+def build_model_hub(entries, meta, status, ctx):
+    """시리즈 허브 — 발행 게이트를 통과한 편만 나열. articles.html·홈은 이 허브 하나만 가리키면 된다."""
+    asof = status.get('updated', '')[:10]
+    rows = ''.join('<a class="row" href="/model/%s.html"><div class="grow"><div class="tit">%s</div>'
+                   '<div class="desc">%s</div><div class="desc" style="opacity:.75">게시 %s</div></div></a>'
+                   % (e['slug'],
+                      esc(e['fm'].get('title') or '%s 보조금 심층 분석' % e['group']),
+                      esc(e['fm'].get('description') or '트림·지역·겨울 성능 실측 분석'),
+                      esc(e['publish']))
+                   for e in entries)
+    listing = ('<div class="rowlist">%s</div>' % rows if rows else
+               '<p class="muted small" style="padding:10px 4px">첫 편을 준비 중입니다. 발행되는 대로 이곳에 나열돼요.</p>')
+    # 시리즈 소개 2문단 — 정적(멱등). 키워드 반복 제한: '전기차 보조금' 문단당 1회 이하
+    intro = (
+        '<p style="line-height:1.75;margin:10px 0">이 시리즈는 관심이 큰 전기차 모델을 한 편에 하나씩 깊게 다루는 연재입니다. '
+        '같은 이름의 차라도 트림에 따라 국비가 달라지고, 주소지에 따라 지방비가 갈리며, 겨울(저온) 주행거리 유지율도 제각각입니다. '
+        '각 편은 무공해차 통합누리집(ev.or.kr) 공고 데이터를 매시간 수집한 실측치를 근거로, '
+        '트림별 국비 차이 → 지역별 합계 분포 → 겨울 성능 → 신청 실무 순서로 정리합니다.</p>'
+        '<p style="line-height:1.75;margin:10px 0">본문 산문에는 작성 기준일을 명시하고, 데이터 표(트림·지역·접수 상태)는 '
+        '매시간 자동 갱신됩니다. 시리즈는 순차 발행되며 발행된 편만 아래에 나열됩니다. 표시 금액은 공고 단가 기준이므로, '
+        '실제 신청 자격·기간·접수 가능 여부는 관할 지자체 공고문으로 확인하세요.</p>')
+    canonical = BASE + '/model/'
+    main_body = (
+        '<div class="hero" style="text-align:left;padding-bottom:0">\n'
+        '  <h1>모델별 <span class="hl">보조금 심층 시리즈</span></h1>\n'
+        '  <p>인기 전기차를 한 편에 하나씩 — 트림·지역·겨울 성능 실측 분석</p>\n'
+        '</div>\n'
+        '<p class="stamp">글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 데이터 기준 %s</p>\n'
+        '<section class="card">\n%s\n</section>\n'
+        '%s\n'
+        '<section class="card">\n  <h2 class="mt0">발행된 편 <span class="sub">%d편 · 발행일 순</span></h2>\n  %s\n</section>\n'
+        '<section class="card">\n  <h2 class="mt0">다음 단계</h2>\n  <div class="chips">\n'
+        '    <a class="chip" href="status.html">🗺 전국 현황판</a>\n'
+        '    <a class="chip" href="winter-range-ranking.html">❄️ 겨울 주행거리 랭킹</a>\n'
+        '    <a class="chip" href="articles.html">📚 읽을거리 전체</a>\n'
+        '  </div>\n</section>\n')
+    gate = len(strip_tags(main_body % (esc(asof), intro, '', len(entries), listing)))
+    ad1 = ad_slot('model-hub-1', gate, False)
+    main = main_body % (esc(asof), intro, ad1, len(entries), listing)
+    ld = [{'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
+        {'@type': 'ListItem', 'position': 1, 'name': '홈', 'item': BASE + '/'},
+        {'@type': 'ListItem', 'position': 2, 'name': '모델별 보조금 심층 시리즈', 'item': canonical}]},
+        {'@context': 'https://schema.org', '@type': 'CollectionPage',
+         'name': '모델별 전기차 보조금 심층 시리즈',
+         'description': '인기 전기차 모델별 보조금 심층 분석 연재 — 트림·지역·겨울 성능 실측 데이터 기준.',
+         'url': canonical, 'inLanguage': 'ko'}]
+    if entries:
+        ld.append({'@context': 'https://schema.org', '@type': 'ItemList',
+                   'name': '모델별 보조금 심층 시리즈 발행 목록',
+                   'itemListOrder': 'https://schema.org/ItemListOrderAscending',
+                   'numberOfItems': len(entries),
+                   'itemListElement': [
+                       {'@type': 'ListItem', 'position': i + 1,
+                        'url': '%s/model/%s.html' % (BASE, e['slug']),
+                        'name': e['fm'].get('title') or '%s 보조금 심층 분석' % e['group']}
+                       for i, e in enumerate(entries)]})
+    return render(ctx['tpl_page'], {
+        'TITLE': esc('모델별 전기차 보조금 심층 시리즈 — 트림·지역·겨울 성능 | EV보조금'),
+        'DESC': esc('아이오닉5·EV3·모델Y 등 인기 모델의 2026년 보조금을 한 편에 하나씩 심층 분석. 트림별 국비, 지역별 합계 분포, 저온 주행거리까지 매시간 갱신되는 실측 데이터 기준.'),
+        'ROBOTS': '',
+        'CANONICAL': canonical,
+        'JSONLD': jsonld_script(ld),
+        'BREADCRUMB': '<a href="/">홈</a> › <b>모델별 시리즈</b>',
+        'MAIN': main,
+        'META_UPDATED': esc(meta['updated']),
+    })
+
+
+# ══════════════════════════════════════════════════════════
 #  sitemap · 쓰기 · 메인
 # ══════════════════════════════════════════════════════════
-def build_sitemap(regions, cars, today):
+def build_sitemap(regions, cars, today, model_entries=()):
     urls = []
     for path, freq in CORE_PAGES:
         urls.append((BASE + path, freq))
@@ -1918,6 +2136,9 @@ def build_sitemap(regions, cars, today):
         urls.append(('%s/car/%d.html' % (BASE, c['id']), 'weekly'))
     for sido in SIDO_SLUG:
         urls.append(('%s/sido/%s.html' % (BASE, SIDO_SLUG[sido]), 'daily'))
+    urls.append((BASE + '/model/', 'weekly'))          # 시리즈 허브(index.html) — 항상 생성
+    for e in model_entries:                            # 발행 게이트 통과분만 — 미래 publish는 미포함
+        urls.append(('%s/model/%s.html' % (BASE, e['slug']), 'weekly'))
     body = '\n'.join('<url><loc>%s</loc><lastmod>%s</lastmod><changefreq>%s</changefreq></url>'
                      % (u, today, f) for u, f in urls)
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -1961,12 +2182,26 @@ def main():
                    and not closed_map[cd]['closed'])
     ctx = {'tpl_page': load_tpl('page.tpl'), 'tpl_region': load_tpl('region.tpl'),
            'tpl_car': load_tpl('car.tpl'), 'tpl_sido': load_tpl('sido.tpl'),
+           'tpl_model': load_tpl('model.tpl'),
            'asof_day': asof_day if asof_day is not None else (datetime.date.today() - D0).days,
            'asof': status.get('updated', '')[:10],
            'closed_map': closed_map, 'open_cnt': open_cnt,
            'open_base': sum(1 for cd in regions if cd != '9999')}
 
     pages = {}   # 전부 메모리에서 완성 → 성공 시에만 원자 쓰기(부분 파일 금지)
+
+    # 모델 시리즈 — car 상호링크가 '실제 생성된 편' 집합을 봐야 하므로 car보다 먼저 조립
+    today_kst = datetime.datetime.now(KST).date().isoformat()
+    pub_entries = []
+    for e in load_model_entries(today_kst):
+        html = build_model(e, cars, regions, meta, status, ctx)
+        if html is None:
+            continue                                   # 트림 전멸 등 — 무소음 강등
+        pages[os.path.join(SITE, 'model', e['slug'] + '.html')] = html
+        pub_entries.append(e)
+    ctx['model_pub'] = {e['group']: e['slug'] for e in pub_entries}
+    pages[os.path.join(SITE, 'model', 'index.html')] = build_model_hub(pub_entries, meta, status, ctx)
+
     for cd, r in regions.items():
         html, _ = build_region(cd, r, cars, regions, meta, status, hist, ctx)
         pages[os.path.join(SITE, 'region', cd + '.html')] = html
@@ -1979,16 +2214,19 @@ def main():
     n_region = sum(1 for p in pages if os.sep + 'region' + os.sep in p)
     n_car = sum(1 for p in pages if os.sep + 'car' + os.sep in p)
     n_sido = sum(1 for p in pages if os.sep + 'sido' + os.sep in p)
-    if n_region != len(regions) or n_car != len(cars) or n_sido != len(SIDO_SLUG):
-        raise RuntimeError('페이지 수 불일치: region %d/%d car %d/%d sido %d/%d'
-                           % (n_region, len(regions), n_car, len(cars), n_sido, len(SIDO_SLUG)))
+    n_model = sum(1 for p in pages if os.sep + 'model' + os.sep in p)
+    if (n_region != len(regions) or n_car != len(cars) or n_sido != len(SIDO_SLUG)
+            or n_model != len(pub_entries) + 1):
+        raise RuntimeError('페이지 수 불일치: region %d/%d car %d/%d sido %d/%d model %d/%d'
+                           % (n_region, len(regions), n_car, len(cars), n_sido, len(SIDO_SLUG),
+                              n_model, len(pub_entries) + 1))
 
-    sitemap, n_urls = build_sitemap(regions, cars, today)
+    sitemap, n_urls = build_sitemap(regions, cars, today, pub_entries)
 
     for path, html in pages.items():
         atomic_write(path, html)
-    # 생성 대상에서 빠진 잔재 파일 정리(차종 삭제 등) — 이 3개 디렉터리는 생성기 소유
-    for sub in ('region', 'car', 'sido'):
+    # 생성 대상에서 빠진 잔재 파일 정리(차종 삭제·발행 회수 등) — 이 4개 디렉터리는 생성기 소유
+    for sub in ('region', 'car', 'sido', 'model'):
         droot = os.path.join(SITE, sub)
         if not os.path.isdir(droot):
             continue
@@ -1999,8 +2237,8 @@ def main():
     atomic_write(os.path.join(SITE, 'sitemap.xml'), sitemap)
 
     dt = (datetime.datetime.now() - t0).total_seconds()
-    print('prerender OK: region %d · car %d · sido %d · sitemap %d URLs · %.1fs'
-          % (n_region, n_car, n_sido, n_urls, dt))
+    print('prerender OK: region %d · car %d · sido %d · model %d(허브 포함) · sitemap %d URLs · %.1fs'
+          % (n_region, n_car, n_sido, n_model, n_urls, dt))
 
 
 if __name__ == '__main__':
