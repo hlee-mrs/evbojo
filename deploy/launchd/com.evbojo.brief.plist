@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.evbojo.brief</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/hlee/Projects/전기차 보조금 현황/updater/run_brief.sh</string>
+  </array>
+  <!-- 매일 08:20 KST(주 발화) + 12:20(보조 — 아침 실패·수면 대비, '이미 존재 SKIP' 멱등 가드로 이중 발행 없음) -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Hour</key><integer>12</integer><key>Minute</key><integer>20</integer></dict>
+  </array>
+  <key>RunAtLoad</key><false/>
+  <key>StandardOutPath</key><string>/Users/hlee/Projects/전기차 보조금 현황/updater/brief_launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/hlee/Projects/전기차 보조금 현황/updater/brief_launchd.log</string>
+</dict>
+</plist>

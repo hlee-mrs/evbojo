@@ -15,3 +15,7 @@ updater/adsense_watch.log
 updater/adsense_launchd.log
 updater/.adsense_state
 updater/.adsense_api_state
+updater/brief.log
+updater/brief_launchd.log
+updater/.brief.lock/
+updater/.brief_prev.json

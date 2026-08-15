@@ -2120,27 +2120,113 @@ def build_model_hub(entries, meta, status, ctx):
 
 
 # ══════════════════════════════════════════════════════════
+#  brief (일간 브리핑 통합 — 날짜 파일은 daily_brief.py 산출물, 허브·사이트맵만 여기 소유)
+# ══════════════════════════════════════════════════════════
+BRIEF_RE = re.compile(r'(\d{4}-\d{2}-\d{2})\.html$')
+
+
+def list_brief_days(today_iso):
+    """site/brief/의 날짜 파일 중 최근 30일분(내림차순). 파일 자체는 영구 보존 — 목록만 자름."""
+    droot = os.path.join(SITE, 'brief')
+    if not os.path.isdir(droot):
+        return []
+    cut = (datetime.date.fromisoformat(today_iso) - datetime.timedelta(days=29)).isoformat()  # 오늘 포함 30일 창
+    days = sorted((m.group(1) for fn in os.listdir(droot)
+                   for m in [BRIEF_RE.fullmatch(fn)] if m), reverse=True)
+    return [d for d in days if d >= cut]
+
+
+def _brief_desc(day):
+    """발행된 브리핑 파일의 meta description을 허브 요약으로 재사용(파일 앞부분만 읽음)."""
+    try:
+        with open(os.path.join(SITE, 'brief', day + '.html'), encoding='utf-8') as f:
+            head = f.read(4096)
+        m = re.search(r'<meta name="description" content="([^"]*)"', head)
+        return m.group(1) if m else ''
+    except OSError:
+        return ''
+
+
+def build_brief_hub(brief_days, meta, status, ctx):
+    """/brief/ 허브 — 최근 30일 목록 + 자동 생성 공개 문단(정적·멱등)."""
+    wd = ['월', '화', '수', '목', '금', '토', '일']
+    rows = []
+    for d in brief_days:
+        dt = datetime.date.fromisoformat(d)
+        rows.append('<a class="row" href="/brief/%s.html"><div class="grow">'
+                    '<div class="tit">%d월 %d일(%s) 브리핑</div><div class="desc">%s</div>'
+                    '<div class="desc" style="opacity:.75">발행 %s</div></div></a>'
+                    % (d, dt.month, dt.day, wd[dt.weekday()], _brief_desc(d), d))
+    listing = ('<div class="rowlist">%s</div>' % ''.join(rows) if rows else
+               '<p class="muted small" style="padding:10px 4px">첫 브리핑을 준비 중입니다. 발행되는 대로 이곳에 나열돼요.</p>')
+    intro = (
+        '<p style="line-height:1.75;margin:10px 0">일일 브리핑은 무공해차 통합누리집(ev.or.kr)에서 매시간 수집하는 '
+        '지자체 공고 데이터를 바탕으로 매일 아침 자동 생성되는 페이지입니다. 전국 잔여 합계의 전일 대비 변화, '
+        '가장 많이 줄어든 지역, 새로 마감이 공지된 지역, 물량이 크게 늘어난(추가 공고 가능성) 지역을 '
+        '그날의 실측 수치로만 정리합니다. 외부 기사를 재작성하지 않습니다.</p>'
+        '<p style="line-height:1.75;margin:10px 0">변화가 없거나 데이터 수집이 오래된 날에는 발행을 건너뜁니다. '
+        '발행된 브리핑은 그날의 기록으로 보존되며 이후 수정하지 않습니다. 목록에는 최근 30일분만 나열하지만 '
+        '지난 브리핑 페이지 자체는 계속 유지됩니다. 데이터·생성: EV보조금 자동 브리핑 · '
+        '편집 책임: <a href="about.html#operator">HyeongHun Lee</a>.</p>')
+    canonical = BASE + '/brief/'
+    main_body = (
+        '<div class="hero" style="text-align:left;padding-bottom:0">\n'
+        '  <h1>매일 아침 <span class="hl">보조금 브리핑</span></h1>\n'
+        '  <p>어제 하루 전국 잔여 변화 — 실측 데이터 자동 브리핑</p>\n'
+        '</div>\n'
+        '<p class="stamp">데이터 기준 %s · 매일 아침 발행(변화 없는 날 제외) · 출처 ev.or.kr</p>\n'
+        '<section class="card">\n%s\n</section>\n'
+        '<section class="card">\n  <h2 class="mt0">지난 브리핑 <span class="sub">최근 30일 · %d편</span></h2>\n  %s\n</section>\n'
+        '<section class="card">\n  <h2 class="mt0">다음 단계</h2>\n  <div class="chips">\n'
+        '    <a class="chip" href="status.html">🗺 전국 현황판</a>\n'
+        '    <a class="chip" href="quota-reading.html">📖 잔여 대수 읽는 법</a>\n'
+        '    <a class="chip" href="articles.html">📚 읽을거리 전체</a>\n'
+        '  </div>\n</section>\n'
+        % (esc(status.get('updated', '')[:10]), intro, len(brief_days), listing))
+    ld = [{'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
+        {'@type': 'ListItem', 'position': 1, 'name': '홈', 'item': BASE + '/'},
+        {'@type': 'ListItem', 'position': 2, 'name': '일일 브리핑', 'item': canonical}]},
+        {'@context': 'https://schema.org', '@type': 'CollectionPage',
+         'name': '전기차 보조금 일일 브리핑',
+         'description': '전국 전기승용 보조금 잔여 변화를 매일 아침 실측 데이터로 자동 정리하는 브리핑 모음.',
+         'url': canonical, 'inLanguage': 'ko'}]
+    return render(ctx['tpl_page'], {
+        'TITLE': esc('전기차 보조금 일일 브리핑 — 전국 잔여 변화 매일 아침 정리 | EV보조금'),
+        'DESC': esc('전국 160개 지자체의 전기승용 보조금 잔여 변화·신규 마감·물량 증가를 매일 아침 실측 데이터로 자동 정리. 최근 30일 브리핑 모음.'),
+        'ROBOTS': '',
+        'CANONICAL': canonical,
+        'JSONLD': jsonld_script(ld),
+        'BREADCRUMB': '<a href="/">홈</a> › <b>일일 브리핑</b>',
+        'MAIN': main_body,
+        'META_UPDATED': esc(meta['updated']),
+    })
+
+
+# ══════════════════════════════════════════════════════════
 #  sitemap · 쓰기 · 메인
 # ══════════════════════════════════════════════════════════
-def build_sitemap(regions, cars, today, model_entries=()):
+def build_sitemap(regions, cars, today, model_entries=(), brief_days=()):
     urls = []
     for path, freq in CORE_PAGES:
-        urls.append((BASE + path, freq))
+        urls.append((BASE + path, freq, today))
     for cd in sorted(regions):
         if cd == '9999':
             continue                       # noindex — 사이트맵 제외
-        urls.append(('%s/region/%s.html' % (BASE, cd), 'daily'))
+        urls.append(('%s/region/%s.html' % (BASE, cd), 'daily', today))
     for c in cars:
         if c['disc']:
             continue                       # 단종 noindex — 제외
-        urls.append(('%s/car/%d.html' % (BASE, c['id']), 'weekly'))
+        urls.append(('%s/car/%d.html' % (BASE, c['id']), 'weekly', today))
     for sido in SIDO_SLUG:
-        urls.append(('%s/sido/%s.html' % (BASE, SIDO_SLUG[sido]), 'daily'))
-    urls.append((BASE + '/model/', 'weekly'))          # 시리즈 허브(index.html) — 항상 생성
-    for e in model_entries:                            # 발행 게이트 통과분만 — 미래 publish는 미포함
-        urls.append(('%s/model/%s.html' % (BASE, e['slug']), 'weekly'))
+        urls.append(('%s/sido/%s.html' % (BASE, SIDO_SLUG[sido]), 'daily', today))
+    urls.append((BASE + '/model/', 'weekly', today))    # 시리즈 허브(index.html) — 항상 생성
+    for e in model_entries:                             # 발행 게이트 통과분만 — 미래 publish는 미포함
+        urls.append(('%s/model/%s.html' % (BASE, e['slug']), 'weekly', today))
+    urls.append((BASE + '/brief/', 'daily', today))     # 브리핑 허브 — 항상 생성
+    for d in brief_days:                                # 최근 30일분만(파일은 영구 보존) · 발행 후 불변 → lastmod=발행일
+        urls.append(('%s/brief/%s.html' % (BASE, d), 'monthly', d))
     body = '\n'.join('<url><loc>%s</loc><lastmod>%s</lastmod><changefreq>%s</changefreq></url>'
-                     % (u, today, f) for u, f in urls)
+                     % (u, lm, f) for u, f, lm in urls)
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s\n</urlset>\n' % body), len(urls)
 
@@ -2211,6 +2297,10 @@ def main():
     for sido in SIDO_SLUG:
         pages[os.path.join(SITE, 'sido', SIDO_SLUG[sido] + '.html')] = build_sido(sido, regions, meta, status, ctx)
 
+    # 일간 브리핑 허브 — 날짜 파일(daily_brief.py 산출물)은 여기서 생성하지 않고 목록만 읽음
+    brief_days = list_brief_days(today_kst)
+    pages[os.path.join(SITE, 'brief', 'index.html')] = build_brief_hub(brief_days, meta, status, ctx)
+
     n_region = sum(1 for p in pages if os.sep + 'region' + os.sep in p)
     n_car = sum(1 for p in pages if os.sep + 'car' + os.sep in p)
     n_sido = sum(1 for p in pages if os.sep + 'sido' + os.sep in p)
@@ -2221,24 +2311,27 @@ def main():
                            % (n_region, len(regions), n_car, len(cars), n_sido, len(SIDO_SLUG),
                               n_model, len(pub_entries) + 1))
 
-    sitemap, n_urls = build_sitemap(regions, cars, today, pub_entries)
+    sitemap, n_urls = build_sitemap(regions, cars, today, pub_entries, brief_days)
 
     for path, html in pages.items():
         atomic_write(path, html)
-    # 생성 대상에서 빠진 잔재 파일 정리(차종 삭제·발행 회수 등) — 이 4개 디렉터리는 생성기 소유
-    for sub in ('region', 'car', 'sido', 'model'):
+    # 생성 대상에서 빠진 잔재 파일 정리(차종 삭제·발행 회수 등) — 이 5개 디렉터리는 생성기 소유.
+    # 단 brief의 날짜 파일(YYYY-MM-DD.html)은 daily_brief.py 산출물이라 절대 삭제하지 않음(영구 보존).
+    for sub in ('region', 'car', 'sido', 'model', 'brief'):
         droot = os.path.join(SITE, sub)
         if not os.path.isdir(droot):
             continue
         for fn in os.listdir(droot):
             fp = os.path.join(droot, fn)
+            if sub == 'brief' and BRIEF_RE.fullmatch(fn):
+                continue                       # 발행된 브리핑은 허브·사이트맵과 무관하게 보존
             if fn.endswith('.html') and fp not in pages:
                 os.remove(fp)
     atomic_write(os.path.join(SITE, 'sitemap.xml'), sitemap)
 
     dt = (datetime.datetime.now() - t0).total_seconds()
-    print('prerender OK: region %d · car %d · sido %d · model %d(허브 포함) · sitemap %d URLs · %.1fs'
-          % (n_region, n_car, n_sido, n_model, n_urls, dt))
+    print('prerender OK: region %d · car %d · sido %d · model %d(허브 포함) · brief 허브+%d편 · sitemap %d URLs · %.1fs'
+          % (n_region, n_car, n_sido, n_model, len(brief_days), n_urls, dt))
 
 
 if __name__ == '__main__':
