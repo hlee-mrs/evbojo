@@ -2300,6 +2300,10 @@ def main():
     # 일간 브리핑 허브 — 날짜 파일(daily_brief.py 산출물)은 여기서 생성하지 않고 목록만 읽음
     brief_days = list_brief_days(today_kst)
     pages[os.path.join(SITE, 'brief', 'index.html')] = build_brief_hub(brief_days, meta, status, ctx)
+    if brief_days:
+        # 홈 상단 배너용 최신 브리핑 메타(JS가 fetch — 없으면 배너는 정적 문구로 강등)
+        pages[os.path.join(SITE, 'brief', 'latest.json')] = json.dumps(
+            {'d': brief_days[0], 'desc': _brief_desc(brief_days[0])}, ensure_ascii=False)
 
     n_region = sum(1 for p in pages if os.sep + 'region' + os.sep in p)
     n_car = sum(1 for p in pages if os.sep + 'car' + os.sep in p)

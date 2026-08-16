@@ -33,6 +33,12 @@
 <header id="site-header"></header>
 
 <main class="container">
+  <!-- 일일 브리핑 배너 — 맨 상단. 정적 문구가 기본, JS가 최신 브리핑 날짜·요약으로 승격 -->
+  <a id="brief-banner" class="brief-banner" href="brief/">
+    <span class="bb-tag">📰 일일 브리핑</span>
+    <span class="bb-text" id="bb-text">매일 아침 실측 데이터로 발행하는 전국 보조금 변동 요약</span>
+    <span class="bb-go">보기 →</span>
+  </a>
   <div class="hero">
     <h1>우리 지역 전기차 보조금,<br><span class="hl">10초 만에</span> 확인하세요</h1>
     <p>2026년 · 전국 160개 지자체 · 전기승용 117개 모델 · 접수 현황까지</p>
@@ -167,6 +173,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const statusUpdated = statusFile && statusFile.updated;
 
   /* ── 전국 요약 스탯 스트립 — statusBadge를 실제 호출해 cls별 버킷 집계(뱃지 로직과 항상 일치) ── */
+  /* ── 상단 일일 브리핑 배너 승격 — 최신 브리핑 메타(fetch), 실패 시 정적 문구 유지 ── */
+  fetch('brief/latest.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).then(b => {
+    if (!b || !b.d) return;
+    const el = document.getElementById('brief-banner'), tx = document.getElementById('bb-text');
+    if (!el || !tx) return;
+    const [, m, d] = b.d.split('-');
+    // desc 선두의 "N월 N일(요일) 전기차 보조금 브리핑: " 중복 제거 후 첫 문장만
+    const core = (b.desc || '').split('. ')[0].replace(/^.*?브리핑:\s*/, '');
+    tx.textContent = `${+m}월 ${+d}일 브리핑 — ${core}`;
+    el.href = `brief/${b.d}.html`;
+  }).catch(() => {});
+
   const strip = document.getElementById('stat-strip');
   if (strip) {
     if (!statusFile || !statusFile.data) strip.hidden = true;   // 로드 실패 → 무소음 숨김
