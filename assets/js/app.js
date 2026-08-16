@@ -461,20 +461,43 @@
   window.carEff = c => (c.range && c.batt) ? +(c.range / c.batt).toFixed(1) : null;
   window.coldRatio = c => (c.range && c.rangeCold) ? Math.round(c.rangeCold / c.range * 100) : null;
 
-  /* ── 헤더/푸터 주입 ── */
+  /* ── 헤더/푸터 주입 ──
+     상위 메뉴 5개로 통폐합: 성격이 비슷한 항목은 드롭다운(details — JS 없이도 동작) 하위로.
+     프리렌더 정적 내비(page.tpl)와 구조 동일해야 함 — 한쪽 수정 시 양쪽 동기화. */
   const NAV = [
-    ['index.html', '홈'], ['status.html', '전국 현황판'], ['calc.html', '유지비 계산기'], ['check.html', '자격 진단'],
-    ['guide.html', '신청 절차'], ['law.html', '제도·법령'], ['refund.html', '환수 계산'], ['faq.html', 'FAQ'],
-    ['articles.html', '읽을거리'],
+    ['index.html', '홈'],
+    ['status.html', '전국 현황판'],
+    ['도구', [['calc.html', '유지비 계산기'], ['check.html', '자격 진단'], ['refund.html', '환수 계산'], ['compare.html', '차종 비교']]],
+    ['가이드', [['guide.html', '신청 절차'], ['law.html', '제도·법령'], ['faq.html', 'FAQ']]],
+    ['읽을거리', [['articles.html', '읽을거리 전체'], ['brief/', '일일 브리핑'], ['model/', '모델별 시리즈']]],
   ];
   function header() {
-    const here = location.pathname.split('/').pop() || 'index.html';
+    const path = location.pathname;
+    const here = path.split('/').pop() || 'index.html';
+    const inDir = h => h.endsWith('/') && path.indexOf('/' + h) >= 0;   // brief/·model/ 하위 페이지 매칭
     const el = $('#site-header'); if (!el) return;
     el.className = 'site-header';
+    const item = ([h, t]) => {
+      if (typeof t !== 'string') return '';
+      // 지역·시도 상세는 '전국 현황판' 계열로 하이라이트
+      const on = here === h || (h === 'status.html' && /\/(region|sido)\//.test(path));
+      return `<a href="${h}" class="${on ? 'on' : ''}">${t}</a>`;
+    };
+    const group = (t, items) => {
+      const on = items.some(([h]) => here === h || inDir(h));
+      return `<details class="nav-dd"><summary class="${on ? 'on' : ''}">${t}</summary><div class="dd">${items.map(([h, l]) => `<a href="${h}" class="${here === h || inDir(h) ? 'on' : ''}">${l}</a>`).join('')}</div></details>`;
+    };
     el.innerHTML = `<div class="inner">
       <a class="logo" href="index.html"><span class="bolt">⚡</span>${SITE.name}</a>
-      <nav class="gnb" aria-label="주 메뉴">${NAV.map(([h, t]) => `<a href="${h}" class="${here === h ? 'on' : ''}">${t}</a>`).join('')}</nav>
+      <nav class="gnb" aria-label="주 메뉴">${NAV.map(n => Array.isArray(n[1]) ? group(n[0], n[1]) : item(n)).join('')}</nav>
     </div>`;
+    // 드롭다운 UX: 하나 열면 나머지 닫기, 바깥 탭으로 닫기
+    el.querySelectorAll('.nav-dd').forEach(d => d.addEventListener('toggle', () => {
+      if (d.open) el.querySelectorAll('.nav-dd[open]').forEach(o => { if (o !== d) o.open = false; });
+    }));
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.nav-dd')) el.querySelectorAll('.nav-dd[open]').forEach(o => { o.open = false; });
+    });
   }
   function footer() {
     const el = $('#site-footer'); if (!el) return;
