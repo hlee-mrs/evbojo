@@ -18,8 +18,10 @@ ev.or.kr은 웹방화벽(JS 챌린지)이 있어 requests/curl로는 수집 불�
     → data/_pending/ 에 저장하고 알림 로그만 남김 (FORCE=1 env로 강제 적용)
   · 원자적 교체(os.replace) → 서빙 중인 사이트가 깨진 JSON을 읽는 일 없음
 """
-import argparse, json, math, os, re, shutil, sys, time, zlib
+import argparse, json, math, os, re, shutil, sys, time, zipfile, zlib
 from datetime import datetime, timezone, timedelta, date
+from io import BytesIO
+from xml.etree import ElementTree as ET
 
 from playwright.sync_api import sync_playwright
 
@@ -69,84 +71,136 @@ def with_retry(fn, name, tries=3):
     raise RuntimeError(f'{name}: {tries}회 모두 실패')
 
 
-# ─────────────────────────── 스크레이퍼 ───────────────────────────
+# ─────────────────────────── 수집 (공식 엑셀 1회 다운로드) ───────────────────────────
+# 2026-08-16 ev.or.kr 전면 개편으로 기존 표 스크레이핑 전체 폐기.
+# 개편 사이트의 "Excel 다운로드"(localinfoExcelDownload2.do)가 전 시트를 제공:
+#   sheet2 지역별 현황(접수상태·최종마감·비고·담당부서 포함) · sheet3 우선/법인/택시/일반 분해
+#   sheet6 지역×모델 국비/지방비/전환/총액/배터리/주행거리 · sheet5 공고 목록 · sheet7 변경이력
+# → 한 파일이 기존 status + full(팝업 161회) + 제원 수집을 전부 대체 (요청 수 165→2).
 
 def new_page(pw):
     browser = pw.chromium.launch(headless=True, args=['--no-sandbox', '--disable-dev-shm-usage'])
     ctx = browser.new_context(user_agent=UA, locale='ko-KR', viewport={'width': 1280, 'height': 900})
     page = ctx.new_page()
     page.set_default_timeout(45000)
-    return browser, page
+    return browser, ctx, page
 
 
-def wait_table(page, min_rows=1):
-    page.wait_for_function(
-        f"() => document.querySelectorAll('table tbody tr').length >= {min_rows}",
-        timeout=45000,
-    )
-
-
-def scrape_status(page):
-    """지급현황: 161개 지자체 공고/접수/출고/잔여 (전기승용)
-    각 셀 형식: "전체 (우선순위) (법인·기관) (택시) (일반)" → 전체 + 4개 항목 분해 수집.
-    ※ 항목 합계가 전체와 다를 수 있음(공고 회차 이월 등, ev.or.kr 원본 특성) — 그대로 보존."""
+def download_workbook(ctx, page):
+    """지급현황 페이지 방문(WAF 세션) 후 공식 엑셀 다운로드 → bytes"""
     page.goto(f'{BASE}/nportal/buySupprt/initSubsidyPaymentCheckAction.do', wait_until='domcontentloaded')
-    wait_table(page, 150)
-    rows = page.evaluate(r"""() => {
-      const t = [...document.querySelectorAll('table')].find(x => x.querySelectorAll('tbody tr').length >= 150);
-      const parse = s => {                       // "12201 (1600) (0) (840) (9761)" → [12201,1600,0,840,9761]
-        const m = (s||'').match(/-?[0-9,]+/g) || [];
-        const v = m.map(x => +x.replace(/,/g,''));
-        return { t: v.length ? v[0] : null, b: v.length >= 5 ? v.slice(1,5) : null };
-      };
-      return [...t.querySelectorAll('tbody tr')].map(tr => {
-        const c = [...tr.querySelectorAll('td,th')].map(x => x.textContent.replace(/\s+/g,' ').trim());
-        const n = parse(c[5]), a = parse(c[6]), r = parse(c[7]), l = parse(c[8]);
-        const note = (c[9]||'').slice(0,2000);   // 원문 보존(과거 140자 절단 버그). 2000자는 비정상 데이터 방어용 상한
-        return { name: c[1], m: (c[4]||'').replace('*일반: ','일반 ').replace('*우선: ',' · 우선 '),
-                 n: n.t, a: a.t, r: r.t, left: l.t,
-                 d: (n.b||a.b||r.b||l.b) ? { n: n.b, a: a.b, r: r.b, left: l.b } : null,
-                 note: note || null };
-      });
-    }""")
+    page.wait_for_function(r"() => /총\s*[0-9,]+\s*건/.test(document.body.innerText)", timeout=45000)
+    time.sleep(PAGE_DELAY)
+    resp = ctx.request.post(
+        f'{BASE}/nportal/buySupprt/localinfoExcelDownload2.do',
+        form={'car_type': '11', 'year1': YEAR, 'localDo_cd': 'all', 'local_cd1': 'all'},
+    )
+    if resp.status != 200:
+        raise RuntimeError(f'엑셀 다운로드 HTTP {resp.status}')
+    body = resp.body()
+    if not body.startswith(b'PK'):
+        raise ValueError(f'엑셀 형식 아님 (head={body[:20]!r})')
+    return body
+
+
+_XNS = {'m': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'}
+_XT = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}t'
+
+
+def parse_workbook(blob):
+    """xlsx(bytes) → {시트번호: [ {열문자: 값} ]} (stdlib zipfile+ElementTree, inlineStr/sharedStrings 모두 지원)"""
+    z = zipfile.ZipFile(BytesIO(blob))
+    shared = []
+    if 'xl/sharedStrings.xml' in z.namelist():
+        for si in ET.fromstring(z.read('xl/sharedStrings.xml')).findall('m:si', _XNS):
+            shared.append(''.join(t.text or '' for t in si.iter(_XT)))
+    sheets = {}
+    for name in z.namelist():
+        m = re.fullmatch(r'xl/worksheets/sheet(\d+)\.xml', name)
+        if not m:
+            continue
+        rows = []
+        for r in ET.fromstring(z.read(name)).findall('.//m:row', _XNS):
+            cells = {}
+            for c in r.findall('m:c', _XNS):
+                col = re.match(r'[A-Z]+', c.get('r', 'A')).group()
+                v = c.find('m:v', _XNS)
+                if v is not None:
+                    cells[col] = shared[int(v.text)] if c.get('t') == 's' else v.text
+                else:
+                    iss = c.find('m:is', _XNS)
+                    cells[col] = ''.join(t.text or '' for t in iss.iter(_XT)) if iss is not None else None
+            rows.append(cells)
+        sheets[int(m.group(1))] = rows
+    return sheets
+
+
+def _int(v):
+    """'15430.0' → 15430, 빈 값 → None"""
+    if v is None or v == '':
+        return None
+    try:
+        return int(float(v))
+    except ValueError:
+        return None
+
+
+def _cd(row):
+    """관리번호 '2026-1100' → '1100' (형식 불일치는 None)"""
+    m = re.fullmatch(r'\d{4}-(\d{4,5})', (row.get('A') or '').strip())
+    return m.group(1) if m else None
+
+
+def _clean(s, cap=2000):
+    """비고/텍스트 공백 정규화 — 구 표 수집(textContent 공백 축약)과 동일 형태 유지"""
+    if not s:
+        return None
+    return re.sub(r'\s+', ' ', s).strip()[:cap] or None
+
+
+def build_status_rows(sheets):
+    """sheet2(지역 현황)+sheet3(4분류) → 구 scrape_status와 동일 스키마 + 공식 접수상태(st)·최종마감(dl)·선정(sel/sleft)
+    ※ 4분류 합계가 전체와 다를 수 있음(공고 회차 이월 등, ev.or.kr 원본 특성) — 그대로 보존."""
+    s2, s3 = sheets.get(2, []), sheets.get(3, [])
+    if not s2 or (s2[0].get('A') or '') != '관리번호':
+        raise ValueError('sheet2 헤더 이상 — 엑셀 구조 변경 의심')
+    # sheet3: cd → 구분(공고대수 등) → [우선, 법인, 택시, 일반]
+    GUBUN = {'공고대수': 'n', '접수대수': 'a', '출고대수': 'r', '출고잔여': 'left'}
+    brk = {}
+    for r in s3[1:]:
+        cd, key = _cd(r), GUBUN.get((r.get('G') or '').strip())
+        if cd and key:
+            brk.setdefault(cd, {})[key] = [_int(r.get('I')), _int(r.get('J')), _int(r.get('K')), _int(r.get('L'))]
+    rows = []
+    for r in s2[1:]:
+        cd = _cd(r)
+        if not cd:
+            continue
+        m = (r.get('G') or '').replace('*일반: ', '일반 ').replace(' / *우선: ', ' · 우선 ').replace('*우선: ', '우선 ')
+        d = brk.get(cd)
+        rows.append({'cd': cd, 'name': _clean(r.get('D'), 100), 'm': _clean(m, 200),
+                     'n': _int(r.get('L')), 'a': _int(r.get('M')), 'r': _int(r.get('O')), 'left': _int(r.get('Q')),
+                     'sel': _int(r.get('N')), 'sleft': _int(r.get('P')),
+                     'st': _clean(r.get('H'), 20), 'dl': _clean(r.get('K'), 40),
+                     'd': d if d and len(d) == 4 else None,
+                     'note': _clean(r.get('Y')),
+                     'dept': _clean(r.get('W'), 100), 'tel': _clean(r.get('X'), 40)})
     if len(rows) < 150:
         raise ValueError(f'현황 행 수 이상: {len(rows)}')
     return rows
 
 
-def scrape_local_units(page, cd):
-    """지자체 모델별 단가 팝업 → [(국비, 지방비, 전환지방비, 모델명), ...]"""
-    page.goto(f'{BASE}/nportal/buySupprt/psPopupLocalCarModelPrice.do?year={YEAR}&local_cd={cd}&car_type=11',
-              wait_until='domcontentloaded')
-    wait_table(page, 5)
-    return page.evaluate(r"""() => [...document.querySelectorAll('table tbody tr')].map(tr => {
-      const c = [...tr.querySelectorAll('td,th')].map(x => x.textContent.replace(/,/g,'').trim());
-      return { name: c[2], nat: +c[3], loc: +c[4], convNat: +(c[6]||0), convLoc: +(c[7]||0), cls: c[0] };
-    })""")
+def _batt(s):
+    m = re.search(r'\(([0-9.]+)\s*kWh', s or '')
+    return float(m.group(1)) if m else None
 
 
-def scrape_specs(page):
-    """구매보조금 지급대상 차종(승용) — 주행거리/배터리"""
-    page.goto(f'{BASE}/nportal/buySupprt/initSubsidyTargetVehicleAction.do', wait_until='domcontentloaded')
-    page.wait_for_selector('div.infoBox', timeout=45000)
-    try:
-        page.evaluate("goPage('statsList', 300, 1)")
-        page.wait_for_load_state('domcontentloaded')
-        page.wait_for_selector('div.infoBox', timeout=45000)
-    except Exception:
-        log('goPage(300) 실패 — 첫 페이지만 수집')
-    return page.evaluate(r"""() => {
-      const MAKERS=['현대자동차','기아','테슬라코리아','메르세데스벤츠코리아','볼보자동차코리아','케이지모빌리티','폭스바겐그룹코리아','BMW','비와이디코리아','아우디폭스바겐코리아'];
-      return [...document.querySelectorAll('div.infoBox')].map(el => {
-        const t = el.textContent.replace(/\s+/g,' ').trim();
-        const head = t.split(/-\s*승차인원/)[0].trim();
-        const maker = MAKERS.find(m => head.startsWith(m)) || '';
-        const g = re => { const m = t.match(re); return m ? +m[1].replace(/,/g,'') : null; };
-        return { maker, name: head.slice(maker.length).trim(),
-                 range: g(/상온\)?\s*([0-9,]+)\s*km/), rangeCold: g(/저온\)?\s*([0-9,]+)\s*km/),
-                 batt: (t.match(/\(([0-9.]+)\s*kWh/) || [null,null])[1] && +t.match(/\(([0-9.]+)\s*kWh/)[1] };
-      });
-    }""")
+def _range(s):
+    """'(상온) 470km (저온) 416km' → (470, 416)"""
+    warm = re.search(r'상온\)?\s*([0-9,]+)\s*km', s or '')
+    cold = re.search(r'저온\)?\s*([0-9,]+)\s*km', s or '')
+    return (int(warm.group(1).replace(',', '')) if warm else None,
+            int(cold.group(1).replace(',', '')) if cold else None)
 
 
 # ─────────────────────────── 갱신 작업 ───────────────────────────
@@ -156,31 +210,33 @@ def norm_name(s):
     return re.sub(r'[^0-9a-zA-Z가-힣]', '', s).lower()
 
 
-def update_status(page):
+def update_status(sheets):
     regions = read_json(os.path.join(DATA, 'regions.json'))
     if not regions:
         raise RuntimeError('regions.json 없음 — full 갱신을 먼저 실행')
-    rows = with_retry(lambda: scrape_status(page), '지급현황 수집')
-    # 이름 → cd 매핑 (중복 지명은 등장 순서 = 표 순서)
-    by_name = {}
-    for cd, r in regions.items():
-        by_name.setdefault(r['name'], []).append(cd)
-    data, used = {}, {}
+    rows = build_status_rows(sheets)
+    # 관리번호가 cd를 직접 제공 — 구 이름 순서 매핑 폐기. regions.json과의 교집합으로 정합성 검증.
+    data = {}
     for row in rows:
-        cds = by_name.get(row['name'])
-        if not cds:
-            continue
-        idx = used.get(row['name'], 0)
-        if idx < len(cds):
-            entry = {'m': row['m'], 'n': row['n'], 'a': row['a'], 'r': row['r'], 'left': row['left']}
-            if row.get('d'):
-                entry['d'] = row['d']
-            if row.get('note'):
-                entry['note'] = row['note']
-            data[cds[idx]] = entry
-            used[row['name']] = idx + 1
-    if len(data) < 150:
-        raise ValueError(f'매핑된 지역 수 이상: {len(data)}')
+        cd = row['cd']
+        entry = {'m': row['m'], 'n': row['n'], 'a': row['a'], 'r': row['r'], 'left': row['left']}
+        if row.get('d'):
+            entry['d'] = row['d']
+        if row.get('note'):
+            entry['note'] = row['note']
+        # 개편 사이트의 공식 필드(추가분): 접수상태·최종 신청마감·선정/선정잔여
+        if row.get('st'):
+            entry['st'] = row['st']
+        if row.get('dl'):
+            entry['dl'] = row['dl']
+        if row.get('sel') is not None:
+            entry['sel'] = row['sel']
+        if row.get('sleft') is not None:
+            entry['sleft'] = row['sleft']
+        data[cd] = entry
+    known = sum(1 for cd in data if cd in regions)
+    if known < 150:
+        raise ValueError(f'regions.json과 겹치는 지역 수 이상: {known}')
     atomic_write(os.path.join(DATA, 'status.json'),
                  {'updated': datetime.now(KST).isoformat(timespec='minutes'), 'data': data})
     update_history(data, datetime.now(KST))
@@ -295,79 +351,141 @@ def update_history(data, now):
     atomic_write(path, h)
 
 
-def update_full(page):
-    """차종 마스터(서울 팝업 기준 순서) + 전 지역 지방비 + 제원 재수집"""
+def update_full(sheets):
+    """차종 마스터 + 전 지역 지방비 + 제원 — 엑셀 sheet6(지역×모델)·sheet2(지역 정보)에서 재구성.
+    기존 car id(= /car/N.html URL)를 보존: 기존 모델은 기존 위치 유지, 신규만 뒤에 추가, 사라진 모델은 disc."""
     old_regions = read_json(os.path.join(DATA, 'regions.json')) or {}
     old_cars = read_json(os.path.join(DATA, 'cars.json')) or []
     meta = read_json(os.path.join(DATA, 'meta.json')) or {}
 
-    # 1) 서울 팝업 = 마스터 모델 목록·순서·국비
-    seoul = with_retry(lambda: scrape_local_units(page, '1100'), '마스터(서울) 수집')
-    if len(seoul) < 100:
-        raise ValueError(f'마스터 행 수 이상: {len(seoul)}')
-    cars = []
-    for i, m in enumerate(seoul):
-        cars.append({'id': i, 'cls': 'S' if '경' in m['cls'] else 'P', 'maker': '', 'name': m['name'],
-                     'nat': m['nat'], 'convNat': m['convNat'], 'disc': m['name'].startswith('(단종)'),
-                     'range': None, 'rangeCold': None, 'batt': None})
-    nat_seq = [c['nat'] for c in cars]
+    s2, s6 = sheets.get(2, []), sheets.get(6, [])
+    if not s6 or (s6[0].get('G') or '') != '모델명':
+        raise ValueError('sheet6 헤더 이상 — 엑셀 구조 변경 의심')
+    mrows = [r for r in s6[1:] if _cd(r) and (r.get('G') or '').strip()]
 
-    # 2) 제원 병합
-    specs = with_retry(lambda: scrape_specs(page), '제원 수집')
-    smap = {norm_name(s['name']): s for s in specs if s['name']}
-    mmap = {norm_name(s['name']): s['maker'] for s in specs if s['name']}
-    for c in cars:
-        k = norm_name(c['name'])
-        sp = smap.get(k) or (smap.get(norm_name('Pv5 WAV')) if k.startswith('pv5wav') else None)
-        if sp:
-            c.update({'range': sp['range'], 'rangeCold': sp['rangeCold'], 'batt': sp['batt']})
-        c['maker'] = mmap.get(k) or next((o['maker'] for o in old_cars if norm_name(o['name']) == k and o.get('maker')), '') or c['maker']
+    # 모델 식별 키 = 정확한 모델명(공백 정규화). norm_name은 '(5999만원)' 같은 가격 구간 표기를 지워
+    # 트윈 트림(국비 상이)을 충돌시키므로 마스터 키로 쓰지 않는다 — 모호하지 않을 때만 폴백.
+    def key_name(s):
+        return re.sub(r'\s+', ' ', (s or '').replace('(단종)', '').strip())
 
-    # 3) 전 지역 지방비 (요약표에서 지역 목록 추출)
-    page.goto(f'{BASE}/nportal/buySupprt/initPsLocalCarPirceAction.do', wait_until='domcontentloaded')
-    wait_table(page, 150)
-    region_list = page.evaluate(r"""() => {
-      const t = [...document.querySelectorAll('table')].find(x => x.querySelectorAll('tbody tr').length >= 150);
-      return [...t.querySelectorAll('tbody tr')].map(tr => {
-        const td = [...tr.querySelectorAll('td,th')].map(c => c.textContent.replace(/\s+/g,' ').trim());
-        const btn = tr.querySelector('[href*=psPopupLocalCarModelPrice],[onclick*=psPopupLocalCarModelPrice]');
-        const m = btn ? ((btn.getAttribute('onclick')||btn.getAttribute('href')||'').match(/'(\d{4})','(\d+)','([^']+)'/)) : null;
-        const p = s => { const x = s.match(/승용\s*([0-9,]+)/); return x ? +x[1].replace(/,/g,'') : null; };
-        const q = s => { const x = s.match(/소형\s*([0-9,]+)/); return x ? +x[1].replace(/,/g,'') : null; };
-        return { cd: m ? m[2] : null, sido: td[0], name: td[1], maxP: p(td[3]||''), maxS: q(td[3]||'') };
-      }).filter(r => r.cd);
-    }""")
-    if len(region_list) < 150:
-        raise ValueError(f'지역 목록 이상: {len(region_list)}')
+    # 1) 모델 마스터: 모델명 기준 대표 행(첫 등장 순서 = 엑셀 순서). 국비는 지역 불변(2026-08-19 실측 0건 예외).
+    seen, order = {}, []
+    for r in mrows:
+        k = key_name(r['G'])
+        if k not in seen:
+            seen[k] = r
+            order.append(k)
+    if len(seen) < 100:
+        raise ValueError(f'마스터 모델 수 이상: {len(seen)}')
+    # norm 폴백 사전: 같은 norm에 후보가 정확히 1개일 때만 (띄어쓰기 변화 등 흡수)
+    norm_map = {}
+    for k in order:
+        norm_map.setdefault(norm_name(k), []).append(k)
+
+    def find_new(name):
+        k = key_name(name)
+        if k in seen:
+            return k
+        cand = norm_map.get(norm_name(k))
+        return cand[0] if cand and len(cand) == 1 else None
+
+    cars, used = [], set()
+    for old in old_cars:                       # 기존 id·순서 보존
+        k = find_new(old['name'])
+        if k is None:                          # 개편 데이터에서 사라진 모델 → 단종 처리(값은 마지막 관측 유지)
+            c = dict(old)
+            c['disc'] = True
+            cars.append(c)
+            continue
+        used.add(k)
+        r = seen[k]
+        warm, cold = _range(r.get('J'))
+        cars.append({'id': old['id'], 'cls': 'S' if '경' in (r.get('F') or '') or '소형' in (r.get('F') or '') else 'P',
+                     'maker': _clean(r.get('H'), 60) or old.get('maker', ''), 'name': _clean(r.get('G'), 120),
+                     'nat': _int(r.get('K')), 'convNat': _int(r.get('M')) or 0, 'disc': False,
+                     'range': warm or old.get('range'), 'rangeCold': cold or old.get('rangeCold'),
+                     'batt': _batt(r.get('I')) or old.get('batt')})
+    for k in order:                            # 신규 모델은 뒤에 추가 (id 이어붙임)
+        if k in used:
+            continue
+        r = seen[k]
+        warm, cold = _range(r.get('J'))
+        cars.append({'id': len(cars), 'cls': 'S' if '경' in (r.get('F') or '') or '소형' in (r.get('F') or '') else 'P',
+                     'maker': _clean(r.get('H'), 60) or '', 'name': _clean(r.get('G'), 120),
+                     'nat': _int(r.get('K')), 'convNat': _int(r.get('M')) or 0, 'disc': False,
+                     'range': warm, 'rangeCold': cold, 'batt': _batt(r.get('I'))})
+    idx_of = {key_name(c['name']): i for i, c in enumerate(cars)}
+
+    # 2) 지역별 지방비 v 배열(모델명 직접 매칭 — 구 국비 시퀀스 그리디 정렬 폐기) + 지역 메타
+    by_region = {}
+    for r in mrows:
+        by_region.setdefault(_cd(r), []).append(r)
+    reg_info = {}
+    for r in s2[1:]:
+        cd = _cd(r)
+        if cd:
+            reg_info[cd] = r
+    if len(by_region) < 150:
+        raise ValueError(f'지역 목록 이상: {len(by_region)}')
+
+    # 전환지방비: 개편 엑셀 N열은 전 행 일률 '지방비 100%'로 구 실측(지역별 4~20%)·공단 계산기(전환 가산 0)와
+    # 모순 → 채택 기각(I3). 마지막 검증값을 보존하고, 근거 없는 모델은 0(전환 서술 자동 억제).
+    def old_v_resolved(cd):
+        r = old_regions.get(cd) or {}
+        if r.get('v'):
+            return r['v']
+        return (old_regions.get(r.get('ref')) or {}).get('v') or []
 
     regions_out = {}
-    for idx, r in enumerate(region_list):
-        rows = with_retry(lambda cd=r['cd']: scrape_local_units(page, cd), f"지자체 {r['name']}")
-        # 국비 시퀀스 기준 정렬(그리디) — 지역별 누락 모델 대응
-        vals, j = [], 0
-        for i in range(len(cars)):
-            if j < len(rows) and rows[j]['nat'] == nat_seq[i]:
-                vals.append([rows[j]['loc'], rows[j]['convLoc']]); j += 1
-            else:
-                vals.append(None)
-        if j != len(rows):
-            raise ValueError(f"{r['name']} 정렬 실패 {j}/{len(rows)} — 모델 목록 변경 의심, full 중단")
-        old = old_regions.get(r['cd'], {})
-        regions_out[r['cd']] = {'name': r['name'], 'sido': r['sido'],
-                                'dept': old.get('dept', ''), 'tel': old.get('tel', ''),
-                                'maxP': r['maxP'], 'maxS': r['maxS'], 'rep': False, 'v': vals}
-        time.sleep(PAGE_DELAY)
-        if (idx + 1) % 20 == 0:
-            log(f'  지자체 진행 {idx+1}/{len(region_list)}')
+    for cd, rows in by_region.items():
+        old_v = old_v_resolved(cd)
+        vals = [None] * len(cars)
+        for r in rows:
+            i = idx_of.get(key_name(r['G']))
+            if i is not None:
+                conv = old_v[i][1] if i < len(old_v) and old_v[i] else 0
+                vals[i] = [_int(r.get('L')) or 0, conv]
+        # 단종 모델(개편 데이터에 없음)은 마지막 관측값 보존 — 단종 차량 페이지 표시용
+        for i, c in enumerate(cars):
+            if c['disc'] and vals[i] is None and i < len(old_v):
+                vals[i] = old_v[i]
+        tots = [_int(r.get('O')) for r in rows if _int(r.get('O')) is not None]
+        stot = [_int(r.get('O')) for r in rows
+                if _int(r.get('O')) is not None and ('경' in (r.get('F') or '') or '소형' in (r.get('F') or ''))]
+        info = reg_info.get(cd, {})
+        old = old_regions.get(cd, {})
+        regions_out[cd] = {'name': _clean(info.get('D'), 100) or old.get('name', ''),
+                           'sido': _clean(info.get('C'), 40) or old.get('sido', ''),
+                           'dept': _clean(info.get('W'), 100) or old.get('dept', ''),
+                           'tel': _clean(info.get('X'), 40) or old.get('tel', ''),
+                           'maxP': max(tots) if tots else old.get('maxP'),
+                           'maxS': max(stot) if stot else None,
+                           'rep': False, 'v': vals}
+
+    # 도 단위 대표값 압축 유지: 기존 ref 구조를 v가 대표와 동일할 때만 보존(다르면 자체 v 실체화)
+    for cd, out in regions_out.items():
+        old = old_regions.get(cd) or {}
+        ref = old.get('ref')
+        if old.get('rep') and ref in regions_out and out['v'] == regions_out[ref]['v']:
+            regions_out[cd] = {k: v for k, v in out.items() if k != 'v'}
+            regions_out[cd].update({'rep': True, 'ref': ref})
 
     # 4) 변경 감지 + 급변 보류
+    # 신규 모델로 v 꼬리가 늘어나는 구조 변화는 급변이 아님 — 겹치는 구간의 값 변화만 집계.
+    # 대신 마스터 급증(>10%)은 수집 오염 신호로 별도 보류.
+    if old_cars and (len(cars) - len(old_cars)) > max(5, 0.1 * len(old_cars)):
+        raise ValueError(f'모델 수 급증 {len(old_cars)}→{len(cars)} — 수집 오염 의심, full 중단')
     changed = 0
     for cd, r in regions_out.items():
-        if json.dumps(r['v']) != json.dumps(old_regions.get(cd, {}).get('v')):
+        ov = old_regions.get(cd, {}).get('v')
+        nv = r.get('v')
+        if (ov is None) != (nv is None):
+            changed += 1
+        elif ov and nv and any(o != n for o, n in zip(ov, nv)):
             changed += 1
     nat_changed = sum(1 for c in cars if c['id'] < len(old_cars) and old_cars[c['id']]['nat'] != c['nat'])
     ratio = changed / max(1, len(regions_out))
-    log(f'변경: 지자체 {changed}곳, 국비 {nat_changed}건 (변경률 {ratio:.0%})')
+    log(f'변경: 지자체 {changed}곳, 국비 {nat_changed}건 (변경률 {ratio:.0%}), 모델 {len(old_cars)}→{len(cars)}')
     if old_regions and ratio > 0.4 and os.environ.get('FORCE') != '1':
         pend = os.path.join(DATA, '_pending')
         os.makedirs(pend, exist_ok=True)
@@ -379,8 +497,11 @@ def update_full(page):
     today = datetime.now(KST).strftime('%Y-%m-%d')
     atomic_write(os.path.join(DATA, 'cars.json'), cars)
     atomic_write(os.path.join(DATA, 'regions.json'), regions_out)
+    # natMax: 일반 승용 국비 상한 — WAV·미지원 표기 모델은 제외(팩트체크: WAV는 최고액 서술 대상 아님)
+    nat_pool = [c['nat'] for c in cars
+                if not c['disc'] and c['nat'] and 'WAV' not in c['name'] and '미지원' not in c['name']]
     meta.update({'updated': today, 'source': '무공해차 통합누리집(ev.or.kr)',
-                 'natMax': max(nat_seq), 'year': int(YEAR)})
+                 'natMax': max(nat_pool), 'year': int(YEAR)})
     atomic_write(os.path.join(DATA, 'meta.json'), meta)
     log(f'full 갱신 완료: 차종 {len(cars)}, 지자체 {len(regions_out)}')
 
@@ -399,15 +520,24 @@ def main():
         p = os.path.join(DATA, f)
         if os.path.exists(p):
             shutil.copy2(p, p + '.bak')
-    with sync_playwright() as pw:
-        browser, page = new_page(pw)
-        try:
-            if a.full or a.once:
-                update_full(page)
-            if a.status or a.once:
-                update_status(page)
-        finally:
-            browser.close()
+    # 엑셀 1회 다운로드가 full·status 공용 소스. XLSX_PATH 지정 시 파일 재사용(테스트·재처리용, 네트워크 없음).
+    xlsx_path = os.environ.get('XLSX_PATH')
+    if xlsx_path:
+        with open(xlsx_path, 'rb') as f:
+            blob = f.read()
+        log(f'XLSX_PATH 사용: {xlsx_path} ({len(blob)}B) — 다운로드 생략')
+    else:
+        with sync_playwright() as pw:
+            browser, ctx, page = new_page(pw)
+            try:
+                blob = with_retry(lambda: download_workbook(ctx, page), '엑셀 다운로드')
+            finally:
+                browser.close()
+    sheets = parse_workbook(blob)
+    if a.full or a.once:
+        update_full(sheets)
+    if a.status or a.once:
+        update_status(sheets)
 
 
 if __name__ == '__main__':

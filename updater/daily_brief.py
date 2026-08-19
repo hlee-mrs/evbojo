@@ -220,6 +220,16 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
     if prev_regions is None:
         return None, 'SKIP 전일 기준값 없음(스냅샷·이력 모두 부재) — 다음 실행부터 비교 가능'
 
+    # 비교 기준일 라벨 — 기준이 실제 '어제'가 아니면(수집 공백 뒤 복구 등) 날짜를 명시해 '전일' 오표기 방지
+    basis_day = ((prev_meta or {}).get('updated') or (prev_meta or {}).get('date') or '')[:10]
+    if basis_day == (target - datetime.timedelta(days=1)).isoformat():
+        vs = '전일'
+    elif basis_day:
+        _bd = datetime.date.fromisoformat(basis_day)
+        vs = '%d월 %d일' % (_bd.month, _bd.day)
+    else:
+        vs = '직전 관측'
+
     # ── 지역별 전일 대비 ──
     dup = {}
     for cd, r in regions.items():
@@ -266,15 +276,15 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
     kd = kdate(target)
     hs = []
     if net < 0:
-        net_txt = ['전일 같은 시각 대비 %s대 줄었습니다.' % pr.fmt(-net),
-                   '하루 사이 %s대가 줄어든 수치입니다.' % pr.fmt(-net),
-                   '전일 수집분보다 %s대 감소했습니다.' % pr.fmt(-net)]
+        net_txt = ['%s 같은 시각 대비 %s대 줄었습니다.' % (vs, pr.fmt(-net)),
+                   '%s 대비 %s대가 줄어든 수치입니다.' % (vs, pr.fmt(-net)),
+                   '%s 수집분보다 %s대 감소했습니다.' % (vs, pr.fmt(-net))]
     elif net > 0:
-        net_txt = ['전일 같은 시각 대비 %s대 늘었습니다(추가 공고·취소 환입 등).' % pr.fmt(net),
-                   '하루 사이 %s대가 늘어난 수치입니다(추가 공고·취소 환입 등).' % pr.fmt(net)]
+        net_txt = ['%s 같은 시각 대비 %s대 늘었습니다(추가 공고·취소 환입 등).' % (vs, pr.fmt(net)),
+                   '%s 대비 %s대가 늘어난 수치입니다(추가 공고·취소 환입 등).' % (vs, pr.fmt(net))]
     else:
-        net_txt = ['전일 합계와 같은 수준이지만 지역별로는 증감이 엇갈렸습니다.',
-                   '합계는 전일과 같아도 지역 단위로는 이동이 있었습니다.']
+        net_txt = ['%s 합계와 같은 수준이지만 지역별로는 증감이 엇갈렸습니다.' % vs,
+                   '합계는 %s과 같아도 지역 단위로는 이동이 있었습니다.' % vs]
     hs.append(C('h-total',
                 ['%s 아침 집계 기준, ' % kd, '%s 기준으로 보면, ' % kd, '%s 수집분 기준, ' % kd],
                 ['전국 160개 지자체의 전기승용 잔여 물량 합계는 %s대입니다. ' % pr.fmt(cur_total),
@@ -313,9 +323,9 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
 
     # ── 차트 ──
     # 비교 기준 라벨은 stamp·바이라인과 동일한 것을 차트 부제에도 사용(폴백일 자기모순 방지)
-    basis_label = ('전일 스냅샷(%s 수집) 대비' % (prev_meta or {}).get('updated', '').replace('T', ' ').strip()
+    basis_label = ('%s 스냅샷(%s 수집) 대비' % (vs, (prev_meta or {}).get('updated', '').replace('T', ' ').strip())
                    if basis == 'snapshot' and (prev_meta or {}).get('updated')
-                   else '전일 일별 이력(마지막 관측값) 대비')
+                   else '%s 일별 이력(마지막 관측값) 대비' % vs)
     c1sub = c2sub = ''
     if series:
         span = series[-1][0] - series[0][0] + 1
@@ -326,9 +336,9 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
     chart1 = c1 or '<p class="muted small">추이 이력이 아직 충분히 쌓이지 않아 차트를 생략합니다.</p>'
     top10 = decreases[:10]
     c2 = svg_bars([(m['label'], -m['delta']) for m in top10],
-                  '전일 대비 잔여 감소 상위 %d개 지역 가로 막대 차트' % len(top10)) if top10 else None
+                  '%s 대비 잔여 감소 상위 %d개 지역 가로 막대 차트' % (vs, len(top10))) if top10 else None
     c2sub = '%s · %s 기준' % (basis_label, up_label)
-    chart2 = c2 or '<p class="muted small">전일 대비 잔여가 줄어든 지역이 없었습니다.</p>'
+    chart2 = c2 or '<p class="muted small">%s 대비 잔여가 줄어든 지역이 없었습니다.</p>' % vs
 
     # 감소 상위 표
     table = ''
@@ -341,10 +351,10 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
                          pr.fmt(m['prev']), pr.fmt(m['cur']), pr.fmt(-m['delta']))
                       for m in top10)
         table = ('<div class="tbl-wrap"><table class="tbl">'
-                 '<thead><tr><th>지역</th><th class="num">전일 잔여</th><th class="num">오늘 잔여</th>'
+                 '<thead><tr><th>지역</th><th class="num">%s 잔여</th><th class="num">오늘 잔여</th>'
                  '<th class="num">감소</th></tr></thead><tbody>%s</tbody></table></div>'
                  '<p class="small muted mt8">잔여 감소는 대부분 출고 진행에 따른 차감입니다. '
-                 '접수 가능 여부는 별개이니 각 지역 페이지의 공지를 확인하세요.</p>' % trs)
+                 '접수 가능 여부는 별개이니 각 지역 페이지의 공지를 확인하세요.</p>' % (vs, trs))
 
     # ── 이벤트 섹션 (신규 마감·물량 증가) ──
     ev_html = []
@@ -355,8 +365,8 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
                           ' (%s)' % pr.esc(m['cinfo'].get('closedDate')) if m['cinfo'].get('closedDate') else '',
                           pr.fmt(m['cur']))
                        for m in newly_closed[:8])
-        ev_html.append('<section class="card"><h2 class="mt0">신규 마감 공지 <span class="sub">%s곳 · 전일 스냅샷과 비교해 새로 감지</span></h2>'
-                       '<div class="rowlist">%s</div></section>' % (pr.fmt(len(newly_closed)), rows))
+        ev_html.append('<section class="card"><h2 class="mt0">신규 마감 공지 <span class="sub">%s곳 · %s 스냅샷과 비교해 새로 감지</span></h2>'
+                       '<div class="rowlist">%s</div></section>' % (pr.fmt(len(newly_closed)), vs, rows))
     if resets:
         rows = ''.join('<a class="row" href="/region/%s.html"><div class="grow"><div class="tit">%s</div>'
                        '<div class="desc">잔여 %s대 → %s대 (+%s대) · 추가 공고·회차 갱신 가능성 — 공고문 확인</div></div></a>'
@@ -383,12 +393,12 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
     else:
         top3 = '·'.join('%s(−%s대)' % (pr.esc(m['label']), pr.fmt(-m['delta'])) for m in decreases[:3])
         paras.append(C('p1',
-            ['하루 동안 잔여가 줄어든 지역은 %s곳이고, 감소분 합계는 %s대입니다. '
+            ['이번 집계에서 잔여가 줄어든 지역은 %s곳이고, 감소분 합계는 %s대입니다. '
              % (pr.fmt(len(decreases)), pr.fmt(total_drop)),
              '오늘 집계에서 감소가 확인된 지역은 %s곳, 합계 %s대가 줄었습니다. '
              % (pr.fmt(len(decreases)), pr.fmt(total_drop)),
-             '전일 대비 감소 지역은 %s곳으로 집계됐고 합계 감소분은 %s대입니다. '
-             % (pr.fmt(len(decreases)), pr.fmt(total_drop))],
+             '%s 대비 감소 지역은 %s곳으로 집계됐고 합계 감소분은 %s대입니다. '
+             % (vs, pr.fmt(len(decreases)), pr.fmt(total_drop))],
             (['감소 상위는 %s 순이었습니다. ' % top3,
               '많이 줄어든 곳부터 보면 %s입니다. ' % top3] if top3 else ['']),
             ['잔여 감소는 대부분 앞서 접수된 차량이 출고되며 차감되는 수치라, 오늘 줄어든 만큼 오늘 새 신청이 몰렸다는 뜻은 아닙니다.',
@@ -443,7 +453,7 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
         '공고 데이터를 바탕으로 매일 1회(원칙적으로 아침) 자동 생성되는 브리핑입니다. 외부 기사를 재작성하지 않으며, '
         '본문·차트의 수치는 전부 수집 시점의 실측값입니다. 변화가 없거나 데이터가 오래된 날에는 발행을 건너뜁니다.</p>'
         '<p style="line-height:1.8;margin:10px 0">집계 방법: 수치는 매시간 수집분 가운데 브리핑 생성 직전 값을 쓰고, '
-        '전일 대비는 어제 보관한 스냅샷(첫 발행 등 스냅샷이 없으면 일별 이력의 마지막 관측값)과 비교합니다. '
+        '증감은 직전 보관 스냅샷(수집 공백이 있으면 그 이전 마지막 관측값 — 본문에 기준일 명시)과 비교합니다. '
         '마감은 지자체 공지 원문에 완료형 마감 선언이 있을 때만 인정하고, "예산 소진 시 조기 마감" 같은 '
         '조건부 예고는 마감으로 세지 않습니다. 물량 증가는 공고 물량 대비 5%% 이상(최소 10대) 늘어난 경우에 감지합니다.</p>'
         '<p style="line-height:1.8;margin:10px 0">잔여 수치는 출고 시점에 차감하는 지역이 많아 실제 접수는 '
@@ -460,8 +470,8 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
     # ── 렌더 ──
     mapping = {
         'H1': '%s <span class="hl">보조금 브리핑</span>' % kd,
-        'SUB': '전국 잔여 %s대 · 전일 대비 %s%s대 · 자동 생성 브리핑'
-               % (pr.fmt(cur_total), '+' if net > 0 else ('−' if net < 0 else '±'), pr.fmt(abs(net))),
+        'SUB': '전국 잔여 %s대 · %s 대비 %s%s대 · 자동 생성 브리핑'
+               % (pr.fmt(cur_total), vs, '+' if net > 0 else ('−' if net < 0 else '±'), pr.fmt(abs(net))),
         'STAMP': '기준시각 %s · %s · 출처 무공해차 통합누리집(ev.or.kr)' % (pr.esc(up_label), pr.esc(basis_label)),
         'HEADLINE': headline,
         'C1SUB': pr.esc(c1sub), 'CHART1': chart1,
@@ -474,8 +484,8 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
     main = pr.render(tpl_brief, mapping)
 
     canonical = '%s/brief/%s.html' % (BASE, date_iso)
-    desc = ('%s 전기차 보조금 브리핑: 전국 잔여 %s대(전일 대비 %s%s대)%s%s%s. ev.or.kr 실측 데이터로 자동 생성.'
-            % (kd, pr.fmt(cur_total), '+' if net > 0 else '−' if net < 0 else '±', pr.fmt(abs(net)),
+    desc = ('%s 전기차 보조금 브리핑: 전국 잔여 %s대(%s 대비 %s%s대)%s%s%s. ev.or.kr 실측 데이터로 자동 생성.'
+            % (kd, pr.fmt(cur_total), vs, '+' if net > 0 else '−' if net < 0 else '±', pr.fmt(abs(net)),
                ', 최대 감소 %s −%s대' % (decreases[0]['label'], pr.fmt(-decreases[0]['delta'])) if decreases else '',
                ', 신규 마감 %s곳' % pr.fmt(len(newly_closed)) if newly_closed else '',
                ', 물량 증가 %s곳' % pr.fmt(len(resets)) if resets else ''))
