@@ -156,12 +156,13 @@
       <a class="chip" href="articles.html">읽을거리 전체 보기 →</a>
     </div>
     <h3 class="mt16">지역·모델 심층 분석</h3>
-    <p class="muted small">시도별 접수 흐름·마감 패턴 에세이와 모델별 보조금 심층 시리즈 — 매주 새 글이 추가됩니다.</p>
+    <p class="muted small">시도별 접수 흐름·마감 패턴 에세이 17편 완간 · 모델별 보조금 심층 시리즈 순차 발행 중.</p>
     <div class="chips mt8">
       <a class="chip" href="/sido/seoul.html">서울 분석</a>
       <a class="chip" href="/sido/gyeonggi.html">경기 31곳 총정리</a>
       <a class="chip" href="/sido/busan.html">부산 분석</a>
       <a class="chip" href="/sido/jeju.html">제주 분석</a>
+      <a class="chip" href="articles.html#sido">시도 분석 전체 →</a>
       <a class="chip" href="/model/model-y.html">테슬라 모델Y 시리즈</a>
       <a class="chip" href="/model/ioniq5.html">아이오닉5 시리즈</a>
       <a class="chip" href="/model/ev6.html">EV6 시리즈</a>
@@ -253,7 +254,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div id="mr-cats"></div>
       <div class="grid2 mt8">
         <a class="btn btn-primary" href="/region/${cd}.html">차종별 보조금 전체 보기</a>
-        <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">실시간 잔여 확인 ↗</a>
+        <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">ev.or.kr 원본에서 직접 확인 ↗</a>
       </div>
       <p class="stamp">📞 ${r.dept}${/0000-?0000/.test(r.tel) ? '' : ' ' + r.tel} · 잔여현황 기준 ${statusUpdated ? new Date(statusUpdated).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'numeric'}) : '-'} · 단가 기준 ${meta.updated}</p>`;
     // 지자체 공지 — 원문 + 더보기/접기, 공지상 마감이면 danger 승격 (app.js noteCallout 공용)
