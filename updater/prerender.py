@@ -234,8 +234,11 @@ def detect_closed(note):
     has_pass = any(h['pass'] for h in hits)
     has_truck = any(h['truck'] for h in hits)
     res['partial'] = (not any_global and has_pass != has_truck) or bool(_OPEN_SIG.search(t))
-    h0 = hits[0]
-    win = t[max(0, h0['idx'] - 40):min(len(t), h0['idx'] + h0['len'] + 40)]
+    # 날짜 창은 승용 문장 우선 → 전역 문장 → 첫 매치 순: "화물 8.7 마감 ★ 승용 8.12 마감"에서 8/7 오집기 방지.
+    # 창 시작은 해당 문장 경계로 제한 — 앞 문장(화물 등)의 날짜가 창에 섞이지 않게.
+    h0 = next((h for h in hits if h['pass']),
+              next((h for h in hits if h['global']), hits[0]))
+    win = t[max(_sent_start(t, h0['idx']), h0['idx'] - 40):min(len(t), h0['idx'] + h0['len'] + 40)]
     dm = _DATE1.search(win) or _DATE2.search(win)
     if dm:
         if dm.re is _DATE1:
@@ -352,6 +355,9 @@ def load_data():
         with open(os.path.join(DATA, name), encoding='utf-8') as f:
             return json.load(f)
     cars = rj('cars.json')
+    for c in cars:                                   # 표시명(사양코드 제거) 우선 — 원문 name은 수집 매칭용
+        if c.get('disp'):
+            c['name'] = c['disp']
     regions = rj('regions.json')
     for r in regions.values():                       # 도 공통 단가 ref → 원본 v 연결
         if r.get('ref') and regions.get(r['ref']):
@@ -362,7 +368,11 @@ def load_data():
         hist = rj('history.json')
     except Exception:
         hist = None                                   # 이력은 없어도 빌드 성공(무소음 강등)
-    return cars, regions, meta, status, hist
+    try:
+        rounds = rj('rounds.json')                    # 공고 차수·공단 변경이력 — 없어도 빌드 성공
+    except Exception:
+        rounds = None
+    return cars, regions, meta, status, hist, rounds
 
 
 def car_v(r, cid):
@@ -416,6 +426,11 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
                          sibs=sibs, status=status, ctx=ctx, models=models)
     prose_html = ''.join('<p style="line-height:1.75;margin:10px 0">%s</p>' % p for p in prose)
 
+    # 공고 차수·변경이력 데이터 (연혁 섹션에서 사용)
+    rd = ctx.get('rounds') or {}
+    r_rounds = (rd.get('rounds') or {}).get(cd) or []
+    r_events = (rd.get('events') or {}).get(cd) or []
+
     # 공지 원문 섹션 (페이지별 완전 고유 텍스트 — 이스케이프 필수)
     note = (st.get('note') or '').strip()
     note_sec = ''
@@ -436,18 +451,50 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
                     '<p class="stamp">출처: 무공해차 통합누리집(ev.or.kr) 지자체 공고 · 수집 %s</p></section>'
                     % (head, body, esc(updated.replace('T', ' '))))
 
+    # 공고 차수·공식 변경이력 — 이 지역에서만 참인 1차 데이터(차수 구성·일정·공단 등록 변경 기록)
+    if r_rounds:
+        rtr = []
+        for x in r_rounds:
+            period = ('%s ~ %s' % (esc(x.get('s') or '?'), esc(x.get('e') or '?'))
+                      if x.get('s') or x.get('e') else '—')
+            rtr.append('<tr><td style="font-weight:700">%s</td><td class="small">%s</td>'
+                       '<td class="small">%s</td><td class="small">%s</td></tr>'
+                       % (esc(x.get('k') or '?'), esc(x.get('post') or '—'), period, esc(x.get('d') or '—')))
+        ev_html = ''
+        if r_events:
+            evs = []
+            for t, item, before, after in r_events[:8]:
+                chg = ('%s → %s' % (esc(before), esc(after))) if before else esc(after)
+                evs.append('<li class="small" style="margin:4px 0"><span class="muted">%s</span> · %s: %s</li>'
+                           % (esc((t or '')[:16].replace('-', '.')), esc(item or ''), chg))
+            ev_html = ('<h3 class="small" style="margin:14px 0 4px">공단 등록 변경 이력 (최근 90일 · %d건)</h3>'
+                       '<ul style="list-style:none;padding:0;margin:0">%s</ul>' % (len(r_events), ''.join(evs)))
+        note_sec += ('<section class="card"><h2 class="mt0">📅 %s 공고 차수·일정</h2>'
+                     '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>차수</th><th>게시일</th>'
+                     '<th>접수기간</th><th>신청마감</th></tr></thead><tbody>%s</tbody></table></div>%s'
+                     '<p class="stamp">출처: 무공해차 통합누리집(ev.or.kr) 보조금관리시스템 등록 정보 · 수집 %s</p></section>'
+                     % (esc(name), ''.join(rtr), ev_html, esc(updated.replace('T', ' '))))
+
     # 차종 표 (상위 25 정적 — 전체는 detail.js 확장)
-    rows = sorted(((c, v[0], c['nat'] + v[0]) for c, v in models), key=lambda x: (-x[2], x[0]['name']))
-    trs = []
-    for c, loc, tot in rows[:25]:
-        trs.append('<tr><td><a href="/car/%d.html" style="color:inherit;font-weight:700">%s</a>'
-                   '<div class="small muted">%s%s</div></td>'
-                   '<td class="num">%s</td><td class="num">%s</td>'
-                   '<td class="num" style="font-weight:800;color:var(--money)">%s</td>'
-                   '<td><button class="btn-s btn btn-ghost" data-cmp="%d">비교</button></td></tr>'
-                   % (c['id'], esc(c['name']), esc(MAKER_SHORT.get(c['maker'], c['maker'])),
-                      ' · %skm' % c['range'] if c.get('range') else '',
-                      fmt(c['nat']), fmt(loc), fmt(tot), c['id']))
+    # WAV·미지원 모델은 일반 구매와 조건이 달라 본표에서 분리 — 헤드라인 최고액(maxP)과 표 1위가 일치하도록
+    all_rows = sorted(((c, v[0], c['nat'] + v[0]) for c, v in models), key=lambda x: (-x[2], x[0]['name']))
+    special = [x for x in all_rows if 'WAV' in x[0]['name'] or '미지원' in x[0]['name']]
+    rows = [x for x in all_rows if x not in special]
+
+    def tr_of(c, loc, tot):
+        return ('<tr><td><a href="/car/%d.html" style="color:inherit;font-weight:700">%s</a>'
+                '<div class="small muted">%s%s</div></td>'
+                '<td class="num">%s</td><td class="num">%s</td>'
+                '<td class="num" style="font-weight:800;color:var(--money)">%s</td>'
+                '<td><button class="btn-s btn btn-ghost" data-cmp="%d">비교</button></td></tr>'
+                % (c['id'], esc(c.get('disp') or c['name']), esc(MAKER_SHORT.get(c['maker'], c['maker'])),
+                   ' · %skm' % c['range'] if c.get('range') else '',
+                   fmt(c['nat']), fmt(loc), fmt(tot), c['id']))
+    trs = [tr_of(c, loc, tot) for c, loc, tot in rows[:25]]
+    if special:
+        trs.append('<tr><td colspan="5" class="small muted" style="padding-top:12px">'
+                   '♿ 복지·특수목적 차량 — 일반 구매와 지원 조건이 다릅니다 (아래 금액은 해당 요건 충족 시)</td></tr>')
+        trs += [tr_of(c, loc, tot) for c, loc, tot in special]
 
     # 형제 지역: 접수 가능(open→low→나머지) 우선 최대 8개 + 시도 허브 링크
     def sib_key(item):
@@ -483,6 +530,12 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     status_lines = []
     if st.get('m'):
         status_lines.append('<p class="small muted mt8">선정 방식: %s</p>' % esc(st['m']))
+    # 공단 공식 접수상태·최종 신청마감 병기 — 공지 원문 해석(뱃지)과 다를 수 있어 두 신호를 모두 제공
+    if st.get('st'):
+        official = '공단 등록 접수상태: <b>%s</b>' % esc(st['st'])
+        if st.get('dl'):
+            official += ' · 최종 신청마감 %s' % esc(st['dl'])
+        status_lines.append('<p class="small muted mt8">%s <span class="muted">(공지 원문과 다르면 최근 변경이 반영 중일 수 있어요)</span></p>' % official)
     if r.get('rep'):
         status_lines.append('<p class="small muted mt8">ℹ️ 차종별 단가: 도(道) 공통 단가 기준 — 시·군 자체 추가 지원 여부는 공고문 확인</p>')
 
@@ -523,9 +576,9 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
         'PROSE': prose_html,
         'NOTE_SECTION': note_sec,
         'AD1': '', 'AD2': '',
-        'TABLE_SUB': '보조금 상위 %d개 / 전체 %d개 모델' % (min(25, len(rows)), len(rows)),
+        'TABLE_SUB': '보조금 상위 %d개 / 전체 %d개 모델' % (min(25, len(rows)), len(all_rows)),
         'TABLE_ROWS': ''.join(trs),
-        'MODEL_COUNT': str(len(rows)),
+        'MODEL_COUNT': str(len(all_rows)),
         'SIDO_LABEL': esc(SIDO_FULL.get(sido, sido or '지역')),
         'SIBLINGS': sibs_html,
     }
@@ -591,16 +644,22 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
     # ── A 현황 ──
     pA = []
     pA.append(CC('intro',
-        ['', '요점부터 말하면 ', '숫자부터 확인하면 '],
+        ['', '요점부터 말하면 ', '숫자부터 확인하면 ', '결론부터 적으면 ',
+         '금액 기준으로 보면 ', '핵심만 추리면 ', '올해 조건을 정리하면 ', '지금 시점 기준으로 '],
         ['%s의 2026년 전기차 보조금(전기승용)은 국비와 지방비를 합해 ' % name,
          '2026년 %s에서 전기승용을 구매할 때 전기차 보조금은 국비+지방비 합계로 ' % name,
          '%s 전기차 보조금은 2026년 전기승용 기준 국비·지방비를 더해 ' % name,
          '전기승용 기준으로 %s%s 올해 국비와 지방비를 합쳐 ' % (name, josa(name, '은', '는')),
-         '%s의 올해 전기승용 지원액은 국비·지방비 합산으로 ' % name],
+         '%s의 올해 전기승용 지원액은 국비·지방비 합산으로 ' % name,
+         '%s에서 올해 전기승용 한 대를 사면 받을 수 있는 보조금은 합계 ' % name,
+         '%s 관내 등록 기준, 2026년 전기승용 구매보조금은 국비·지방비를 더해 ' % name,
+         '2026년 공고 기준 %s의 전기승용 지원 상한은 ' % name],
         ['최대 %s만원입니다.' % maxP,
          '많게는 %s만원에 이릅니다.' % maxP,
          '%s만원이 상한입니다.' % maxP,
-         '최대 %s만원으로 잡혀 있습니다.' % maxP]))
+         '최대 %s만원으로 잡혀 있습니다.' % maxP,
+         '차종에 따라 최대 %s만원까지입니다.' % maxP,
+         '%s만원을 상한으로 차종별로 달라집니다.' % maxP]))
     # 순위 백분위 표기: 하위권에서 '상위 93%' 같은 혼란 표현을 피하고 자연어로
     pct_txt = ('상위 %d%%' % pct) if pct <= 50 else ('하위 %d%%' % (100 - pct))
     rk_head = ['전국 %d개 지자체 가운데 %d위(%s)로, ' % (n_all, rank, pct_txt),
@@ -1090,12 +1149,14 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
                          '잔여는 %s 유형에만 있습니다.' % wtxt,
                          '%s 쪽 수치만 남아 있습니다.' % wtxt]))
         pE.append(CC('alloc-tail',
-            ['', '읽는 법 하나: ', '한 가지 주의로 '],
-            ['유형 합계는 ', '표의 유형 숫자는 ', '이 분해 값은 '],
+            ['', '읽는 법 하나: ', '한 가지 주의로 ', '해석 팁을 덧붙이면 '],
+            ['유형 합계는 ', '표의 유형 숫자는 ', '이 분해 값은 ', '유형별 칸의 수치는 '],
             ['회차 이월 때문에 전체 수치와 어긋날 수 있습니다.',
              '회차 구분 탓에 전체 합계와 다를 수 있습니다.',
              '이월분이 섞이면 전체와 안 맞을 수 있습니다.',
-             '공고 회차가 나뉘면 전체와 차이 날 수 있습니다.']))
+             '공고 회차가 나뉘면 전체와 차이 날 수 있습니다.',
+             '공고가 여러 차수로 쪼개진 지역에서는 전체와 어긋나기도 합니다.',
+             '이월 물량이 반영되는 시점에 따라 전체 수치와 달라질 수 있습니다.']))
 
     # ── F 안내 (선정 방식·연락처·서류·다음 확인 포인트·기준시각·출처) ──
     pF = []
@@ -1254,7 +1315,9 @@ def model_group(c):
 def build_car(car, cars, regions, meta, status, ctx):
     cid = car['id']
     name = car['name']
-    noindex = bool(car['disc'])
+    # 색인은 모델그룹 대표 트림만 — 트림 변형(19/20인치 등)끼리는 근사중복이라 심사·검색 표면에서 제외.
+    # 페이지 자체는 전 트림 생성·상호링크 유지(이용자 탐색·비교 기능은 그대로).
+    noindex = bool(car['disc']) or cid not in ctx.get('car_rep', set())
     maker = MAKER_SHORT.get(car['maker'], car['maker'])
     eff = round(car['range'] / car['batt'], 1) if car.get('range') and car.get('batt') else None
     cr = round(car['rangeCold'] / car['range'] * 100) if car.get('range') and car.get('rangeCold') else None
@@ -1269,11 +1332,37 @@ def build_car(car, cars, regions, meta, status, ctx):
             continue
         rows.append((k, r, v[0], car['nat'] + v[0]))
     rows.sort(key=lambda x: (-x[3], x[1]['name']))
+    # 상위 표는 5행만 정적 노출(전체는 detail.js 확장) — 전 차종 유사 순위표의 반복 footprint 축소
     trs = ['<tr><td><a href="/region/%s.html" style="color:inherit;font-weight:700">%s</a>'
            '<div class="small muted">%s</div></td><td class="num">%s</td>'
            '<td class="num" style="font-weight:800;color:var(--money)">%s</td></tr>'
            % (k, esc(r['name']), esc(r.get('sido', '')), fmt(loc), fmt(tot))
-           for k, r, loc, tot in rows[:15]]
+           for k, r, loc, tot in rows[:5]]
+
+    # 시도별 요약 — 이 차종의 시도 단위 합계 분포(차종마다 값이 다른 실질 요약)
+    by_sido = {}
+    for k, r, loc, tot in rows:
+        by_sido.setdefault(r.get('sido', ''), []).append((k, r, tot))
+    sido_trs = []
+    for sido, items in sorted(by_sido.items(), key=lambda x: -max(t for _, _, t in x[1])):
+        top_k, top_r, top_t = max(items, key=lambda x: x[2])
+        lo = min(t for _, _, t in items)
+        rng = ('%s만원' % fmt(top_t)) if lo == top_t else ('%s만~%s만원' % (fmt(lo), fmt(top_t)))
+        slug = SIDO_SLUG.get(sido)
+        sido_cell = ('<a href="/sido/%s.html" style="color:inherit;font-weight:700">%s</a>' % (slug, esc(SIDO_FULL.get(sido, sido)))
+                     if slug else '<b>%s</b>' % esc(SIDO_FULL.get(sido, sido)))
+        sido_trs.append('<tr><td>%s</td><td class="num">%d</td><td class="num">%s</td>'
+                        '<td class="small"><a href="/region/%s.html" style="color:inherit">%s</a> %s만원</td></tr>'
+                        % (sido_cell, len(items), rng, top_k, esc(top_r['name']), fmt(top_t)))
+    tots_all = sorted(t for _, _, _, t in rows)
+    if tots_all:
+        mid = (tots_all[len(tots_all) // 2] if len(tots_all) % 2
+               else round((tots_all[len(tots_all) // 2 - 1] + tots_all[len(tots_all) // 2]) / 2))
+        dist_line = ('%s 기준 전국 %d개 지역 합계: 중앙값 %s만원 · 평균 %s만원 · 범위 %s만~%s만원'
+                     % (esc(name), len(tots_all), fmt(mid), fmt(round(sum(tots_all) / len(tots_all))),
+                        fmt(tots_all[0]), fmt(tots_all[-1])))
+    else:
+        dist_line = ''
 
     prose = car_prose(car, cars, rows, eff, cr, meta, status, ctx)
     prose_html = ''.join('<p style="line-height:1.75;margin:10px 0">%s</p>' % p for p in prose)
@@ -1349,8 +1438,10 @@ def build_car(car, cars, regions, meta, status, ctx):
         'AD1': '', 'AD2': '',
         'SPECS': specs,
         'WINTER': winter,
-        'TABLE_SUB': '상위 %d개 / 전체 %d개 지역' % (min(15, len(rows)), len(rows)),
+        'TABLE_SUB': '상위 %d개 / 전체 %d개 지역' % (min(5, len(rows)), len(rows)),
         'TABLE_ROWS': ''.join(trs),
+        'SIDO_ROWS': ''.join(sido_trs),
+        'DIST_LINE': dist_line,
         'REGION_COUNT': str(len(rows)),
         'TRIMS': trim_html,
         'RELATED': ''.join(related),
@@ -1872,18 +1963,23 @@ def build_sido(sido, regions, meta, status, ctx):
     trs = []
     for k, v in sibs:
         stt = status['data'].get(k) or {}
-        cls, label = badge_of(stt, detect_closed(stt.get('note')))
+        cls, label = badge_of(stt, ctx['closed_map'].get(k) or detect_closed(stt.get('note')))
         trs.append('<tr data-cd="%s"><td><a href="/region/%s.html" style="font-weight:700">%s</a></td>'
                    '<td class="num">%s</td><td class="num" data-cell="left">%s</td>'
                    '<td><span class="badge %s" data-cell="badge"><span class="dot"></span>%s</span></td></tr>'
                    % (k, k, esc(v['name']), fmt(v.get('maxP')), fmt(stt.get('left')), cls, esc(label)))
 
+    # 단일 지자체 시도(광역시·세종·제주)는 '1개 시군구 총정리'가 doorway 인상 + region 페이지와 근사중복
+    # → 에세이 중심 제목으로 재구성(마감 패턴·경쟁 상황 분석이 이 페이지들의 실제 가치)
+    single = len(sibs) <= 1
+    head_txt = ('%s 전기차 보조금 2026 — 접수 흐름·마감 패턴 분석' % full if single
+                else '%s 전기차 보조금 2026 — %d개 시군구 총정리' % (full, len(sibs)))
     canonical = '%s/sido/%s.html' % (BASE, slug)
     ld = [{'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
         {'@type': 'ListItem', 'position': 1, 'name': '홈', 'item': BASE + '/'},
         {'@type': 'ListItem', 'position': 2, 'name': '%s 전기차 보조금' % full, 'item': canonical}]},
         {'@context': 'https://schema.org', '@type': 'Article',
-         'headline': '%s 전기차 보조금 2026 — %d개 시군구 총정리' % (full, len(sibs)),
+         'headline': head_txt,
          'datePublished': published, 'dateModified': asof, 'inLanguage': 'ko',
          'author': {'@type': 'Person', 'name': 'HyeongHun Lee', 'url': BASE + '/about.html#operator'},
          'publisher': {'@type': 'Organization', 'name': 'EV보조금'},
@@ -1891,7 +1987,8 @@ def build_sido(sido, regions, meta, status, ctx):
 
     mapping = {
         'NAME': esc(full),
-        'SUB': '2026년 전기승용 기준 · %d개 시·군·구 최대 보조금·잔여 현황' % len(sibs),
+        'SUB': ('2026년 전기승용 기준 · 접수 흐름·마감 패턴과 현재 잔여 현황' if single
+                else '2026년 전기승용 기준 · %d개 시·군·구 최대 보조금·잔여 현황' % len(sibs)),
         'PUBLISHED': esc(published), 'ASOF': esc(asof),
         'PROSE': prose,
         'AD1': '', 'AD2': '',
@@ -1903,9 +2000,10 @@ def build_sido(sido, regions, meta, status, ctx):
     mapping['AD2'] = ad_slot('sido-2', gate, False)
     main = render(ctx['tpl_sido'], mapping)
     page = render(ctx['tpl_page'], {
-        'TITLE': esc('%s 전기차 보조금 2026 — %d개 시군구 총정리 | EV보조금' % (full, len(sibs))),
+        'TITLE': esc('%s | EV보조금' % head_txt),
         'DESC': esc(fm.get('description') or
-                    '%s 2026년 전기차 보조금 총정리: %d개 시·군·구별 최대 지원액(국비+지방비)·잔여 물량·접수 상태를 %s 기준 데이터로 한 표에 정리했습니다.' % (full, len(sibs), asof)),
+                    ('%s 2026년 전기차 보조금: 올해 접수 흐름과 마감 패턴, 현재 잔여·접수 상태를 %s 기준 실측 데이터로 분석했습니다.' % (full, asof) if single else
+                     '%s 2026년 전기차 보조금 총정리: %d개 시·군·구별 최대 지원액(국비+지방비)·잔여 물량·접수 상태를 %s 기준 데이터로 한 표에 정리했습니다.' % (full, len(sibs), asof))),
         'ROBOTS': '',
         'CANONICAL': canonical,
         'JSONLD': jsonld_script(ld),
@@ -2161,7 +2259,7 @@ def build_brief_hub(brief_days, meta, status, ctx):
                '<p class="muted small" style="padding:10px 4px">첫 브리핑을 준비 중입니다. 발행되는 대로 이곳에 나열돼요.</p>')
     intro = (
         '<p style="line-height:1.75;margin:10px 0">일일 브리핑은 무공해차 통합누리집(ev.or.kr)에서 매시간 수집하는 '
-        '지자체 공고 데이터를 바탕으로 매일 아침 자동 생성되는 페이지입니다. 전국 잔여 합계의 전일 대비 변화, '
+        '지자체 공고 데이터를 바탕으로 매일 아침 발행되는 페이지입니다(집계 자동화 · 방법 설계·검수 운영자). 전국 잔여 합계의 전일 대비 변화, '
         '가장 많이 줄어든 지역, 새로 마감이 공지된 지역, 물량이 크게 늘어난(추가 공고 가능성) 지역을 '
         '그날의 실측 수치로만 정리합니다. 외부 기사를 재작성하지 않습니다.</p>'
         '<p style="line-height:1.75;margin:10px 0">변화가 없거나 데이터 수집이 오래된 날에는 발행을 건너뜁니다. '
@@ -2193,7 +2291,8 @@ def build_brief_hub(brief_days, meta, status, ctx):
     return render(ctx['tpl_page'], {
         'TITLE': esc('전기차 보조금 일일 브리핑 — 전국 잔여 변화 매일 아침 정리 | EV보조금'),
         'DESC': esc('전국 160개 지자체의 전기승용 보조금 잔여 변화·신규 마감·물량 증가를 매일 아침 실측 데이터로 자동 정리. 최근 30일 브리핑 모음.'),
-        'ROBOTS': '',
+        # 브리핑 섹션은 데이터 집계 페이지 — 자동 생성 콘텐츠 정책상 색인 제외(사이트 이용자용 발행은 유지)
+        'ROBOTS': '\n<meta name="robots" content="noindex">',
         'CANONICAL': canonical,
         'JSONLD': jsonld_script(ld),
         'BREADCRUMB': '<a href="/">홈</a> › <b>일일 브리핑</b>',
@@ -2205,10 +2304,18 @@ def build_brief_hub(brief_days, meta, status, ctx):
 # ══════════════════════════════════════════════════════════
 #  sitemap · 쓰기 · 메인
 # ══════════════════════════════════════════════════════════
-def build_sitemap(regions, cars, today, model_entries=(), brief_days=()):
+def build_sitemap(regions, cars, today, model_entries=(), brief_days=(), car_rep=None):
+    """lastmod 신뢰 원칙: 실제 변경 시점만 기재.
+    - 정적 페이지(CORE) = 파일 수정일(내용이 안 바뀌면 lastmod도 불변)
+    - 데이터 페이지(region/car/sido) = 데이터 기준일(오늘) — 잔여·단가가 실제로 매일 갱신됨
+    - 모델 시리즈 = 발행일 고정 · 브리핑 = noindex 정책이라 사이트맵 전체 제외"""
     urls = []
     for path, freq in CORE_PAGES:
-        urls.append((BASE + path, freq, today))
+        try:
+            lm = datetime.date.fromtimestamp(os.path.getmtime(os.path.join(SITE, path.lstrip('/')))).isoformat()
+        except OSError:
+            lm = today
+        urls.append((BASE + path, freq, lm))
     for cd in sorted(regions):
         if cd == '9999':
             continue                       # noindex — 사이트맵 제외
@@ -2216,15 +2323,15 @@ def build_sitemap(regions, cars, today, model_entries=(), brief_days=()):
     for c in cars:
         if c['disc']:
             continue                       # 단종 noindex — 제외
+        if car_rep is not None and c['id'] not in car_rep:
+            continue                       # 비대표 트림 noindex — 제외(트림 근사중복)
         urls.append(('%s/car/%d.html' % (BASE, c['id']), 'weekly', today))
     for sido in SIDO_SLUG:
         urls.append(('%s/sido/%s.html' % (BASE, SIDO_SLUG[sido]), 'daily', today))
     urls.append((BASE + '/model/', 'weekly', today))    # 시리즈 허브(index.html) — 항상 생성
     for e in model_entries:                             # 발행 게이트 통과분만 — 미래 publish는 미포함
-        urls.append(('%s/model/%s.html' % (BASE, e['slug']), 'weekly', today))
-    urls.append((BASE + '/brief/', 'daily', today))     # 브리핑 허브 — 항상 생성
-    for d in brief_days:                                # 최근 30일분만(파일은 영구 보존) · 발행 후 불변 → lastmod=발행일
-        urls.append(('%s/brief/%s.html' % (BASE, d), 'monthly', d))
+        urls.append(('%s/model/%s.html' % (BASE, e['slug']), 'weekly', e.get('publish') or today))
+    # 브리핑(/brief/)은 자동 생성 콘텐츠 정책상 noindex — 사이트맵에서 전체 제외(발행·열람은 유지)
     body = '\n'.join('<url><loc>%s</loc><lastmod>%s</lastmod><changefreq>%s</changefreq></url>'
                      % (u, lm, f) for u, f, lm in urls)
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -2241,7 +2348,7 @@ def atomic_write(path, content):
 
 def main():
     t0 = datetime.datetime.now()
-    cars, regions, meta, status, hist = load_data()
+    cars, regions, meta, status, hist, rounds = load_data()
     # 경로 안전 검증: cd는 ^[0-9]{4,5}$, 차종 id는 0~99999 정수만 파일명·사이트맵에 사용.
     # 불일치 항목은 경고 후 스킵(디렉터리 밖 쓰기·경로 조작 차단, 사이트맵에도 미포함).
     bad_cd = sorted(cd for cd in regions if not re.fullmatch(r'[0-9]{4,5}', str(cd)))
@@ -2272,7 +2379,18 @@ def main():
            'asof_day': asof_day if asof_day is not None else (datetime.date.today() - D0).days,
            'asof': status.get('updated', '')[:10],
            'closed_map': closed_map, 'open_cnt': open_cnt,
-           'open_base': sum(1 for cd in regions if cd != '9999')}
+           'open_base': sum(1 for cd in regions if cd != '9999'),
+           'rounds': rounds or {}}
+    # 색인 대상 차종 = 모델그룹 대표 트림(국비 최고 비단종, 동률은 id 낮은 쪽) — 트림 근사중복의 색인 노출 차단
+    rep_by_group = {}
+    for c in cars:
+        if c['disc']:
+            continue
+        g = model_group(c)
+        cur = rep_by_group.get(g)
+        if cur is None or (c['nat'] or 0, -c['id']) > (cur['nat'] or 0, -cur['id']):
+            rep_by_group[g] = c
+    ctx['car_rep'] = {c['id'] for c in rep_by_group.values()}
 
     pages = {}   # 전부 메모리에서 완성 → 성공 시에만 원자 쓰기(부분 파일 금지)
 
@@ -2315,7 +2433,7 @@ def main():
                            % (n_region, len(regions), n_car, len(cars), n_sido, len(SIDO_SLUG),
                               n_model, len(pub_entries) + 1))
 
-    sitemap, n_urls = build_sitemap(regions, cars, today, pub_entries, brief_days)
+    sitemap, n_urls = build_sitemap(regions, cars, today, pub_entries, brief_days, ctx.get('car_rep'))
 
     for path, html in pages.items():
         atomic_write(path, html)

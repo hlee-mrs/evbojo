@@ -16,6 +16,7 @@
     <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">ev.or.kr에서 잔여 확인 ↗</a>
   </div>
   <p class="stamp">{{STAMP}}</p>
+  <p class="stamp">데이터 수집·검증: EV보조금 운영자 <a href="/about.html#operator" style="color:inherit;text-decoration:underline">HyeongHun Lee</a> · <a href="/about.html#method" style="color:inherit;text-decoration:underline">수집·검증 방법</a></p>
 </section>
 
 <section class="card">

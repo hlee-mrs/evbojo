@@ -20,6 +20,17 @@
 </section>
 
 <section class="card">
+  <h2 class="mt0">시도별 보조금 요약 <span class="sub">{{NAME}} 기준 · 국비 동일, 지방비만 지역차</span></h2>
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th>시도</th><th class="num">지역 수</th><th class="num">합계 범위</th><th>최고 지역</th></tr></thead>
+      <tbody>{{SIDO_ROWS}}</tbody>
+    </table>
+  </div>
+  <p class="small muted mt8">{{DIST_LINE}}</p>
+</section>
+
+<section class="card">
   <h2 class="mt0">지역별 국비+지방비 합계 <span class="sub">{{TABLE_SUB}}</span></h2>
   <div class="tbl-wrap">
     <table class="tbl" data-live="fulltable" data-kind="car" data-id="{{ID}}">
@@ -44,6 +55,7 @@
 <section class="card">
   <h2 class="mt0">함께 읽으면 좋은 글</h2>
   <div class="chips">{{RELATED}}</div>
+  <p class="stamp mt8">데이터 수집·검증: EV보조금 운영자 <a href="/about.html#operator" style="color:inherit;text-decoration:underline">HyeongHun Lee</a> · <a href="/about.html#method" style="color:inherit;text-decoration:underline">수집·검증 방법</a> · 출처 무공해차 통합누리집(ev.or.kr)</p>
 </section>
 
 {{AD2}}

@@ -203,6 +203,20 @@ def _range(s):
             int(cold.group(1).replace(',', '')) if cold else None)
 
 
+def disp_name(s):
+    """소비자 표시명: 피드의 제조사 내부 사양코드 괄호 제거 — 'iX1 eDrive20(11HM)' → 'iX1 eDrive20'.
+    연식 '(2025)'·가격구간 '(5999만원)'·'(단종)' 등 의미 있는 괄호는 보존. 표기 교정: Pv5 → PV5."""
+    out = re.sub(r'\(\s*[0-9]{1,2}[A-Z]{1,3}[0-9]?\s*\)', '', s or '')
+    out = out.replace('Pv5', 'PV5')
+    return re.sub(r'\s+', ' ', out).strip()
+
+
+def _general_row(r):
+    """일반 구매 가능 행만 — WAV·미지원 표기 모델은 헤드라인 '최대' 산출에서 제외(팩트체크 I3)"""
+    g = r.get('G') or ''
+    return 'WAV' not in g and '미지원' not in g
+
+
 # ─────────────────────────── 갱신 작업 ───────────────────────────
 
 def norm_name(s):
@@ -241,6 +255,37 @@ def update_status(sheets):
                  {'updated': datetime.now(KST).isoformat(timespec='minutes'), 'data': data})
     update_history(data, datetime.now(KST))
     log(f'status.json 갱신 완료 ({len(data)}개 지역)')
+
+
+def update_rounds(sheets):
+    """공고 차수(sheet5)·공단 공식 변경이력(sheet7) → rounds.json.
+    지역 페이지의 '그 지역에서만 참인' 고유 콘텐츠 원천 — 공고 연혁 타임라인용."""
+    s5, s7 = sheets.get(5, []), sheets.get(7, [])
+    rounds, events = {}, {}
+    for r in s5[1:]:
+        cd = _cd(r)
+        if not cd:
+            continue
+        rounds.setdefault(cd, []).append({
+            'k': _clean(r.get('G'), 20), 'nm': _clean(r.get('H'), 80),
+            'post': _clean(r.get('I'), 20), 's': _clean(r.get('J'), 20),
+            'e': _clean(r.get('K'), 20), 'd': _clean(r.get('L'), 20)})
+    cutoff = (datetime.now(KST) - timedelta(days=90)).strftime('%Y-%m-%d')
+    for r in s7[1:]:
+        cd = _cd(r)
+        t = _clean(r.get('C'), 20) or ''
+        if not cd or t[:10] < cutoff:
+            continue
+        events.setdefault(cd, []).append([t, _clean(r.get('E'), 40), _clean(r.get('F'), 40), _clean(r.get('G'), 40)])
+    for cd in events:
+        events[cd] = sorted(events[cd], key=lambda e: e[0], reverse=True)[:12]
+    if len(rounds) < 100:                      # 구조 변경 방어 — 이상 시 기존 파일 유지
+        log(f'⚠ 공고 차수 지역 수 이상({len(rounds)}) — rounds.json 미교체')
+        return
+    atomic_write(os.path.join(DATA, 'rounds.json'),
+                 {'updated': datetime.now(KST).isoformat(timespec='minutes'),
+                  'rounds': rounds, 'events': events})
+    log(f'rounds.json 갱신 ({len(rounds)}개 지역 · 최근 90일 변경 {sum(len(v) for v in events.values())}건)')
 
 
 # ── 잔여 이력(history.json) — 소진 예측용 ─────────────────────────
@@ -414,6 +459,8 @@ def update_full(sheets):
                      'maker': _clean(r.get('H'), 60) or '', 'name': _clean(r.get('G'), 120),
                      'nat': _int(r.get('K')), 'convNat': _int(r.get('M')) or 0, 'disc': False,
                      'range': warm, 'rangeCold': cold, 'batt': _batt(r.get('I'))})
+    for c in cars:                             # 소비자 표시명(사양코드 제거) — 매칭 키(name)는 원문 유지
+        c['disp'] = disp_name(c['name'])
     idx_of = {key_name(c['name']): i for i, c in enumerate(cars)}
 
     # 2) 지역별 지방비 v 배열(모델명 직접 매칭 — 구 국비 시퀀스 그리디 정렬 폐기) + 지역 메타
@@ -449,9 +496,11 @@ def update_full(sheets):
         for i, c in enumerate(cars):
             if c['disc'] and vals[i] is None and i < len(old_v):
                 vals[i] = old_v[i]
-        tots = [_int(r.get('O')) for r in rows if _int(r.get('O')) is not None]
+        # 헤드라인 '최대'는 일반 구매 가능 모델 기준(WAV·미지원 제외) — title·산문·표 1위와 일원화
+        tots = [_int(r.get('O')) for r in rows if _int(r.get('O')) is not None and _general_row(r)]
         stot = [_int(r.get('O')) for r in rows
-                if _int(r.get('O')) is not None and ('경' in (r.get('F') or '') or '소형' in (r.get('F') or ''))]
+                if _int(r.get('O')) is not None and _general_row(r)
+                and ('경' in (r.get('F') or '') or '소형' in (r.get('F') or ''))]
         info = reg_info.get(cd, {})
         old = old_regions.get(cd, {})
         regions_out[cd] = {'name': _clean(info.get('D'), 100) or old.get('name', ''),
@@ -538,6 +587,7 @@ def main():
         update_full(sheets)
     if a.status or a.once:
         update_status(sheets)
+        update_rounds(sheets)
 
 
 if __name__ == '__main__':

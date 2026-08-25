@@ -10,8 +10,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <!-- 하위 경로(/region/ 등)에서도 상대 URL이 루트 기준으로 풀리도록 base 고정 — app.js의 data/*.json fetch·nav 링크가 그대로 동작 -->
 <base href="/">
-<title>세종특별자치시 전기차 보조금 2026 — 1개 시군구 총정리 | EV보조금</title>
-<meta name="description" content="세종특별자치시는 17개 시도 중 소진율이 가장 낮은 61.5%(2026-08-15 기준, 잔여 470대)이며 8월 20일 14시 3차 접수(173대)가 시작됩니다. 60일 연속 거주요건 등 조건을 정리했습니다.">
+<title>세종특별자치시 전기차 보조금 2026 — 접수 흐름·마감 패턴 분석 | EV보조금</title>
+<meta name="description" content="세종특별자치시는 게시 시점(2026-08-15) 소진율 61.5%·잔여 470대로 17개 시도 중 가장 여유가 있었고, 8월 20일 14시 3차 접수(173대) 개시가 공고돼 있었습니다. 60일 연속 거주요건 등 조건을 정리했습니다. 현재 상태는 본문 표 기준입니다.">
 <link rel="canonical" href="https://evbojo.co.kr/sido/sejong.html">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
@@ -19,7 +19,7 @@
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":"https://evbojo.co.kr/"},{"@type":"ListItem","position":2,"name":"세종특별자치시 전기차 보조금","item":"https://evbojo.co.kr/sido/sejong.html"}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"세종특별자치시 전기차 보조금 2026 — 1개 시군구 총정리","datePublished":"2026-08-15","dateModified":"2026-08-26","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/sido/sejong.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"세종특별자치시 전기차 보조금 2026 — 접수 흐름·마감 패턴 분석","datePublished":"2026-08-26","dateModified":"2026-08-26","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/sido/sejong.html"}</script>
 </head>
 <body>
 <!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
@@ -32,17 +32,17 @@
 <nav class="small muted" aria-label="현재 위치" style="margin:14px 0 0"><a href="/">홈</a> › <b>세종특별자치시</b></nav>
 <div class="hero" style="text-align:left;padding-bottom:0">
   <h1>세종특별자치시 <span class="hl">전기차 보조금</span></h1>
-  <p>2026년 전기승용 기준 · 1개 시·군·구 최대 보조금·잔여 현황</p>
+  <p>2026년 전기승용 기준 · 접수 흐름·마감 패턴과 현재 잔여 현황</p>
 </div>
 
-<p class="stamp">글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 게시 2026-08-15 · 데이터 기준 2026-08-26</p>
+<p class="stamp">글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 게시 2026-08-26 · 데이터 기준 2026-08-26</p>
 
 <section class="card">
-  <p style="line-height:1.75;margin:10px 0">17개 시도의 소진율(공고 대비 잔여를 뺀 비율)을 전부 계산해 줄을 세우면 꼴찌, 그러니까 물량이 가장 여유 있는 곳이 세종입니다. 2026-08-15 기준 세종특별자치시의 전기승용 공고는 1,221대, 잔여는 470대로 소진율 61.5% — 전국 평균에 한참 못 미치는 속도입니다. 대구·인천·대전·울산이 잔여 0대에 도달한 시점에 공고 물량의 3분의 1 이상이 남아 있는 광역 단위는 세종이 유일합니다. 접수 누계(790대) 자체가 공고 물량에 못 미치는 것도 광역 단위에서는 보기 드문 그림인데, 그만큼 수요 대비 배정이 빠듯하지 않았다는 뜻으로 읽을 수 있습니다.</p>
-<p style="line-height:1.75;margin:10px 0">게다가 새 회차가 코앞입니다. 세종시 공지문에 따르면 3차 전기승용 보급사업 접수가 2026년 8월 20일(목) 14시에 시작되며, 보급물량은 전기승용 173대입니다. 지원가능여부 확인 요청은 8월 24일(월) 9시부터 가능하다고 안내되어 있습니다. 접수 기간은 예산 소진 시까지로 열려 있는데, 세종의 그간 소진 속도를 감안하면 수도권 대도시처럼 며칠 만에 마감될 가능성은 상대적으로 낮아 보입니다. 다만 이는 과거 속도에 근거한 참고일 뿐, 특정 시점을 장담할 수는 없습니다.</p>
-<p style="line-height:1.75;margin:10px 0">세종에서 가장 조심해야 할 것은 거주요건입니다. 공지문에 지원대상이 &quot;신청일 기준 60일 이상 세종시에 연속하여 주소를 둔 자 등&quot;으로 명시되어 있습니다. 거주 기간 요건은 지자체마다 있기도 하고 없기도 한데, 세종은 60일 연속 거주라는 문턱을 명시해 둔 경우입니다. 최근 세종으로 전입했다면 전입일로부터 60일을 세어 접수 가능 시점을 역산해야 하는데, 8월 20일 접수 개시일에 요건을 채우려면 6월 21일 무렵 이전에 전입해 있었어야 한다는 계산이 나옵니다(정확한 판정은 공고문 기준). 판정 기준일이 계약일이 아니라 신청서 접수일이라는 원칙은 여기서도 같습니다.</p>
+  <p style="line-height:1.75;margin:10px 0">이 글이 게시된 2026년 8월 15일 기준으로 17개 시도의 소진율(공고 대비 잔여를 뺀 비율)을 전부 계산해 줄을 세우면 꼴찌, 그러니까 물량이 가장 여유 있는 곳이 세종이었습니다. 당시 세종특별자치시의 전기승용 공고는 1,221대, 잔여는 470대로 소진율 61.5% — 전국 평균에 한참 못 미치는 속도였습니다. 대구·인천·대전·울산이 잔여 0대에 도달한 시점에 공고 물량의 3분의 1 이상이 남아 있는 광역 단위는 세종이 유일했습니다. 접수 누계(790대) 자체가 공고 물량에 못 미쳤던 것도 광역 단위에서는 보기 드문 그림인데, 그만큼 수요 대비 배정이 빠듯하지 않았다는 뜻으로 읽을 수 있습니다.</p>
+<p style="line-height:1.75;margin:10px 0">게다가 게시 시점에는 새 회차가 코앞이었습니다. 세종시 공지문 기준으로 3차 전기승용 보급사업 접수가 2026년 8월 20일(목) 14시 개시로 공고돼 있었고, 보급물량은 전기승용 173대였습니다. 지원가능여부 확인 요청은 8월 24일(월) 9시부터로 안내됐습니다. 접수 기간은 예산 소진 시까지로 공고됐는데, 173대라는 물량 규모상 실제 마감 시점은 예단할 수 없으므로, 접수 개시 이후의 진행 상황과 마감 여부는 이 페이지의 표와 공지 원문에서 직접 확인하는 것이 안전합니다.</p>
+<p style="line-height:1.75;margin:10px 0">세종에서 가장 조심해야 할 것은 거주요건입니다. 공지문에 지원대상이 &quot;신청일 기준 60일 이상 세종시에 연속하여 주소를 둔 자 등&quot;으로 명시되어 있습니다. 거주 기간 요건은 지자체마다 있기도 하고 없기도 한데, 세종은 60일 연속 거주라는 문턱을 명시해 둔 경우입니다. 최근 세종으로 전입했다면 전입일로부터 60일을 세어 접수 가능 시점을 역산해야 하는데, 예컨대 3차 개시일인 8월 20일에 요건을 채우려면 6월 21일 무렵 이전에 전입해 있었어야 한다는 계산이 나옵니다(정확한 판정은 공고문 기준). 판정 기준일이 계약일이 아니라 신청서 접수일이라는 원칙은 여기서도 같습니다.</p>
 <p style="line-height:1.75;margin:10px 0">단가와 선정 방식은 이렇습니다. 세종은 단일 단가 지역으로 승용 최대 보조금은 842만원(국비+지방비, 단가 기준일 2026-07-15), 광역 대도시들과 같은 전국 최하위 동률 그룹입니다. 3차 선정 기준은 공지문상 출고·등록순(지원 가능여부 확인 요청순)으로, 서류 접수가 빨라도 출고가 늦으면 순번이 뒤로 밀리는 구조입니다. 금액이 차종별로 차등 지급되므로, 본인 차종의 정확한 금액은 단가표 조회가 필수입니다. 전환지원금은 국비 차종별 금액에 세종 지방분(차종별 최대 30만원)이 더해집니다.</p>
-<p style="line-height:1.75;margin:10px 0">지리적으로 세종을 둘러싼 지역들의 처지는 제각각이라 비교해 볼 만합니다. <a href="/region/3000.html">대전광역시</a>는 같은 842만원 단가에 잔여 0대, 충남 도 공통 단가 1,248만원을 쓰는 <a href="/region/4415.html">공주시</a>도 잔여가 바닥났습니다. 반면 같은 충남에서 마감 공지 없이 물량이 남은 <a href="/region/44825.html">태안군</a>은 123대를 유지 중이고, 충북의 <a href="/region/4311.html">청주시</a>는 잔여 0대로 조기 마감 상태입니다(모두 2026-08-15 기준). 요컨대 세종은 단가는 낮지만 &#39;신청할 수 있다&#39;는 것 자체가 강점인 지역입니다. 3차 접수 공고문 전문과 차종별 금액은 <a href="/region/3611.html">세종특별자치시</a> 페이지에서 확인하실 수 있습니다. 8월 20일 이후에는 잔여 숫자가 줄어드는 속도가 가장 정직한 신호가 될 것입니다.</p>
+<p style="line-height:1.75;margin:10px 0">지리적으로 세종을 둘러싼 지역들의 게시 시점 처지도 제각각이라 비교해 볼 만했습니다. <a href="/region/3000.html">대전광역시</a>는 같은 842만원 단가에 잔여 0대, 충남 도 공통 단가 1,248만원을 쓰는 <a href="/region/4415.html">공주시</a>도 잔여가 바닥나 있었습니다. 반면 같은 충남에서 마감 공지 없이 물량이 남은 <a href="/region/44825.html">태안군</a>은 123대를 유지 중이었고, 충북의 <a href="/region/4311.html">청주시</a>는 잔여 0대로 조기 마감 상태였습니다(모두 2026-08-15 게시 시점). 요컨대 게시 시점의 세종은 단가는 낮지만 &#39;신청할 수 있다&#39;는 것 자체가 강점인 지역이었습니다. 3차 접수 공고문 전문과 차종별 금액, 그리고 매시간 갱신되는 현재 잔여·접수 상태는 <a href="/region/3611.html">세종특별자치시</a> 페이지에서 확인하실 수 있습니다. 접수 개시 후에는 잔여 숫자가 줄어드는 속도가 가장 정직한 신호입니다.</p>
 </section>
 
 <div class="ad-slot" data-slot="sido-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
@@ -52,7 +52,7 @@
   <div class="tbl-wrap">
     <table class="tbl" data-live="sidotable">
       <thead><tr><th>지역</th><th class="num">최대 보조금</th><th class="num">잔여</th><th>상태</th></tr></thead>
-      <tbody><tr data-cd="3611"><td><a href="/region/3611.html" style="font-weight:700">세종특별자치시</a></td><td class="num">842</td><td class="num" data-cell="left">469</td><td><span class="badge badge-shut" data-cell="badge"><span class="dot"></span>공지상 접수 마감 · 잔여 469대는 미출고분일 수 있음</span></td></tr></tbody>
+      <tbody><tr data-cd="3611"><td><a href="/region/3611.html" style="font-weight:700">세종특별자치시</a></td><td class="num">741</td><td class="num" data-cell="left">469</td><td><span class="badge badge-shut" data-cell="badge"><span class="dot"></span>공지상 접수 마감 · 잔여 469대는 미출고분일 수 있음</span></td></tr></tbody>
     </table>
   </div>
   <p class="small muted mt8">최대 보조금은 승용 기준 국비+지방비 합계 상한(만원)이에요. 상태·잔여는 2026-08-26 수집 기준이며, 페이지를 열면 최신 수치로 갱신돼요.</p>

@@ -450,7 +450,7 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
     # ── 공개·바이라인 ── (basis_label은 차트 섹션에서 계산)
     disclosure = (
         '<p style="line-height:1.8;margin:10px 0">이 페이지는 무공해차 통합누리집(ev.or.kr)에서 매시간 수집한 '
-        '공고 데이터를 바탕으로 매일 1회(원칙적으로 아침) 자동 생성되는 브리핑입니다. 외부 기사를 재작성하지 않으며, '
+        '공고 데이터를 바탕으로 매일 1회(원칙적으로 아침) 발행하는 브리핑입니다. 수치 집계는 자동화 파이프라인이 수행하고, 집계 방법 설계와 문안 검수는 운영자(HyeongHun Lee)가 관리합니다. 외부 기사를 재작성하지 않으며, '
         '본문·차트의 수치는 전부 수집 시점의 실측값입니다. 변화가 없거나 데이터가 오래된 날에는 발행을 건너뜁니다.</p>'
         '<p style="line-height:1.8;margin:10px 0">집계 방법: 수치는 매시간 수집분 가운데 브리핑 생성 직전 값을 쓰고, '
         '증감은 직전 보관 스냅샷(수집 공백이 있으면 그 이전 마지막 관측값 — 본문에 기준일 명시)과 비교합니다. '
@@ -470,7 +470,7 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
     # ── 렌더 ──
     mapping = {
         'H1': '%s <span class="hl">보조금 브리핑</span>' % kd,
-        'SUB': '전국 잔여 %s대 · %s 대비 %s%s대 · 자동 생성 브리핑'
+        'SUB': '전국 잔여 %s대 · %s 대비 %s%s대 · 실측 데이터 브리핑'
                % (pr.fmt(cur_total), vs, '+' if net > 0 else ('−' if net < 0 else '±'), pr.fmt(abs(net))),
         'STAMP': '기준시각 %s · %s · 출처 무공해차 통합누리집(ev.or.kr)' % (pr.esc(up_label), pr.esc(basis_label)),
         'HEADLINE': headline,
@@ -484,7 +484,7 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
     main = pr.render(tpl_brief, mapping)
 
     canonical = '%s/brief/%s.html' % (BASE, date_iso)
-    desc = ('%s 전기차 보조금 브리핑: 전국 잔여 %s대(%s 대비 %s%s대)%s%s%s. ev.or.kr 실측 데이터로 자동 생성.'
+    desc = ('%s 전기차 보조금 브리핑: 전국 잔여 %s대(%s 대비 %s%s대)%s%s%s. ev.or.kr 실측 데이터 기준.'
             % (kd, pr.fmt(cur_total), vs, '+' if net > 0 else '−' if net < 0 else '±', pr.fmt(abs(net)),
                ', 최대 감소 %s −%s대' % (decreases[0]['label'], pr.fmt(-decreases[0]['delta'])) if decreases else '',
                ', 신규 마감 %s곳' % pr.fmt(len(newly_closed)) if newly_closed else '',
@@ -500,11 +500,12 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
          'author': {'@type': 'Person', 'name': 'HyeongHun Lee', 'url': BASE + '/about.html#operator'},
          'publisher': {'@type': 'Organization', 'name': 'EV보조금'},
          'mainEntityOfPage': canonical,
-         'description': '무공해차 통합누리집(ev.or.kr) 수집 데이터 기반 자동 생성 브리핑'}]
+         'description': '무공해차 통합누리집(ev.or.kr) 수집 데이터 기반 일일 브리핑 — 집계 자동화·검수 운영자'}]
     page = pr.render(tpl_page, {
         'TITLE': pr.esc(title),
         'DESC': pr.esc(desc),
-        'ROBOTS': '',
+        # 자동 집계 페이지 — 색인 제외(발행·홈 배너 노출은 유지). 심사·검색 표면에는 편집 콘텐츠만 올린다.
+        'ROBOTS': '\n<meta name="robots" content="noindex">',
         'CANONICAL': canonical,
         'JSONLD': pr.jsonld_script(ld),
         'BREADCRUMB': '<a href="/">홈</a> › <a href="/brief/">일일 브리핑</a> › <b>%s</b>' % date_iso,

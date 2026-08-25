@@ -10,8 +10,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <!-- 하위 경로(/region/ 등)에서도 상대 URL이 루트 기준으로 풀리도록 base 고정 — app.js의 data/*.json fetch·nav 링크가 그대로 동작 -->
 <base href="/">
-<title>서울특별시 전기차 보조금 2026 — 1개 시군구 총정리 | EV보조금</title>
-<meta name="description" content="서울시 전기승용 보조금 최대 842만원의 단가 구조, 2026-08-15 기준 공고 15,430대·잔여 1,765대·소진율 88.6%, 하반기 접수 마감 상황과 유의점을 실측 데이터로 정리했습니다.">
+<title>서울특별시 전기차 보조금 2026 — 접수 흐름·마감 패턴 분석 | EV보조금</title>
+<meta name="description" content="서울시 전기승용 보조금 최대 842만원의 단가 구조와 하반기 접수 마감(8월 7일 13시) 경위, 게시 시점(2026-08-15)의 공고 15,430대·잔여 1,765대·소진율 88.6% 집계를 실측 데이터로 정리했습니다.">
 <link rel="canonical" href="https://evbojo.co.kr/sido/seoul.html">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
@@ -19,7 +19,7 @@
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":"https://evbojo.co.kr/"},{"@type":"ListItem","position":2,"name":"서울특별시 전기차 보조금","item":"https://evbojo.co.kr/sido/seoul.html"}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"서울특별시 전기차 보조금 2026 — 1개 시군구 총정리","datePublished":"2026-08-15","dateModified":"2026-08-26","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/sido/seoul.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"서울특별시 전기차 보조금 2026 — 접수 흐름·마감 패턴 분석","datePublished":"2026-08-26","dateModified":"2026-08-26","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/sido/seoul.html"}</script>
 </head>
 <body>
 <!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
@@ -32,17 +32,17 @@
 <nav class="small muted" aria-label="현재 위치" style="margin:14px 0 0"><a href="/">홈</a> › <b>서울특별시</b></nav>
 <div class="hero" style="text-align:left;padding-bottom:0">
   <h1>서울특별시 <span class="hl">전기차 보조금</span></h1>
-  <p>2026년 전기승용 기준 · 1개 시·군·구 최대 보조금·잔여 현황</p>
+  <p>2026년 전기승용 기준 · 접수 흐름·마감 패턴과 현재 잔여 현황</p>
 </div>
 
-<p class="stamp">글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 게시 2026-08-15 · 데이터 기준 2026-08-26</p>
+<p class="stamp">글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 게시 2026-08-26 · 데이터 기준 2026-08-26</p>
 
 <section class="card">
-  <p style="line-height:1.75;margin:10px 0">서울은 전국에서 가장 많은 물량을 움직이는 지자체입니다. 2026-08-15 기준 서울시의 전기승용 공고 물량은 15,430대로, 전국 160개 지자체 합계 137,257대의 약 11%를 혼자 차지합니다. 그런데 단가는 정반대 위치에 있습니다. 승용 최대 보조금(국비+지방비 합계, 단가 기준일 2026-07-15)은 842만원으로, 전국 최하위 동률 그룹(12곳)에 속합니다. 물량은 압도적으로 크고 1대당 금액은 가장 얇은, 대도시형 배분의 전형이라고 할 수 있습니다.</p>
+  <p style="line-height:1.75;margin:10px 0">서울은 전국에서 가장 많은 물량을 움직이는 지자체입니다. 이 글이 게시된 2026년 8월 15일 기준 서울시의 전기승용 공고 물량은 15,430대로, 당시 전국 160개 지자체 합계 137,257대의 약 11%를 혼자 차지했습니다. 그런데 단가는 정반대 위치에 있습니다. 승용 최대 보조금(국비+지방비 합계, 단가 기준일 2026-07-15)은 842만원으로, 전국 최하위 동률 그룹(12곳)에 속합니다. 물량은 압도적으로 크고 1대당 금액은 가장 얇은, 대도시형 배분의 전형이라고 할 수 있습니다.</p>
 <p style="line-height:1.75;margin:10px 0">서울은 광역시·특별시가 그렇듯 자치구 단위가 아니라 시 전체가 하나의 단가표를 씁니다. 강남구든 도봉구든 같은 차종이면 받는 금액이 동일하므로, 도(道) 지역처럼 시군별 금액을 비교할 필요는 없습니다. 격차 문제는 서울 안이 아니라 서울 밖과의 비교에서 생깁니다. 예컨대 전국 1위인 경북 울릉군의 승용 최대는 1,872만원으로 서울과 1,030만원 벌어집니다. 다만 보조금은 주민등록 주소지 기준이고 거주요건 판정 기준일은 구매지원신청서 접수일이므로, 다른 지역 단가는 어디까지나 참고용입니다.</p>
-<p style="line-height:1.75;margin:10px 0">접수 상황은 시점이 중요합니다. 서울시 공지문에 따르면 하반기 전기승용 접수는 2026년 8월 7일 13시부로 마감되었습니다. 하반기 공고 물량은 총 3,173대였고 이 가운데 전기승용이 2,927대(일반 2,634대·우선순위 293대)였는데, 7월 27일 접수 개시 후 열하루 만에 닫힌 것입니다. 2026-08-15 기준 수치로는 공고 15,430대 중 접수 15,404대, 출고 13,665대, 잔여 1,765대(소진율 88.6%, 공고 대비 잔여 제외 비율)입니다. 여기서 주의할 점이 있는데, 접수가 마감된 상태에서 표시되는 잔여 1,765대는 새로 신청할 수 있는 물량이 아니라 접수 후 아직 출고·지급이 끝나지 않은 미출고분일 가능성이 큽니다. 공지문의 연간 총 보급대수는 16,672대(승용 외 차종 포함)로 안내되어 있어, 취소 물량이나 추가 회차가 나올 여지는 지켜볼 필요가 있습니다.</p>
+<p style="line-height:1.75;margin:10px 0">접수 상황은 시점이 중요합니다. 서울시 공지문에 따르면 하반기 전기승용 접수는 2026년 8월 7일 13시부로 마감되었습니다. 하반기 공고 물량은 총 3,173대였고 이 가운데 전기승용이 2,927대(일반 2,634대·우선순위 293대)였는데, 7월 27일 접수 개시 후 열하루 만에 닫힌 것입니다. 게시 시점인 2026년 8월 15일 수치로는 공고 15,430대 중 접수 15,404대, 출고 13,665대, 잔여 1,765대(소진율 88.6%, 공고 대비 잔여 제외 비율)였습니다. 여기서 주의할 점이 있는데, 접수가 마감된 상태에서 표시되던 잔여 1,765대는 새로 신청할 수 있는 물량이 아니라 접수 후 아직 출고·지급이 끝나지 않은 미출고분일 가능성이 큽니다. 이 잔여는 출고가 진행될수록 줄어드는 숫자이므로, 현재 값은 이 페이지의 표에서 매시간 갱신되는 수치로 확인하시기 바랍니다. 공지문의 연간 총 보급대수는 16,672대(승용 외 차종 포함)로 안내되어 있어, 취소 물량이나 추가 회차가 나올 여지는 지켜볼 필요가 있습니다.</p>
 <p style="line-height:1.75;margin:10px 0">신청 방식은 일반·우선순위 모두 출고등록순입니다. 접수순이 아니므로 서류를 먼저 냈다고 순번이 확정되는 구조가 아니고, 차량이 실제로 출고·등록되는 순서로 대상자가 정해집니다. 내연차를 폐차하고 넘어오는 경우에는 전환지원금이 별도로 붙는데, 국비는 차종별로 다르고(실측 데이터상 최대 100만원) 서울의 지방 전환지원금은 차종별 최대 30만원입니다. 합산액은 차종·요건에 따라 달라지므로 계약 전에 본인 차종 기준으로 확인하시는 편이 안전합니다.</p>
-<p style="line-height:1.75;margin:10px 0">주변 지역과 견줘 보면 서울의 위치가 더 뚜렷해집니다. 인접 수도권에서도 <a href="/region/2800.html">인천광역시</a>, <a href="/region/4119.html">부천시</a>, <a href="/region/4136.html">남양주시</a>, <a href="/region/4145.html">하남시</a>가 서울과 동일한 842만원 최하위 그룹에 묶여 있습니다. 수도권 대도시권 전반이 단가는 낮되 물량으로 승부하는 구조인 셈입니다. 서울의 자세한 차종별 금액과 최신 공지 원문은 <a href="/region/1100.html">서울특별시</a> 상세 페이지에서 확인할 수 있습니다. 본 글의 수치는 2026-08-15 기준 매시간 수집 스냅샷이며, 추경·추가 공고에 따라 달라질 수 있습니다. 추가 회차나 취소분 재배정이 공지되면 상태 뱃지가 먼저 바뀌므로, 뱃지를 기준으로 확인하는 것이 안전합니다.</p>
+<p style="line-height:1.75;margin:10px 0">주변 지역과 견줘 보면 서울의 위치가 더 뚜렷해집니다. 인접 수도권에서도 <a href="/region/2800.html">인천광역시</a>, <a href="/region/4119.html">부천시</a>, <a href="/region/4136.html">남양주시</a>, <a href="/region/4145.html">하남시</a>가 서울과 동일한 842만원 최하위 그룹에 묶여 있습니다. 수도권 대도시권 전반이 단가는 낮되 물량으로 승부하는 구조인 셈입니다. 서울의 자세한 차종별 금액과 최신 공지 원문은 <a href="/region/1100.html">서울특별시</a> 상세 페이지에서 확인할 수 있습니다. 본 글의 수치는 2026년 8월 15일 게시 시점 스냅샷이라 시간이 지나면 실제와 달라지며, 현재 잔여·상태는 매시간 갱신되는 이 페이지의 표가 기준입니다. 추가 회차나 취소분 재배정이 공지되면 상태 뱃지가 먼저 바뀌므로, 뱃지를 기준으로 확인하는 것이 안전합니다.</p>
 </section>
 
 <div class="ad-slot" data-slot="sido-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
@@ -52,7 +52,7 @@
   <div class="tbl-wrap">
     <table class="tbl" data-live="sidotable">
       <thead><tr><th>지역</th><th class="num">최대 보조금</th><th class="num">잔여</th><th>상태</th></tr></thead>
-      <tbody><tr data-cd="1100"><td><a href="/region/1100.html" style="font-weight:700">서울특별시</a></td><td class="num">842</td><td class="num" data-cell="left">768</td><td><span class="badge badge-shut" data-cell="badge"><span class="dot"></span>공지상 마감 안내 · 유형별 확인 필요</span></td></tr></tbody>
+      <tbody><tr data-cd="1100"><td><a href="/region/1100.html" style="font-weight:700">서울특별시</a></td><td class="num">741</td><td class="num" data-cell="left">768</td><td><span class="badge badge-shut" data-cell="badge"><span class="dot"></span>공지상 마감 안내 · 유형별 확인 필요</span></td></tr></tbody>
     </table>
   </div>
   <p class="small muted mt8">최대 보조금은 승용 기준 국비+지방비 합계 상한(만원)이에요. 상태·잔여는 2026-08-26 수집 기준이며, 페이지를 열면 최신 수치로 갱신돼요.</p>
