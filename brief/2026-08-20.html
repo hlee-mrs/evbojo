@@ -11,7 +11,8 @@
 <!-- 하위 경로(/region/ 등)에서도 상대 URL이 루트 기준으로 풀리도록 base 고정 — app.js의 data/*.json fetch·nav 링크가 그대로 동작 -->
 <base href="/">
 <title>전기차 보조금 일일 브리핑 2026-08-20 — 전국 잔여 20,092대 | EV보조금</title>
-<meta name="description" content="8월 20일(목) 전기차 보조금 브리핑: 전국 잔여 20,092대(전일 대비 −729대), 최대 감소 경산시 −251대. ev.or.kr 실측 데이터로 자동 생성.">
+<meta name="description" content="8월 20일(목) 전기차 보조금 브리핑: 전국 잔여 20,092대(전일 대비 −729대), 최대 감소 경산시 −251대. ev.or.kr 실측 데이터 기준.">
+<meta name="robots" content="noindex">
 <link rel="canonical" href="https://evbojo.co.kr/brief/2026-08-20.html">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
@@ -19,7 +20,7 @@
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":"https://evbojo.co.kr/"},{"@type":"ListItem","position":2,"name":"일일 브리핑","item":"https://evbojo.co.kr/brief/"},{"@type":"ListItem","position":3,"name":"8월 20일(목) 브리핑","item":"https://evbojo.co.kr/brief/2026-08-20.html"}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"전기차 보조금 일일 브리핑 2026-08-20","datePublished":"2026-08-20","dateModified":"2026-08-20","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/brief/2026-08-20.html","description":"무공해차 통합누리집(ev.or.kr) 수집 데이터 기반 자동 생성 브리핑"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"전기차 보조금 일일 브리핑 2026-08-20","datePublished":"2026-08-20","dateModified":"2026-08-20","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/brief/2026-08-20.html","description":"무공해차 통합누리집(ev.or.kr) 수집 데이터 기반 실측 데이터 브리핑"}</script>
 </head>
 <body>
 <!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
@@ -32,7 +33,7 @@
 <nav class="small muted" aria-label="현재 위치" style="margin:14px 0 0"><a href="/">홈</a> › <a href="/brief/">일일 브리핑</a> › <b>2026-08-20</b></nav>
 <div class="hero" style="text-align:left;padding-bottom:0">
   <h1>8월 20일(목) <span class="hl">보조금 브리핑</span></h1>
-  <p>전국 잔여 20,092대 · 전일 대비 −729대 · 자동 생성 브리핑</p>
+  <p>전국 잔여 20,092대 · 전일 대비 −729대 · 실측 데이터 브리핑</p>
 </div>
 <p class="stamp">기준시각 2026-08-20 08:10+09:00 · 전일 스냅샷(2026-08-19 09:42+09:00 수집) 대비 · 출처 무공해차 통합누리집(ev.or.kr)</p>
 
@@ -63,7 +64,7 @@
 
 <section class="card">
   <h2 class="mt0">이 브리핑에 대하여</h2>
-  <p style="line-height:1.8;margin:10px 0">이 페이지는 무공해차 통합누리집(ev.or.kr)에서 매시간 수집한 공고 데이터를 바탕으로 매일 1회(원칙적으로 아침) 자동 생성되는 브리핑입니다. 외부 기사를 재작성하지 않으며, 본문·차트의 수치는 전부 수집 시점의 실측값입니다. 변화가 없거나 데이터가 오래된 날에는 발행을 건너뜁니다.</p><p style="line-height:1.8;margin:10px 0">집계 방법: 수치는 매시간 수집분 가운데 브리핑 생성 직전 값을 쓰고, 증감은 직전 보관 스냅샷(수집 공백이 있으면 그 이전 마지막 관측값 — 본문에 기준일 명시)과 비교합니다. 마감은 지자체 공지 원문에 완료형 마감 선언이 있을 때만 인정하고, "예산 소진 시 조기 마감" 같은 조건부 예고는 마감으로 세지 않습니다. 물량 증가는 공고 물량 대비 5% 이상(최소 10대) 늘어난 경우에 감지합니다.</p><p style="line-height:1.8;margin:10px 0">잔여 수치는 출고 시점에 차감하는 지역이 많아 실제 접수는 더 일찍 마감될 수 있고, 잔여가 남아 있어도 유형·요건에 따라 신청이 어려울 수 있습니다. 신청 전에는 반드시 관할 지자체 공고문을 확인하세요.</p><p class="stamp">데이터·생성: EV보조금 자동 브리핑 · 편집 책임: HyeongHun Lee · 기준시각 2026-08-20 08:10+09:00 · 비교 기준: 전일 스냅샷(2026-08-19 09:42+09:00 수집) 대비</p>
+  <p style="line-height:1.8;margin:10px 0">이 페이지는 무공해차 통합누리집(ev.or.kr)에서 매시간 수집한 공고 데이터를 바탕으로 매일 1회(원칙적으로 아침) 발행하는 브리핑입니다(집계 자동화 · 방법 설계·검수 운영자). 외부 기사를 재작성하지 않으며, 본문·차트의 수치는 전부 수집 시점의 실측값입니다. 변화가 없거나 데이터가 오래된 날에는 발행을 건너뜁니다.</p><p style="line-height:1.8;margin:10px 0">집계 방법: 수치는 매시간 수집분 가운데 브리핑 생성 직전 값을 쓰고, 증감은 직전 보관 스냅샷(수집 공백이 있으면 그 이전 마지막 관측값 — 본문에 기준일 명시)과 비교합니다. 마감은 지자체 공지 원문에 완료형 마감 선언이 있을 때만 인정하고, "예산 소진 시 조기 마감" 같은 조건부 예고는 마감으로 세지 않습니다. 물량 증가는 공고 물량 대비 5% 이상(최소 10대) 늘어난 경우에 감지합니다.</p><p style="line-height:1.8;margin:10px 0">잔여 수치는 출고 시점에 차감하는 지역이 많아 실제 접수는 더 일찍 마감될 수 있고, 잔여가 남아 있어도 유형·요건에 따라 신청이 어려울 수 있습니다. 신청 전에는 반드시 관할 지자체 공고문을 확인하세요.</p><p class="stamp">데이터·생성: EV보조금 자동 브리핑 · 편집 책임: HyeongHun Lee · 기준시각 2026-08-20 08:10+09:00 · 비교 기준: 전일 스냅샷(2026-08-19 09:42+09:00 수집) 대비</p>
   <div class="chips" style="margin-top:10px"><a class="chip" href="status.html">🗺 전국 현황판</a><a class="chip" href="brief/">📅 지난 브리핑 목록</a><a class="chip" href="quota-reading.html">📖 잔여 대수 읽는 법</a><a class="chip" href="articles.html">📚 읽을거리 전체</a></div>
 </section>
 

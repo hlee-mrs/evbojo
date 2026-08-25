@@ -49,6 +49,10 @@
         if (name === 'regions') {
           Object.values(d).forEach(r => { if (r.ref && d[r.ref]) r.v = d[r.ref].v; });
         }
+        // cars: 표시명(사양코드 제거) 우선 — 원문 name은 수집 매칭용이라 UI에는 disp 사용
+        if (name === 'cars') {
+          d.forEach(c => { if (c.disp) c.name = c.disp; });
+        }
         return d;
       });
     }
@@ -188,10 +192,13 @@
     let anyGlobal = false, pass = false, truck = false;
     for (const h of hits) { if (h.isGlobal) anyGlobal = true; if (h.hasPass) pass = true; if (h.hasTruck) truck = true; }
     res.partial = (!anyGlobal && pass !== truck) || OPEN_SIG.test(t);       // 승용만/화물만 마감 or 열림 신호 공존
-    const h0 = hits[0];
+    // 날짜 창은 승용 문장 우선 → 전역 문장 → 첫 매치 순 — "화물 8.7 마감 ★ 승용 8.12 마감"에서 8/7 오집기 방지
+    const h0 = hits.find(h => h.hasPass) || hits.find(h => h.isGlobal) || hits[0];
     res.evidence = t.slice(Math.max(0, h0.idx - 30), Math.min(t.length, h0.idx + h0.len + 20)).trim();
     if (res.evidence.length > 80) res.evidence = res.evidence.slice(res.evidence.length - 80);
-    const win = t.slice(Math.max(0, h0.idx - 40), Math.min(t.length, h0.idx + h0.len + 40)); // 마감 시점(베스트에포트)
+    // 마감 시점(베스트에포트) — 창 시작은 해당 문장 경계로 제한: 앞 문장(화물 등)의 날짜 오집기 방지
+    const sb = Math.max(...['.', '!', '?', '★', '☆', '※'].map(ch => t.lastIndexOf(ch, h0.idx - 1))) + 1;
+    const win = t.slice(Math.max(sb, h0.idx - 40), Math.min(t.length, h0.idx + h0.len + 40));
     let dm = win.match(/(?:(20\d{2})|['’`]?(\d{2}))\s?[.년]\s?(\d{1,2})\s?[.월/]\s?(\d{1,2})[일.]?(?:\s?\([월화수목금토일]\))?(?:\s?기준)?(?:\s?(\d{1,2}:\d{2}))?/);
     if (!dm) dm = win.match(/()(?:^|[^\d.])(\d{1,2})()\s?[.\/]\s?(\d{1,2})\.?(?:\s?\([월화수목금토일]\))?(?:\s?(\d{1,2}:\d{2}))?/); // "7.16" "6/30"
     if (dm) {

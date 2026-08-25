@@ -10,8 +10,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <!-- 하위 경로(/region/ 등)에서도 상대 URL이 루트 기준으로 풀리도록 base 고정 — app.js의 data/*.json fetch·nav 링크가 그대로 동작 -->
 <base href="/">
-<title>대구광역시 전기차 보조금 2026 — 1개 시군구 총정리 | EV보조금</title>
-<meta name="description" content="대구광역시는 2026-08-15 기준 공고 4,087대가 잔여 0대까지 소진되고 승용 접수가 마감된 상태입니다. 842만원 단가 구조와 9월 말 추가 공고 관망 포인트를 정리했습니다.">
+<title>대구광역시 전기차 보조금 2026 — 접수 흐름·마감 패턴 분석 | EV보조금</title>
+<meta name="description" content="대구광역시는 게시 시점(2026-08-15) 공고 4,087대가 잔여 0대까지 소진되고 승용 접수가 마감된 상태였습니다. 842만원 단가 구조와 추가 공고 관망 포인트를 정리했습니다. 현재 상태는 본문 표 기준입니다.">
 <link rel="canonical" href="https://evbojo.co.kr/sido/daegu.html">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
@@ -19,7 +19,7 @@
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":"https://evbojo.co.kr/"},{"@type":"ListItem","position":2,"name":"대구광역시 전기차 보조금","item":"https://evbojo.co.kr/sido/daegu.html"}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"대구광역시 전기차 보조금 2026 — 1개 시군구 총정리","datePublished":"2026-08-15","dateModified":"2026-08-26","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/sido/daegu.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"대구광역시 전기차 보조금 2026 — 접수 흐름·마감 패턴 분석","datePublished":"2026-08-26","dateModified":"2026-08-26","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/sido/daegu.html"}</script>
 </head>
 <body>
 <!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
@@ -32,17 +32,17 @@
 <nav class="small muted" aria-label="현재 위치" style="margin:14px 0 0"><a href="/">홈</a> › <b>대구광역시</b></nav>
 <div class="hero" style="text-align:left;padding-bottom:0">
   <h1>대구광역시 <span class="hl">전기차 보조금</span></h1>
-  <p>2026년 전기승용 기준 · 1개 시·군·구 최대 보조금·잔여 현황</p>
+  <p>2026년 전기승용 기준 · 접수 흐름·마감 패턴과 현재 잔여 현황</p>
 </div>
 
-<p class="stamp">글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 게시 2026-08-15 · 데이터 기준 2026-08-26</p>
+<p class="stamp">글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 게시 2026-08-26 · 데이터 기준 2026-08-26</p>
 
 <section class="card">
-  <p style="line-height:1.75;margin:10px 0">지금 대구에서 전기차 보조금을 알아보는 분이라면 결론부터 아는 것이 낫겠습니다. 2026-08-15 기준 대구광역시의 전기승용 잔여는 0대이고, 시 공지문에도 승용·화물이 마감되었다는 완료형 안내가 올라와 있습니다. 공고 물량 4,087대가 전부 소진된 상태(소진율 100%)라서, 당장 신청서를 낼 수 있는 창구는 닫혀 있습니다. 그렇다면 관심은 하나로 좁혀집니다 — 추가 공고가 나오느냐입니다.</p>
-<p style="line-height:1.75;margin:10px 0">이 부분도 공지문에 단서가 있습니다. 대구시는 하반기 추가 공고 여부가 확정된 바 없으며, 9월 말경 추가 공고 여부에 대한 안내가 가능할 것으로 예상된다고 밝히고 있습니다. 확정이 아니라 &#39;안내 시점의 예상&#39;이라는 점에 주의해야 합니다. 추가 물량이 편성될 수도, 올해는 이대로 끝날 수도 있습니다. 과거 회차 기준으로 3차 공고까지 진행된 이력(공지문상 &#39;민간보급사업 안내 3차&#39;)이 있는 만큼 가능성이 닫힌 것은 아니지만, 예단하고 차량 계약을 서두르는 것은 권하지 않습니다. 보조금은 대상자 선정 전에 출고·등록하면 받을 수 없기 때문입니다.</p>
-<p style="line-height:1.75;margin:10px 0">단가 구조를 보면 대구는 시 전역 단일 단가이며, 승용 최대 보조금은 842만원(국비+지방비, 단가 기준일 2026-07-15)입니다. 전국 160개 지자체 중 최하위 동률 그룹으로, 서울·인천·광주·대전·울산·세종과 같은 금액입니다. 참고로 접수 누계는 4,377대로 공고 물량보다 많이 잡혀 있는데, 이는 공고 회차가 이월되며 집계되는 ev.or.kr 원본 데이터의 특성이라 항목 합계가 공고 수와 정확히 맞지 않을 수 있습니다. 공지문 기준 3차 보급물량은 2,757대(승용 1,962대·화물 795대)였고, 이 회차까지 소화된 뒤 지금의 마감 상태에 이르렀습니다.</p>
+  <p style="line-height:1.75;margin:10px 0">대구에서 전기차 보조금을 알아보는 분이라면 결론부터 아는 것이 낫겠습니다. 이 글이 게시된 2026년 8월 15일 기준 대구광역시의 전기승용 잔여는 0대였고, 시 공지문에도 승용·화물이 마감되었다는 완료형 안내가 올라와 있었습니다. 공고 물량 4,087대가 전부 소진된 상태(소진율 100%)여서, 게시 시점에는 당장 신청서를 낼 수 있는 창구가 닫혀 있었습니다. 현재 상태는 이 페이지의 표에서 매시간 갱신되는 수치로 확인하실 수 있습니다. 그렇다면 관심은 하나로 좁혀집니다 — 추가 공고가 나오느냐입니다.</p>
+<p style="line-height:1.75;margin:10px 0">이 부분도 공지문에 단서가 있습니다. 대구시는 게시 시점 공지에서 하반기 추가 공고 여부가 확정된 바 없으며, 9월 말경 추가 공고 여부에 대한 안내가 가능할 것으로 예상된다고 밝혔습니다. 확정이 아니라 &#39;안내 시점의 예상&#39;이라는 점에 주의해야 합니다. 추가 물량이 편성될 수도, 올해는 이대로 끝날 수도 있습니다. 과거 회차 기준으로 3차 공고까지 진행된 이력(공지문상 &#39;민간보급사업 안내 3차&#39;)이 있는 만큼 가능성이 닫힌 것은 아니지만, 예단하고 차량 계약을 서두르는 것은 권하지 않습니다. 보조금은 대상자 선정 전에 출고·등록하면 받을 수 없기 때문입니다.</p>
+<p style="line-height:1.75;margin:10px 0">단가 구조를 보면 대구는 시 전역 단일 단가이며, 승용 최대 보조금은 842만원(국비+지방비, 단가 기준일 2026-07-15)입니다. 전국 160개 지자체 중 최하위 동률 그룹으로, 서울·인천·광주·대전·울산·세종과 같은 금액입니다. 참고로 게시 시점 접수 누계는 4,377대로 공고 물량보다 많이 잡혀 있었는데, 이는 공고 회차가 이월되며 집계되는 ev.or.kr 원본 데이터의 특성이라 항목 합계가 공고 수와 정확히 맞지 않을 수 있습니다. 공지문 기준 3차 보급물량은 2,757대(승용 1,962대·화물 795대)였고, 이 회차까지 소화된 뒤 게시 시점의 마감 상태에 이르렀습니다.</p>
 <p style="line-height:1.75;margin:10px 0">추가 공고를 기다리는 동안 준비할 수 있는 것들이 있습니다. 선정 방식이 일반·우선순위 모두 출고등록순이므로, 공고가 다시 열리면 재고가 있는 차량이 유리해지는 경향이 있습니다. 원하는 차종의 출고 대기 기간을 미리 파악해 두면 판단이 빨라집니다. 폐차 후 전환 구매를 계획한다면 전환지원금(국비 차종별 상이 + 대구 지방분 차종별 최대 30만원) 요건도 함께 챙겨두시길 권합니다. 거주요건은 접수일 기준이라는 점도 기억해 둘 만합니다.</p>
-<p style="line-height:1.75;margin:10px 0">대구 생활권과 붙어 있는 경북 지역들의 사정은 사뭇 다릅니다. 경북은 울릉군을 뺀 21개 시군이 1,315만원의 도 공통 단가를 쓰는데, 마감 공지 없이 <a href="/region/4713.html">경주시</a>는 잔여 350대, <a href="/region/4715.html">김천시</a>는 219대, <a href="/region/4711.html">포항시</a>는 135대가 남아 있습니다(2026-08-15 기준). 대구 생활권과 가장 가까운 <a href="/region/4729.html">경산시</a>는 잔여 259대가 표시되지만 일부 차종 마감이 안내된 상태라 유형별 확인이 필요합니다. 물론 주소지가 대구라면 이 단가와는 무관하지만, 도 경계 하나로 단가와 잔여가 이렇게 갈린다는 점은 알아둘 만한 배경지식입니다. 대구의 공지 원문과 차종별 단가표는 <a href="/region/2700.html">대구광역시</a> 페이지에서, 추가 공고 발생 여부는 매시간 갱신되는 현황판에서 확인할 수 있습니다. 취소·미출고 처리로 잔여 표시가 잠깐 움직이는 일도 있으니, 숫자 변동만 보고 접수 재개로 단정하지는 마시길 바랍니다.</p>
+<p style="line-height:1.75;margin:10px 0">대구 생활권과 붙어 있는 경북 지역들의 사정은 사뭇 다릅니다. 경북은 울릉군을 뺀 21개 시군이 1,315만원의 도 공통 단가를 쓰는데, 마감 공지 없이 <a href="/region/4713.html">경주시</a>는 잔여 350대, <a href="/region/4715.html">김천시</a>는 219대, <a href="/region/4711.html">포항시</a>는 135대가 남아 있었습니다(2026-08-15 게시 시점). 대구 생활권과 가장 가까운 <a href="/region/4729.html">경산시</a>는 잔여 259대가 표시됐지만 일부 차종 마감이 안내된 상태여서 유형별 확인이 필요했습니다. 물론 주소지가 대구라면 이 단가와는 무관하지만, 도 경계 하나로 단가와 잔여가 이렇게 갈린다는 점은 알아둘 만한 배경지식입니다. 대구의 공지 원문과 차종별 단가표는 <a href="/region/2700.html">대구광역시</a> 페이지에서, 추가 공고 발생 여부는 매시간 갱신되는 현황판에서 확인할 수 있습니다. 취소·미출고 처리로 잔여 표시가 잠깐 움직이는 일도 있으니, 숫자 변동만 보고 접수 재개로 단정하지는 마시길 바랍니다.</p>
 </section>
 
 <div class="ad-slot" data-slot="sido-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
@@ -52,7 +52,7 @@
   <div class="tbl-wrap">
     <table class="tbl" data-live="sidotable">
       <thead><tr><th>지역</th><th class="num">최대 보조금</th><th class="num">잔여</th><th>상태</th></tr></thead>
-      <tbody><tr data-cd="2700"><td><a href="/region/2700.html" style="font-weight:700">대구광역시</a></td><td class="num">842</td><td class="num" data-cell="left">0</td><td><span class="badge badge-closed" data-cell="badge"><span class="dot"></span>잔여 소진(추가공고 확인)</span></td></tr></tbody>
+      <tbody><tr data-cd="2700"><td><a href="/region/2700.html" style="font-weight:700">대구광역시</a></td><td class="num">741</td><td class="num" data-cell="left">0</td><td><span class="badge badge-closed" data-cell="badge"><span class="dot"></span>잔여 소진(추가공고 확인)</span></td></tr></tbody>
     </table>
   </div>
   <p class="small muted mt8">최대 보조금은 승용 기준 국비+지방비 합계 상한(만원)이에요. 상태·잔여는 2026-08-26 수집 기준이며, 페이지를 열면 최신 수치로 갱신돼요.</p>
