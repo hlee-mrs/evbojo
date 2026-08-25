@@ -35,6 +35,41 @@
 
   <section class="card">
     <h2>한눈에 보는 전체 타임라인</h2>
+    <!-- 절차 스텝 도해 — 외부 요청 없음, 색은 사이트 토큰(var), 좁은 화면은 tbl-wrap 가로 스크롤 -->
+    <div class="tbl-wrap">
+      <svg width="100%" viewBox="0 0 740 108" style="min-width:660px;display:block" role="img"
+           aria-label="보조금 절차 타임라인: 1 계약, 2 지원신청 접수(거주요건 기준일), 3 선정, 원칙 2개월 안에 4 출고·등록, 10일 안에 5 지급신청, 이후 6 의무운행 2년(수출 목적 말소는 5년)">
+        <line x1="50" y1="40" x2="690" y2="40" stroke="var(--line)" stroke-width="2"/>
+        <g fill="var(--primary-soft)" stroke="var(--primary)" stroke-width="2">
+          <circle cx="50" cy="40" r="14"/><circle cx="178" cy="40" r="14"/><circle cx="306" cy="40" r="14"/>
+          <circle cx="434" cy="40" r="14"/><circle cx="562" cy="40" r="14"/><circle cx="690" cy="40" r="14"/>
+        </g>
+        <g text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--primary)">
+          <text x="50" y="44.5">1</text><text x="178" y="44.5">2</text><text x="306" y="44.5">3</text>
+          <text x="434" y="44.5">4</text><text x="562" y="44.5">5</text><text x="690" y="44.5">6</text>
+        </g>
+        <g>
+          <rect x="334" y="30" width="72" height="20" rx="10" fill="var(--warn-soft)"/>
+          <rect x="474" y="30" width="48" height="20" rx="10" fill="var(--warn-soft)"/>
+        </g>
+        <g text-anchor="middle" font-size="11" font-weight="700" fill="var(--text2)">
+          <text x="370" y="44">원칙 2개월</text>
+          <text x="498" y="44">10일</text>
+        </g>
+        <g text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">
+          <text x="50" y="78">계약</text>
+          <text x="178" y="78">지원신청 접수</text>
+          <text x="306" y="78">선정</text>
+          <text x="434" y="78">출고·등록</text>
+          <text x="562" y="78">지급신청</text>
+          <text x="690" y="78">의무운행 2년</text>
+        </g>
+        <g text-anchor="middle" font-size="11" fill="var(--text2)">
+          <text x="178" y="95">거주요건 기준일</text>
+          <text x="690" y="95">수출 말소는 5년</text>
+        </g>
+      </svg>
+    </div>
     <div class="tbl-wrap"><table class="tbl">
       <thead><tr><th>단계</th><th>기준·기한</th><th>놓치면</th></tr></thead>
       <tbody>
@@ -43,7 +78,7 @@
         <tr><td>③ 대상자 선정(자격부여)</td><td>지자체 통보</td><td>—</td></tr>
         <tr><td>④ 출고·등록</td><td>자격부여일부터 <b>원칙 2개월</b></td><td>선정 취소 가능</td></tr>
         <tr><td>⑤ 보조금 지급신청</td><td>출고·등록 후 <b>10일 이내</b></td><td>지급 지연·불이익</td></tr>
-        <tr><td>⑥ 의무운행</td><td>등록일부터 <b>2년</b></td><td>조기 처분 시 환수</td></tr>
+        <tr><td>⑥ 의무운행</td><td>등록일부터 <b>2년</b>(수출 목적 말소는 5년)</td><td>조기 처분 시 환수</td></tr>
       </tbody>
     </table></div>
     <p class="muted small">②의 접수와 ⑤의 지급신청은 대부분 딜러·제조사가 대행하지만, <b>기한 관리의 책임과 손해는 구매자 몫</b>입니다. 각 단계가 실제로 처리됐는지 확인하세요.</p>
@@ -90,7 +125,7 @@
       <li>계약서 사본과 <b>자격부여 통보일</b>을 휴대폰 캘린더에 기록하고, +2개월 알림을 걸어둔다.</li>
       <li>출고일이 잡히면 <b>등록 예정일 + 10일</b> 알림을 추가한다.</li>
       <li>각 단계 완료 시 딜러에게 문자로 확인을 남겨 <b>기록</b>을 만든다.</li>
-      <li>등록일 기준 <b>2년</b>이 의무운행 기간 — 그 전에 팔면 환수됩니다(<a href="refund-rules.html">환수 규정</a> 참고).</li>
+      <li>등록일 기준 <b>2년</b>이 의무운행 기간(수출 목적 말소는 5년) — 그 전에 팔면 환수됩니다(<a href="refund-rules.html">환수 규정</a> 참고).</li>
     </ul>
   </section>
 

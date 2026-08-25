@@ -1955,7 +1955,10 @@ def build_sido(sido, regions, meta, status, ctx):
     if os.path.exists(md_path):
         with open(md_path, encoding='utf-8') as f:
             prose, fm = md_to_html(f.read())
-        published = datetime.date.fromtimestamp(os.path.getmtime(md_path)).isoformat()
+        # 게시일은 프런트매터 publish가 정본(본문 '게시 시점' 앵커와 일치) — 없을 때만 mtime 폴백
+        pub_fm = (fm.get('publish') or '').strip()
+        published = (pub_fm if re.fullmatch(r'\d{4}-\d{2}-\d{2}', pub_fm)
+                     else datetime.date.fromtimestamp(os.path.getmtime(md_path)).isoformat())
     else:
         # W2 산문이 아직 없으면 데이터 요약 산문으로 자동 대체 — 빌드는 항상 성공
         prose = sido_auto_prose(sido, sibs, status, meta, asof)
