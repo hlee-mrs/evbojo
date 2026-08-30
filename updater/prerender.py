@@ -3,11 +3,12 @@
 """EV보조금 정적 프리렌더 엔진 (stdlib 전용, /usr/bin/python3)
 
 site/data/*.json + updater/templates/*.tpl (+ updater/content/{sido,model}/*.md) →
-  site/region/{cd}.html × 161 (9999 한국환경공단은 noindex)
+  site/region/{cd}.html × 161 (9999 한국환경공단 + region_noindex.json 롱테일 지역은 noindex)
   site/car/{id}.html   × 117 (단종 disc=true 는 noindex)
   site/sido/{slug}.html × 17
   site/model/{slug}.html (모델 시리즈 — md의 publish가 KST 오늘 이하인 편만) + site/model/index.html (허브)
-  site/sitemap.xml      (noindex·미발행 페이지 제외, lastmod=오늘)
+  site/sitemap.xml      (noindex·미발행 페이지 제외, lastmod=내용이 실제로 바뀐 날)
+  updater/.page_lastmod.json (lastmod 산정용 빌드 캐시 — 커밋 대상 아님)
 
 원칙:
 - 전량 재생성·멱등. 모든 페이지를 메모리에서 완성한 뒤에만 파일에 씀(임시파일 → os.replace 원자 교체).
@@ -16,6 +17,8 @@ site/data/*.json + updater/templates/*.tpl (+ updater/content/{sido,model}/*.md)
   데이터 모순(전체 잔여 0 + 유형 잔여 >0 등)은 단정 문장 생략. '전기차 보조금' 키워드 문단당 1회 이하.
 - 마감 감지는 site/assets/js/app.js detectClosed의 보수 포팅(완료형 선언만 마감, 조건부는 절대 마감 아님).
 - 광고 게이팅: 정적 산문+공지 합계 1,200자 미만 또는 noindex 페이지엔 광고 슬롯 자체를 만들지 않음.
+- sitemap lastmod는 내용 해시(<main> 구간, 수치 마스킹) 기준. 잔여 대수만 바뀐 날은 lastmod 불변
+  → 크롤 스케줄러가 "매일 전 URL 변경"으로 오인하지 않게 한다.
 """
 import datetime
 import hashlib
@@ -32,6 +35,8 @@ DATA = os.path.join(SITE, 'data')
 TPL_DIR = os.path.join(HERE, 'templates')
 SIDO_MD_DIR = os.path.join(HERE, 'content', 'sido')
 MODEL_MD_DIR = os.path.join(HERE, 'content', 'model')
+LASTMOD_STORE = os.path.join(HERE, '.page_lastmod.json')   # 페이지별 내용 해시·최종 변경일(빌드 캐시)
+REGION_NOINDEX = os.path.join(DATA, 'region_noindex.json')   # 롱테일 지역 noindex 목록(cd 배열)
 BASE = 'https://evbojo.co.kr'
 KST = datetime.timezone(datetime.timedelta(hours=9))   # 발행 게이트는 서버 로컬이 아니라 KST 기준
 AD_MIN = 1200          # 광고 게이팅: 정적 산문+공지 합계 최소 자수
@@ -349,6 +354,68 @@ def jsonld_script(objs):
                      % json.dumps(o, ensure_ascii=False, separators=(',', ':')) for o in objs)
 
 
+# ── sitemap lastmod 신뢰 회복: 내용 해시 ────────────────────
+_MAIN_RE = re.compile(r'<main\b[^>]*>(.*?)</main>', re.S | re.I)
+_NUM_RE = re.compile(r'[0-9][0-9,.:]*')
+# 고유어 수사(kn/knu/kday 산출물)도 수치 표현이라 함께 마스킹 — 평탄 일수처럼 매일 증가하는
+# 값이 '사흘→나흘'로 바뀌는 것만으로 lastmod가 갱신되는 것을 막는다. 단위가 붙은 형태만 대상.
+_KNUM_RE = re.compile(r'하루|이틀|사흘|나흘|닷새|엿새|이레'
+                      r'|(?:영|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)(?=\s?(?:개|곳|가지|번째))')
+
+
+def content_hash(html):
+    """페이지 본문(<main> 구간)에서 수치 표현을 마스킹한 md5.
+
+    잔여 대수 100→99, 갱신 시각 같은 '숫자만' 바뀐 날은 해시가 같고,
+    문장 분기·마감 상태·공지 원문·공고 차수처럼 실질 텍스트가 바뀐 날만 달라진다.
+    <main>이 없으면(비정형 정적 파일) 문서 전체를 대상으로 한다. 빈 입력은 ''(→ 폴백)."""
+    if not html:
+        return ''
+    m = _MAIN_RE.search(html)
+    body = m.group(1) if m else html
+    return hashlib.md5(_KNUM_RE.sub('#', _NUM_RE.sub('#', body)).encode('utf-8')).hexdigest()
+
+
+def load_lastmod_store():
+    """{'<사이트 상대경로>': {'h': 해시, 'd': 'YYYY-MM-DD'}} — 없거나 깨졌으면 빈 dict.
+    빈 dict면 이번 회차 lastmod는 전부 오늘로 폴백된다(종전 동작). 빌드는 절대 실패시키지 않음."""
+    try:
+        with open(LASTMOD_STORE, encoding='utf-8') as f:
+            raw = json.load(f)
+        if not isinstance(raw, dict):
+            return {}
+    except Exception:
+        return {}
+    out = {}
+    for k, v in raw.items():
+        if (isinstance(k, str) and isinstance(v, dict) and isinstance(v.get('h'), str) and v['h']
+                and isinstance(v.get('d'), str) and re.fullmatch(r'\d{4}-\d{2}-\d{2}', v['d'])):
+            out[k] = {'h': v['h'], 'd': v['d']}
+    return out
+
+
+def save_lastmod_store(store):
+    """캐시 저장(원자 교체). 실패해도 빌드는 성공 — 다음 회차가 오늘 날짜로 폴백될 뿐."""
+    try:
+        atomic_write(LASTMOD_STORE,
+                     json.dumps(store, ensure_ascii=False, sort_keys=True, indent=0) + '\n')
+    except Exception as e:
+        print('경고: lastmod 캐시 저장 실패(%s) — 다음 회차는 오늘 날짜로 폴백' % e, file=sys.stderr)
+
+
+def load_region_noindex():
+    """색인 표면 축소 대상 지역 cd 집합(군 단위 롱테일 = 검색 노출 0).
+    파일이 없거나 파싱 실패면 빈 집합으로 강등해 빌드는 그대로 성공시킨다."""
+    try:
+        with open(REGION_NOINDEX, encoding='utf-8') as f:
+            raw = json.load(f)
+        if not isinstance(raw, list):
+            return set()
+        return {str(x) for x in raw if re.fullmatch(r'[0-9]{4,5}', str(x))}
+    except Exception:
+        return set()
+
+
 # ── 데이터 로드 ──────────────────────────────────────────
 def load_data():
     def rj(name):
@@ -390,7 +457,9 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     name = r['name']
     sido = r.get('sido', '')
     slug = SIDO_SLUG.get(sido)
-    noindex = (cd == '9999')
+    # noindex: 9999(한국환경공단) + 롱테일 지역(region_noindex.json — 검색 노출 0인 군 단위).
+    # 페이지·형제 칩 링크는 그대로 유지(탐색용)하고 색인 표면에서만 뺀다. 광고 슬롯은 ad_slot이 제거.
+    noindex = (cd == '9999') or (cd in ctx.get('region_noindex', ()))
     closed = ctx['closed_map'][cd]
     cls, label = badge_of(st, closed)
     # 데이터 모순 가드: 전체 잔여 0인데 유형 잔여가 남음 → 단정 문장 생략 대상
@@ -2307,38 +2376,71 @@ def build_brief_hub(brief_days, meta, status, ctx):
 # ══════════════════════════════════════════════════════════
 #  sitemap · 쓰기 · 메인
 # ══════════════════════════════════════════════════════════
-def build_sitemap(regions, cars, today, model_entries=(), brief_days=(), car_rep=None):
-    """lastmod 신뢰 원칙: 실제 변경 시점만 기재.
-    - 정적 페이지(CORE) = 파일 수정일(내용이 안 바뀌면 lastmod도 불변)
-    - 데이터 페이지(region/car/sido) = 데이터 기준일(오늘) — 잔여·단가가 실제로 매일 갱신됨
-    - 모델 시리즈 = 발행일 고정 · 브리핑 = noindex 정책이라 사이트맵 전체 제외"""
+def build_sitemap(regions, cars, today, model_entries=(), brief_days=(), car_rep=None,
+                  pages=None, store=None, region_noindex=()):
+    """lastmod 신뢰 원칙: **실제 내용이 바뀐 날만** 기재.
+
+    - 정적 CORE + 데이터 페이지(region/car/sido/모델 허브) = <main> 내용 해시(수치 마스킹) 비교.
+      직전 회차와 해시가 같으면 저장된 날짜를 그대로 쓰고, 다르거나 기록이 없으면 오늘로 갱신.
+      캐시가 없거나 깨졌으면 전부 오늘로 폴백(종전 동작) — 빌드는 실패시키지 않는다.
+    - 모델 시리즈 = 발행일 고정 · 브리핑 = noindex 정책이라 사이트맵 전체 제외
+    반환: (xml, URL 수, 갱신된 캐시 dict) — 캐시는 이번 사이트맵에 실린 URL만 남긴다(잔재 정리)."""
+    pages = pages or {}
+    prev = store or {}
+    new_store = {}
+    noidx = set(region_noindex or ())
+
+    def lm_of(key, html, fallback):
+        h = content_hash(html)
+        if not h:
+            return fallback                # 본문을 못 읽음 → 폴백(파일 mtime 또는 오늘)
+        rec = prev.get(key)
+        d = rec['d'] if (rec and rec['h'] == h) else today
+        new_store[key] = {'h': h, 'd': d}
+        return d
+
     urls = []
     for path, freq in CORE_PAGES:
-        try:
-            lm = datetime.date.fromtimestamp(os.path.getmtime(os.path.join(SITE, path.lstrip('/')))).isoformat()
+        fp = os.path.join(SITE, path.lstrip('/') or 'index.html')
+        try:                               # 폴백: 파일 mtime(내용을 못 읽는 경우에만 사용)
+            fb = datetime.date.fromtimestamp(os.path.getmtime(fp)).isoformat()
         except OSError:
-            lm = today
-        urls.append((BASE + path, freq, lm))
+            fb = today
+        try:
+            with open(fp, encoding='utf-8') as f:
+                html = f.read()
+        except OSError:
+            html = ''
+        urls.append((BASE + path, freq, lm_of(path, html, fb)))
     for cd in sorted(regions):
-        if cd == '9999':
+        if cd == '9999' or cd in noidx:
             continue                       # noindex — 사이트맵 제외
-        urls.append(('%s/region/%s.html' % (BASE, cd), 'daily', today))
+        key = '/region/%s.html' % cd
+        urls.append((BASE + key, 'daily',
+                     lm_of(key, pages.get(os.path.join(SITE, 'region', cd + '.html')), today)))
     for c in cars:
         if c['disc']:
             continue                       # 단종 noindex — 제외
         if car_rep is not None and c['id'] not in car_rep:
             continue                       # 비대표 트림 noindex — 제외(트림 근사중복)
-        urls.append(('%s/car/%d.html' % (BASE, c['id']), 'weekly', today))
+        key = '/car/%d.html' % c['id']
+        urls.append((BASE + key, 'weekly',
+                     lm_of(key, pages.get(os.path.join(SITE, 'car', '%d.html' % c['id'])), today)))
     for sido in SIDO_SLUG:
-        urls.append(('%s/sido/%s.html' % (BASE, SIDO_SLUG[sido]), 'daily', today))
-    urls.append((BASE + '/model/', 'weekly', today))    # 시리즈 허브(index.html) — 항상 생성
+        key = '/sido/%s.html' % SIDO_SLUG[sido]
+        urls.append((BASE + key, 'daily',
+                     lm_of(key, pages.get(os.path.join(SITE, 'sido', SIDO_SLUG[sido] + '.html')), today)))
+    # 시리즈 허브(index.html) — 항상 생성. 편이 늘거나 요약이 바뀐 날만 lastmod 갱신
+    urls.append((BASE + '/model/', 'weekly',
+                 lm_of('/model/', pages.get(os.path.join(SITE, 'model', 'index.html')), today)))
     for e in model_entries:                             # 발행 게이트 통과분만 — 미래 publish는 미포함
         urls.append(('%s/model/%s.html' % (BASE, e['slug']), 'weekly', e.get('publish') or today))
     # 브리핑(/brief/)은 자동 생성 콘텐츠 정책상 noindex — 사이트맵에서 전체 제외(발행·열람은 유지)
     body = '\n'.join('<url><loc>%s</loc><lastmod>%s</lastmod><changefreq>%s</changefreq></url>'
                      % (u, lm, f) for u, f, lm in urls)
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s\n</urlset>\n' % body), len(urls)
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s\n</urlset>\n' % body,
+            len(urls), new_store)
 
 
 def atomic_write(path, content):
@@ -2383,7 +2485,8 @@ def main():
            'asof': status.get('updated', '')[:10],
            'closed_map': closed_map, 'open_cnt': open_cnt,
            'open_base': sum(1 for cd in regions if cd != '9999'),
-           'rounds': rounds or {}}
+           'rounds': rounds or {},
+           'region_noindex': load_region_noindex() & set(regions)}
     # 색인 대상 차종 = 모델그룹 대표 트림(국비 최고 비단종, 동률은 id 낮은 쪽) — 트림 근사중복의 색인 노출 차단
     rep_by_group = {}
     for c in cars:
@@ -2436,7 +2539,9 @@ def main():
                            % (n_region, len(regions), n_car, len(cars), n_sido, len(SIDO_SLUG),
                               n_model, len(pub_entries) + 1))
 
-    sitemap, n_urls = build_sitemap(regions, cars, today, pub_entries, brief_days, ctx.get('car_rep'))
+    sitemap, n_urls, lm_store = build_sitemap(
+        regions, cars, today, pub_entries, brief_days, ctx.get('car_rep'),
+        pages=pages, store=load_lastmod_store(), region_noindex=ctx['region_noindex'])
 
     for path, html in pages.items():
         atomic_write(path, html)
@@ -2453,10 +2558,14 @@ def main():
             if fn.endswith('.html') and fp not in pages:
                 os.remove(fp)
     atomic_write(os.path.join(SITE, 'sitemap.xml'), sitemap)
+    save_lastmod_store(lm_store)   # 사이트맵과 같은 회차의 해시만 남김(실패해도 빌드는 성공)
 
     dt = (datetime.datetime.now() - t0).total_seconds()
-    print('prerender OK: region %d · car %d · sido %d · model %d(허브 포함) · brief 허브+%d편 · sitemap %d URLs · %.1fs'
-          % (n_region, n_car, n_sido, n_model, len(brief_days), n_urls, dt))
+    n_rx = len(ctx['region_noindex']) + (1 if '9999' in regions else 0)   # 롱테일 + 한국환경공단
+    print('prerender OK: region %d(noindex %d) · car %d · sido %d · model %d(허브 포함) · '
+          'brief 허브+%d편 · sitemap %d URLs · lastmod 오늘자 %d/%d · %.1fs'
+          % (n_region, n_rx, n_car, n_sido, n_model, len(brief_days), n_urls,
+             sum(1 for v in lm_store.values() if v['d'] == today), len(lm_store), dt))
 
 
 if __name__ == '__main__':

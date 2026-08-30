@@ -1,6 +1,7 @@
 site/data/*.bak
 updater/updater.log
 updater/.last_full
+updater/.page_lastmod.json
 updater/auto.log
 updater/launchd.log
 updater/.auto.lock/
