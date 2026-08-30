@@ -19,7 +19,11 @@
 <link rel="canonical" href="https://evbojo.co.kr/"><!-- 파라미터 없는 레거시 접근의 정본 = 홈(파라미터 접근은 JS가 /car/{id}.html로 이동) -->
 </head>
 <body>
-<header id="site-header"></header>
+<!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
+<header id="site-header" class="site-header"><div class="inner">
+  <a class="logo" href="/index.html"><span class="bolt">⚡</span>EV보조금</a>
+  <nav class="gnb" aria-label="주 메뉴"><a href="/index.html">홈</a><a href="/status.html">전국 현황판</a><details class="nav-dd"><summary>도구</summary><div class="dd"><a href="/calc.html">유지비 계산기</a><a href="/check.html">자격 진단</a><a href="/refund.html">환수 계산</a><a href="/compare.html">차종 비교</a></div></details><details class="nav-dd"><summary>가이드</summary><div class="dd"><a href="/guide.html">신청 절차</a><a href="/law.html">제도·법령</a><a href="/faq.html">FAQ</a></div></details><details class="nav-dd"><summary>읽을거리</summary><div class="dd"><a href="/articles.html">읽을거리 전체</a><a href="/brief/">일일 브리핑</a><a href="/model/">모델별 시리즈</a></div></details></nav>
+</div></header>
 
 <main class="container">
   <div class="hero" style="text-align:left;padding-bottom:0">
@@ -82,7 +86,21 @@
   </section>
 </main>
 
-<footer id="site-footer"></footer>
+<footer id="site-footer" class="site-footer"><div class="inner">
+  <div class="links">
+    <a href="/about.html">사이트 소개</a><a href="/articles.html">읽을거리</a><a href="/privacy.html">개인정보처리방침</a>
+    <a href="/donate.html">💛 후원하기</a>
+    <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
+    <a href="/report.html">오류 제보</a>
+  </div>
+  <div id="foot-stamp"></div>
+  <div class="disclaimer">
+    본 사이트는 <b>정부·공공기관과 무관한 개인 운영 정보 사이트</b>입니다. 게시된 보조금·제도 정보는 참고용이며 법적 효력이 없습니다.
+    실제 지원 금액·자격·잔여 물량은 반드시 <b>무공해차 통합누리집(ev.or.kr)</b>과 관할 지자체 공고문으로 확인하세요.
+    본 사이트는 광고(Google AdSense 등)를 게재하며, 광고 수익으로 운영됩니다.
+  </div>
+  <div class="mt8">© 2026 EV보조금 · 데이터 출처: 무공해차 통합누리집(ev.or.kr)</div>
+</div></footer>
 <script src="assets/js/app.js" defer></script>
 <script defer>
 document.addEventListener('DOMContentLoaded', async () => {
