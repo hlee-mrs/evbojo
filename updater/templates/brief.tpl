@@ -24,6 +24,8 @@
 
 {{EVENTS}}
 
+{{ROUNDS}}
+
 <section class="card">
   <h2 class="mt0">짧은 해설</h2>
   {{PROSE}}

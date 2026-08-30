@@ -201,7 +201,118 @@ def svg_bars(rows, aria):
 
 
 # ── 본문 조립 ────────────────────────────────────────────
-def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
+# ── 공고 변경 타임라인 ────────────────────────────────────
+# 자체 1차 관측 데이터(rounds.json events = 공단 시스템 등록값 변경 기록)로 만드는 섹션.
+# 외부 기사·타 사이트 콘텐츠를 일절 쓰지 않는다 — 시장 동향을 우리만 가진 데이터로 서술한다.
+def _kmd(iso):
+    """'2026-08-28' → '8월 28일'"""
+    try:
+        d = datetime.date.fromisoformat(iso[:10])
+        return '%d월 %d일' % (d.month, d.day)
+    except (TypeError, ValueError):
+        return iso or ''
+
+
+def _round_kind(item, before, after):
+    """변경 유형 분류 → (라벨, 정렬 우선순위, 설명 조사용 동사)"""
+    is_start = '접수시작' in (item or '')
+    if not before:
+        return ('신규 공고', 0, '새로 등록됐습니다')
+    if not after:
+        return ('등록 취소', 1, '등록이 내려갔습니다')
+    try:
+        b = datetime.date.fromisoformat(before[:10])
+        a = datetime.date.fromisoformat(after[:10])
+    except ValueError:
+        return ('일정 변경', 3, '바뀌었습니다')
+    if a < b:
+        d = (b - a).days
+        return (('개시 앞당김' if is_start else '마감 앞당김'), 1,
+                '%d일 앞당겨졌습니다' % d)
+    if a > b:
+        d = (a - b).days
+        return (('개시 미룸' if is_start else '마감 연장'), 2,
+                '%d일 늦춰졌습니다' % d)
+    return ('일정 변경', 3, '바뀌었습니다')
+
+
+def round_changes(rounds, regions, since_iso, until_iso):
+    """[since, until] 구간에 감지된 공고 변경 → [dict] (없으면 빈 리스트).
+    공고 변경은 지자체 업무시간(주로 09~15시)에 발생하는데 브리핑은 아침에 생성되므로,
+    당일만 보면 거의 항상 비게 된다 → 직전 브리핑 이후 구간을 함께 본다.
+    같은 지역·항목이 구간 내 여러 번 바뀌면 순변화(첫 이전값 → 마지막 새값)로 합치고,
+    번복으로 원위치한 건(순변화 0)은 실제로 바뀐 게 아니므로 제외 — 잡음 노출 방지."""
+    groups = {}
+    for cd, lst in ((rounds or {}).get('events') or {}).items():
+        if cd not in regions:
+            continue
+        for row in lst:
+            if not isinstance(row, list) or len(row) < 4:
+                continue
+            t, item, before, after = row[0], row[1], row[2], row[3]
+            if not t or not (since_iso <= t[:10] <= until_iso):
+                continue
+            groups.setdefault((cd, item or ''), []).append((t, before, after))
+    out = []
+    for (cd, item), seq in groups.items():
+        seq.sort(key=lambda x: x[0])
+        before, after = seq[0][1], seq[-1][2]
+        if (before or '') == (after or ''):
+            continue                                  # 번복·원위치 — 순변화 없음
+        label, rank, verb = _round_kind(item, before, after)
+        out.append({'cd': cd, 'name': regions[cd]['name'], 'sido': regions[cd].get('sido', ''),
+                    'time': seq[-1][0][5:16].replace('-', '/'), 'item': item,
+                    'before': before, 'after': after,
+                    'label': label, 'rank': rank, 'verb': verb,
+                    'flips': len(seq) - 1})           # 중간 번복 횟수(0이면 단순 변경)
+    out.sort(key=lambda e: (e['rank'], e['name'], e['item']))
+    return out
+
+
+def build_rounds_section(evs, since_iso, until_iso):
+    """공고 변경 섹션 HTML. 이벤트 0건이면 '' (빈 섹션 생성 금지)"""
+    if not evs:
+        return '', ''
+    span = ('%s 이후' % _kmd(since_iso)) if since_iso != until_iso else _kmd(until_iso)
+    rows = []
+    for e in evs[:14]:
+        chg = ('<b>%s</b>' % pr.esc(e['after']) if not e['before']
+               else '%s → <b>%s</b>' % (pr.esc(e['before']), pr.esc(e['after'])))
+        if e.get('flips'):
+            chg += ' <span class="small muted">(당일 %d회 정정)</span>' % e['flips']
+        rows.append('<tr><td><a href="/region/%s.html" style="color:inherit;font-weight:700">%s</a>'
+                    '<div class="small muted">%s</div></td>'
+                    '<td class="small">%s</td><td class="small">%s</td>'
+                    '<td class="small muted">%s</td></tr>'
+                    % (e['cd'], pr.esc(e['name']), pr.esc(e['sido']),
+                       pr.esc(e['item']), chg, e['time']))
+    more = ('<p class="small muted mt8">이 밖에 %s건이 더 있습니다.</p>' % pr.fmt(len(evs) - 14)
+            if len(evs) > 14 else '')
+    # 한 줄 요약(집계 사실만 — 점추정·전망 금지)
+    kinds = {}
+    for e in evs:
+        kinds[e['label']] = kinds.get(e['label'], 0) + 1
+    kind_txt = ' · '.join('%s %s건' % (k, pr.fmt(v)) for k, v in
+                          sorted(kinds.items(), key=lambda x: -x[1]))
+    n_region = len({e['cd'] for e in evs})
+    html = ('<section class="card"><h2 class="mt0">📋 공고 일정 변경 '
+            '<span class="sub">%s · %%s개 지자체 · %%s건</span></h2>' % span +
+            '<p class="small muted" style="margin:0 0 10px">%s</p>'
+            '<div class="tbl-wrap"><table class="tbl"><thead><tr>'
+            '<th>지역</th><th>항목</th><th>변경</th><th>감지</th>'
+            '</tr></thead><tbody>%s</tbody></table></div>%s'
+            '<p class="small muted mt8">공고 일정은 지자체가 예고 없이 바꾸는 경우가 있어, '
+            '이 표는 무공해차 통합누리집에 <b>등록된 값이 바뀐 시점</b>을 매시간 수집해 기록한 것입니다. '
+            '공고문 원문과 다를 수 있으니 신청 전에는 해당 지자체 공고문을 확인하세요.</p></section>'
+            % (pr.fmt(n_region), pr.fmt(len(evs)), pr.esc(kind_txt), ''.join(rows), more))
+    # 헤드라인에 얹을 문장(가장 큰 변화 1건)
+    top = evs[0]
+    lead = ('공고 일정도 움직였습니다 — %s의 %s이 %s(%s개 지자체에서 %s건 감지).'
+            % (top['name'], top['item'], top['verb'], pr.fmt(n_region), pr.fmt(len(evs))))
+    return html, lead
+
+
+def build_page(target, status, rounds, regions, hist, meta, state, tpl_brief, tpl_page):
     """페이지 HTML과 발행 판정을 함께 반환. (html, movers_summary) — html이 None이면 스킵."""
     date_iso = target.isoformat()
     tday = (target - D0).days
@@ -266,8 +377,15 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
     changed = sum(1 for m in movers if m['delta'])
     open_cnt = sum(1 for m in movers if (m['cur'] or 0) > 0 and not m['closed'])
 
-    if changed == 0 and not newly_closed and not resets:
-        return None, 'SKIP 변화 없음(전 지역 잔여 변동 0·이벤트 0)'
+    # 공고 변경(자체 관측) — 잔여가 그대로여도 일정이 바뀌면 발행할 가치가 있다.
+    # 창은 직전 브리핑 기준일~오늘(업무시간에 발생하는 변경을 놓치지 않도록), 최대 7일로 제한.
+    _since = max(basis_day or '', (target - datetime.timedelta(days=7)).isoformat()) \
+        or (target - datetime.timedelta(days=1)).isoformat()
+    round_evs = round_changes(rounds, regions, _since, date_iso)
+    rounds_html, rounds_lead = build_rounds_section(round_evs, _since, date_iso)
+
+    if changed == 0 and not newly_closed and not resets and not round_evs:
+        return None, 'SKIP 변화 없음(잔여 변동 0·이벤트 0·공고 변경 0)'
 
     quiet = total_drop <= max(30, cur_total // 1000) and not newly_closed and not resets
     series = national_series(hist, regions, tday)
@@ -319,7 +437,9 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
                 ['현재 ', '이 시점 기준 ', '오늘 집계에서 '],
                 ['잔여가 남아 있고 마감 공지가 없는 지역은 %s곳입니다.' % pr.fmt(open_cnt),
                  '마감 공지 없이 잔여가 남은 지역 수는 %s곳으로 집계됩니다.' % pr.fmt(open_cnt)]))
-    headline = '<p style="line-height:1.8;margin:10px 0">%s</p>' % ' '.join(hs[:5])
+    if rounds_lead:
+        hs.append(rounds_lead)                      # 공고 일정 변화도 요약에 반영
+    headline = '<p style="line-height:1.8;margin:10px 0">%s</p>' % ' '.join(hs[:6])
 
     # ── 차트 ──
     # 비교 기준 라벨은 stamp·바이라인과 동일한 것을 차트 부제에도 사용(폴백일 자기모순 방지)
@@ -476,11 +596,12 @@ def build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page):
         'HEADLINE': headline,
         'C1SUB': pr.esc(c1sub), 'CHART1': chart1,
         'C2SUB': pr.esc(c2sub), 'CHART2': chart2,
-        'TABLE': table, 'EVENTS': events, 'PROSE': prose,
+        'TABLE': table, 'EVENTS': events, 'ROUNDS': rounds_html, 'PROSE': prose,
         'DISCLOSURE': disclosure, 'RELATED': related, 'AD1': '',
     }
     gate = len(pr.strip_tags(re.sub(r'<svg.*?</svg>', ' ', pr.render(tpl_brief, mapping), flags=re.S)))
-    mapping['AD1'] = pr.ad_slot('brief-1', gate, False)
+    # 브리핑은 noindex 자동 집계 페이지 — 광고 슬롯 미생성(I4·'자동 생성 콘텐츠에 광고' 정책 회피)
+    mapping['AD1'] = pr.ad_slot('brief-1', gate, True)
     main = pr.render(tpl_brief, mapping)
 
     canonical = '%s/brief/%s.html' % (BASE, date_iso)
@@ -587,6 +708,10 @@ def main():
         hist = rj(os.path.join(a.data_dir, 'history.json'))
     except Exception:
         hist = None
+    try:
+        rounds = rj(os.path.join(a.data_dir, 'rounds.json'))   # 공고 차수·변경이력(없어도 발행)
+    except Exception:
+        rounds = None
 
     # stale 가드: 수집 시각이 24시간 이상 지났으면 발행하지 않음(스냅샷도 회전 안 함)
     try:
@@ -610,7 +735,7 @@ def main():
 
     tpl_brief = pr.load_tpl('brief.tpl')
     tpl_page = pr.load_tpl('page.tpl')
-    page, summary = build_page(target, status, regions, hist, meta, state, tpl_brief, tpl_page)
+    page, summary = build_page(target, status, rounds, regions, hist, meta, state, tpl_brief, tpl_page)
     if page is None:
         write_json(a.state_file, make_state(date_iso, status, regions, state))   # 스킵도 스냅샷 회전
         print('brief SKIP: %s' % summary[5:] if summary.startswith('SKIP ') else 'brief SKIP: %s' % summary)
