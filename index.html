@@ -248,8 +248,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 승용 보조금 TOP 3 — 모델 그룹별 최고 트림(국비+지방비 합계)
     const byGroup = {};
     cars.forEach((c, i) => {
-      // 일반 승용만: 단종·미지원 제외, WAV(휠체어 복지차량 특수 보조금)는 일반 TOP에서 제외
-      if (c.cls !== 'P' || c.disc || !r.v[i] || /WAV/i.test(c.name)) return;
+      // 일반 승용만: 단종 제외 + WAV(휠체어 복지차량 특수 보조금)·'미지원' 표기 트림 제외.
+      // 기준은 데이터 정본(update.py _general_row = 'WAV' or '미지원')과 동일해야 헤드라인 최고액과 어긋나지 않음.
+      if (c.cls !== 'P' || c.disc || !r.v[i] || /WAV|미지원/i.test(c.name)) return;
       const g = modelGroup(c), tot = c.nat + r.v[i][0];
       if (!byGroup[g] || tot > byGroup[g].tot) byGroup[g] = { c, tot };
     });

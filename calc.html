@@ -44,7 +44,7 @@
     </div>
     <div class="field"><label for="k-trim">구체적 트림</label>
       <select class="select" id="k-trim" disabled><option value="">트림 선택 (미선택 시 평균 전비 5.3 적용)</option></select></div>
-    <div class="kv mt8"><span>적용 전비 <span class="notice-badge">인증 주행거리÷배터리</span><button class="tip" type="button" data-tip="환경부 인증 상온 주행거리 ÷ 배터리 용량으로 계산한 추정 전비예요. 충전 손실 10%는 아래 계산에서 별도로 반영됩니다." aria-label="전비 설명">?</button></span><b id="k-eff-show">-</b></div>
+    <div class="kv mt8"><span>적용 전비 <span class="notice-badge">인증 주행거리÷배터리</span><button class="tip" type="button" data-tip="기후에너지환경부 인증 상온 주행거리 ÷ 배터리 용량으로 계산한 추정 전비예요. 충전 손실 10%는 아래 계산에서 별도로 반영됩니다." aria-label="전비 설명">?</button></span><b id="k-eff-show">-</b></div>
     <details class="acc"><summary class="small">전비 직접 입력</summary><div class="acc-body">
       <div class="input-suffix"><input class="input" id="k-eff" type="number" step="0.1" inputmode="decimal" placeholder="예: 5.5"><span class="sfx">km/kWh</span></div>
       <p class="small muted mt8">실주행 전비를 아신다면 직접 입력하세요. 비워두면 인증값 기반 추정치를 사용해요.</p>
@@ -74,7 +74,7 @@
         <div class="field"><label>집밥 단가(원/kWh)</label><input class="input" id="k-rate-home" type="number" value="150"></div>
         <div class="field"><label>급속 단가(원/kWh)</label><input class="input" id="k-rate-fast" type="number" value="350"></div>
       </div>
-      <p class="small muted">참고: 환경부 급속(100kW) 347.2원/kWh, 아파트 완속은 계절·시간대별 약 100~250원/kWh 수준(2026-07 기준, 사업자별 상이). 충전손실 10%는 자동 반영돼요.</p>
+      <p class="small muted">참고: 기후에너지환경부 급속(100kW) 347.2원/kWh, 아파트 완속은 계절·시간대별 약 100~250원/kWh 수준(2026-07 기준, 사업자별 상이). 충전손실 10%는 자동 반영돼요.</p>
     </div></details>
   </section>
 
