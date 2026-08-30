@@ -251,8 +251,19 @@ def update_status(sheets):
     known = sum(1 for cd in data if cd in regions)
     if known < 150:
         raise ValueError(f'regions.json과 겹치는 지역 수 이상: {known}')
+    now = datetime.now(KST).isoformat(timespec='minutes')
     atomic_write(os.path.join(DATA, 'status.json'),
-                 {'updated': datetime.now(KST).isoformat(timespec='minutes'), 'data': data})
+                 {'updated': now, 'data': data})
+    # meta.statusUpdated = 잔여현황 기준시각. update_full은 단가 기준일(updated)만 갱신해서
+    # 이 키가 과거 값에 고착돼 있었다(공개 JSON 노출). 여기서 status.json과 같은 시각으로 동기화.
+    # (키 제거 대신 갱신을 택함 — app.js가 st.updated 미확보 시 폴백으로 이 값을 읽는다.)
+    meta_path = os.path.join(DATA, 'meta.json')
+    meta = read_json(meta_path)
+    if isinstance(meta, dict):
+        meta['statusUpdated'] = now
+        atomic_write(meta_path, meta)
+    else:
+        log('⚠ meta.json 읽기 실패 — statusUpdated 동기화 생략(status.json은 정상 갱신)')
     update_history(data, datetime.now(KST))
     log(f'status.json 갱신 완료 ({len(data)}개 지역)')
 
@@ -277,6 +288,9 @@ def update_rounds(sheets):
         if not cd or t[:10] < cutoff:
             continue
         events.setdefault(cd, []).append([t, _clean(r.get('E'), 40), _clean(r.get('F'), 40), _clean(r.get('G'), 40)])
+    # evn = 자르기 전 원 건수(최근 90일 전체). events는 12건으로 잘리므로, 이 값이 없으면
+    # 프리렌더 라벨이 잘린 수를 전체 건수인 양 단정하게 된다(라벨-실제 불일치).
+    evn = {cd: len(v) for cd, v in events.items()}
     for cd in events:
         events[cd] = sorted(events[cd], key=lambda e: e[0], reverse=True)[:12]
     if len(rounds) < 100:                      # 구조 변경 방어 — 이상 시 기존 파일 유지
@@ -284,7 +298,7 @@ def update_rounds(sheets):
         return
     atomic_write(os.path.join(DATA, 'rounds.json'),
                  {'updated': datetime.now(KST).isoformat(timespec='minutes'),
-                  'rounds': rounds, 'events': events})
+                  'rounds': rounds, 'events': events, 'evn': evn})
     log(f'rounds.json 갱신 ({len(rounds)}개 지역 · 최근 90일 변경 {sum(len(v) for v in events.values())}건)')
 
 

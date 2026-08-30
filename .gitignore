@@ -1,7 +1,7 @@
 site/data/*.bak
 updater/updater.log
 updater/.last_full
-updater/.page_lastmod.json
+# updater/.page_lastmod.json — 커밋 대상(사이트맵 lastmod 정본 캐시, md5+날짜만이라 public-safe)
 updater/auto.log
 updater/launchd.log
 updater/.auto.lock/

@@ -225,12 +225,24 @@
   /* ── 접수 상태 판정 ──
      잔여율 = 출고잔여 / 공고. 데이터 기준시각이 오래되면 중립 강등(fail-safe).
      catKey 지정 시 해당 신청 유형(일반/우선순위/…)의 잔여로 판정.
-     우선순위: ① stale ② 잔여≤0 ③ 공지상 마감(closedInfo — 잔여>0이어도 초록 금지) ④ 임박/접수중. */
+     우선순위: ① stale ② 잔여≤0 ③ 공지상 마감(closedInfo — 잔여>0이어도 초록 금지)
+               ④ 공단 등록 접수상태(st.st) ⑤ 임박/접수중.
+
+     ── 공단(ev.or.kr) 등록 접수상태 = 지자체 공지와 독립된 두 번째 신호 ──
+     status.json의 st.st('접수중'|'마감'|'접수예정')·st.dl(최종 신청마감)은 161/161 지역에 존재한다.
+     '마감'·'접수예정'이면 잔여가 남아 있어도 badge-open(초록)·badge-low(임박)를 주지 않는다 —
+     남은 숫자는 미출고분이거나 아직 창구가 열리지 않은 물량일 수 있기 때문(보수적 판정, I3).
+     반대 방향(공단 '접수중' + 공지 원문 완료형 마감)은 closedInfo 판정을 그대로 유지한다.
+     라벨에는 공단 상태를 병기해 사용자가 두 신호를 모두 보고 대조할 수 있게 한다.
+     prerender.py badge_of()가 이 로직의 쌍둥이 — 규칙(초록 금지·마감 계열·병기)을 양쪽 동일하게 유지. */
   window.statusBadge = function (st, statusUpdated, catKey) {
     if (!st) return { cls: 'badge-closed', label: '현황 확인 필요', stale: true };
     const ageDays = statusUpdated ? (Date.now() - new Date(statusUpdated).getTime()) / 864e5 : 99;
     if (ageDays > SITE.staleDays) return { cls: 'badge-closed', label: '직접 확인 필요(데이터 오래됨)', stale: true };
     const regionClosed = (st.left != null && st.left <= 0);   // 지역 전체 소진 여부
+    const ks = st.st || '';                                   // 공단 등록 접수상태
+    const ksShut = (ks === '마감'), ksSoon = (ks === '접수예정');
+    const ksTag = ksShut ? `공단 접수 마감${st.dl ? ` (${fmtMD(st.dl)})` : ''}` : (ksSoon ? '공단 접수 예정' : '');
     let left = st.left, quota = st.n, pfx = '';
     if (catKey && st.d && st.d.left) {
       const c = catByKey(catKey);
@@ -246,17 +258,23 @@
     }
     // 지역 전체가 소진됐는데 특정 유형에만 이월 잔여가 남은 경우: 초록 '접수 중'이 아니라 마감 맥락으로 표기.
     // (ev.or.kr 회차 이월로 항목 잔여 > 0 이지만 실제 접수는 마감된 상태 — 오인 방지)
-    if (catKey && regionClosed) return { cls: 'badge-low', label: `${pfx}전체 마감 · 유형 잔여 ${fmt(left)}대(추가공고 확인)`, stale: false };
+    if (catKey && regionClosed)
+      return { cls: ksShut ? 'badge-shut' : ksSoon ? 'badge-closed' : 'badge-low',
+               label: `${pfx}전체 마감 · 유형 잔여 ${fmt(left)}대(추가공고 확인)${ksTag ? ' · ' + ksTag : ''}`, stale: false };
     // 공지상 접수 마감인데 잔여>0 (예: 서울 8/7 마감·잔여 2,703대) — 잔여는 미출고분일 수 있음, 초록 금지
     const ci = window.closedInfo(st);
     if (ci) {
+      const tag = ksTag ? ' · ' + ksTag : '';   // 공단 상태 병기(두 신호 대조용)
       if (catKey) return ci.partial     // 유형 탭: 유형 잔여 숫자는 유지하되 마감 맥락 표기(regionClosed 분기와 동일 철학)
-        ? { cls: 'badge-low', label: `${pfx}공지상 마감 안내 · 잔여 ${fmt(left)}대(유형별 확인)`, stale: false }
-        : { cls: 'badge-shut', label: `${pfx}공지상 접수 마감 · 잔여 ${fmt(left)}대는 미출고분일 수 있음`, stale: false };
+        ? { cls: (ksShut || ksSoon) ? 'badge-shut' : 'badge-low', label: `${pfx}공지상 마감 안내 · 잔여 ${fmt(left)}대(유형별 확인)${tag}`, stale: false }
+        : { cls: 'badge-shut', label: `${pfx}공지상 접수 마감 · 잔여 ${fmt(left)}대는 미출고분일 수 있음${tag}`, stale: false };
       return ci.partial                 // partial=일부 차종·유형만 마감일 수 있음 → 단정 금지 톤
-        ? { cls: 'badge-shut', label: '공지상 마감 안내 · 유형별 확인 필요', stale: false }
-        : { cls: 'badge-shut', label: `공지상 접수 마감${ci.closedDate ? ` (${fmtMD(ci.closedDate)})` : ''} · 잔여 ${fmt(left)}대는 미출고분일 수 있음`, stale: false };
+        ? { cls: 'badge-shut', label: `공지상 마감 안내 · 유형별 확인 필요${tag}`, stale: false }
+        : { cls: 'badge-shut', label: `공지상 접수 마감${ci.closedDate ? ` (${fmtMD(ci.closedDate)})` : ''} · 잔여 ${fmt(left)}대는 미출고분일 수 있음${tag}`, stale: false };
     }
+    // 공지 원문엔 완료형 마감 선언이 없지만 공단 등록 상태가 마감/접수예정 — 초록·임박 금지(위 주석의 보수 규칙)
+    if (ksShut) return { cls: 'badge-shut', label: `${pfx}${ksTag} · 잔여 ${fmt(left)}대는 미출고분일 수 있음 · 공고 일정 확인 필요`, stale: false };
+    if (ksSoon) return { cls: 'badge-closed', label: `${pfx}공단 접수 예정 · 잔여 ${fmt(left)}대 · 공고 일정 확인 필요`, stale: false };
     const ratio = quota ? left / quota : 1;
     if (left < 30 || ratio < 0.06) return { cls: 'badge-low', label: `${pfx}마감 임박 · 잔여 ${fmt(left)}대`, stale: false };
     return { cls: 'badge-open', label: `${pfx}접수 중 · 잔여 ${fmt(left)}대`, stale: false };
@@ -325,6 +343,18 @@
     if (st.left == null || st.left <= 0) return done();                        // ① 마감: 예측 없음(뱃지가 담당)
     if (window.closedInfo(st)) {                                               // ② 공지상 마감(잔여>0이어도 — 전수검증 감지)
       lines.push(P(`지자체 공지상 접수가 마감된 지역이에요. 남은 숫자는 아직 출고되지 않은 물량일 수 있어요 — 예측을 표시하지 않아요.`));
+      return done();
+    }
+    // ②′ 공단(ev.or.kr) 등록 접수상태 — 공지 원문에 완료형 마감 선언이 없어도 등록상 '마감'·'접수예정'이면
+    //     소진 예측을 그리지 않는다(마감 상태의 잔여로 소진일을 그리면 '아직 살 수 있다'는 오독을 만든다).
+    //     statusBadge의 공단 상태 규칙과 동일한 판정 — 한쪽만 고치면 뱃지와 문장이 어긋난다.
+    if (st.st === '마감') {
+      const dlTxt = st.dl ? fmtMD(st.dl, true) : '';
+      lines.push(P(`공단(ev.or.kr) 등록 접수상태가 <b>마감</b>이에요${dlTxt ? ` (최종 신청마감 ${dlTxt})` : ''}. 남은 숫자는 아직 출고되지 않은 물량일 수 있어요 — 소진 예측을 표시하지 않아요. 다음 공고 일정은 지자체 공지를 확인하세요.`));
+      return done();
+    }
+    if (st.st === '접수예정') {
+      lines.push(P(`공단(ev.or.kr) 등록 접수상태가 <b>접수예정</b>이에요. 아직 이번 회차 접수가 시작되지 않아 소진 예측을 표시하지 않아요 — 접수 일정은 지자체 공지를 확인하세요.`));
       return done();
     }
     const collecting = obs => P(`소진 시기 예측: <b>기록을 모으고 있어요</b>${obs ? ` (관측 ${obs}일째)` : ''}`, TIP_COLLECT, true);

@@ -67,12 +67,14 @@ MODEL_SERIES = {
     'model-y': '모델Y', 'casper': '캐스퍼 일렉트릭', 'kona': '코나 일렉트릭', 'ray': '레이 EV',
 }
 
-# 정적 핵심 페이지(30) — sitemap 상단. (region.html/car.html 레거시·파라미터 URL은 신규 경로로 대체돼 제외)
+# 정적 핵심 페이지(28) — sitemap 상단. (region.html/car.html 레거시·파라미터 URL은 신규 경로로 대체돼 제외)
+# donate.html·report.html은 본문 500~600자대의 얇은 페이지라 사이트맵에서 제외(I9 — 애드센스 3차
+# 반려 사유가 '저가치'였다). 페이지 자체와 푸터 링크는 그대로 유지 — 이용자 접근은 막지 않는다.
 CORE_PAGES = [
     ('/', 'daily'), ('/status.html', 'hourly'), ('/calc.html', 'daily'), ('/check.html', 'daily'),
     ('/guide.html', 'daily'), ('/law.html', 'daily'), ('/refund.html', 'daily'), ('/faq.html', 'daily'),
     ('/compare.html', 'daily'), ('/about.html', 'weekly'), ('/privacy.html', 'weekly'),
-    ('/donate.html', 'weekly'), ('/report.html', 'weekly'), ('/articles.html', 'weekly'),
+    ('/articles.html', 'weekly'),
     ('/price-tiers.html', 'weekly'), ('/myths.html', 'weekly'), ('/timeline-traps.html', 'weekly'),
     ('/residency.html', 'weekly'), ('/refund-rules.html', 'weekly'), ('/quota-reading.html', 'weekly'),
     ('/second-round.html', 'weekly'), ('/buyer-types.html', 'weekly'), ('/conversion-grant.html', 'weekly'),
@@ -263,19 +265,52 @@ def detect_closed(note):
     return res
 
 
+# ── 공단 등록 회차 신호 (rounds.json 실측 — 예측 아님) ──
+def rounds_over(rounds, cd, today):
+    """이 지역에 등록된 회차의 접수기간이 **모두** 지났는가.
+
+    - 종료일이 하나라도 오늘 이후면 False(아직 열려 있을 수 있음 — 보수적으로 '종료 아님')
+    - 읽을 수 있는 종료일이 하나도 없으면 None(판단 보류 — 신호로 쓰지 않음)
+    D-day·소진 예측이 아니라 공단에 '등록된 일정'이라는 사실만 본다(I3)."""
+    rr = ((rounds or {}).get('rounds') or {}).get(cd) or []
+    ends = [e for e in ((x.get('e') or '')[:10] for x in rr)
+            if re.fullmatch(r'\d{4}-\d{2}-\d{2}', e)]
+    if not ends:
+        return None
+    return max(ends) < today
+
+
 # ── 상태 뱃지 (app.js statusBadge의 정적 축약 — stale 분기는 생성 시점 데이터라 불필요) ──
-def badge_of(st, closed):
+def badge_of(st, closed, over=None):
+    """공지 판정(closed)과 **공단 공식 신호**를 함께 반영한 상태 뱃지.
+
+    공단 신호 = status의 `st`(공단 등록 접수상태) + `over`(rounds_over() 결과).
+    보수 원칙(I3): 공단이 '마감'·'접수예정'이거나 등록 회차 접수기간이 모두 지났으면
+    잔여가 남아 있어도 badge-open(초록)·badge-low(마감임박)를 주지 않는다.
+    반대 방향(공단 '접수중' ↔ 공지상 마감)은 종전대로 마감을 유지하고, 두 신호가
+    엇갈릴 때는 라벨에 공단 등록 상태를 병기해 이용자가 직접 판단할 수 있게 한다."""
     if not st or st.get('left') is None:
         return ('badge-closed', '물량 정보 없음')
     left = st['left']
+    ost = (st.get('st') or '').strip()          # 공단 등록 접수상태(접수중·마감·접수예정)
     if left <= 0:
         return ('badge-closed', '잔여 소진(추가공고 확인)')
     if closed and closed['closed']:
+        # 공단은 '접수중'인데 공지문은 마감 → 마감 유지(보수) + 공식 상태 병기
+        gap = ' · 공단 등록 상태: 접수중' if ost == '접수중' else ''
         if closed['partial']:
-            return ('badge-shut', '공지상 마감 안내 · 유형별 확인 필요')
+            return ('badge-shut', '공지상 마감 안내 · 유형별 확인 필요' + gap)
         cdte = closed.get('closedDate')
         md = ' (%d/%d)' % (int(cdte[5:7]), int(cdte[8:10])) if cdte else ''
-        return ('badge-shut', '공지상 접수 마감%s · 잔여 %s대는 미출고분일 수 있음' % (md, fmt(left)))
+        return ('badge-shut', '공지상 접수 마감%s · 잔여 %s대는 미출고분일 수 있음%s'
+                % (md, fmt(left), gap))
+    # 공지문에 마감 문구가 없어도 공단 공식 신호가 닫혀 있으면 초록·임박 금지
+    if ost == '마감':
+        return ('badge-shut', '공단 등록 상태 마감 · 잔여 %s대 · 공고 일정 확인 필요' % fmt(left))
+    if ost == '접수예정':
+        return ('badge-shut', '공단 등록 상태 접수예정 · 공고 일정 확인 필요')
+    if over:
+        return ('badge-shut', '등록 회차 접수기간 종료 · 잔여 %s대 · 공고 일정 확인 필요' % fmt(left))
     n = st.get('n')
     ratio = left / n if n else 1
     if left < 30 or ratio < 0.06:
@@ -461,7 +496,7 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     # 페이지·형제 칩 링크는 그대로 유지(탐색용)하고 색인 표면에서만 뺀다. 광고 슬롯은 ad_slot이 제거.
     noindex = (cd == '9999') or (cd in ctx.get('region_noindex', ()))
     closed = ctx['closed_map'][cd]
-    cls, label = badge_of(st, closed)
+    cls, label = badge_of(st, closed, (ctx.get('rounds_over') or {}).get(cd))
     # 데이터 모순 가드: 전체 잔여 0인데 유형 잔여가 남음 → 단정 문장 생략 대상
     d = st.get('d') or {}
     contradiction = (st.get('left') is not None and st['left'] <= 0
@@ -536,8 +571,14 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
                 chg = ('%s → %s' % (esc(before), esc(after))) if before else esc(after)
                 evs.append('<li class="small" style="margin:4px 0"><span class="muted">%s</span> · %s: %s</li>'
                            % (esc((t or '')[:16].replace('-', '.')), esc(item or ''), chg))
-            ev_html = ('<h3 class="small" style="margin:14px 0 4px">공단 등록 변경 이력 (최근 90일 · %d건)</h3>'
-                       '<ul style="list-style:none;padding:0;margin:0">%s</ul>' % (len(r_events), ''.join(evs)))
+            # 라벨 = 실제 렌더 행수와 원 건수를 모두 정확히. update.py의 evn(자르기 전 90일 전체 건수)이
+            # 정본이고, 옛 rounds.json(evn 없음)에서는 저장된 목록 길이로 하위호환 폴백한다.
+            total_ev = ((rd.get('evn') or {}).get(cd)) or len(r_events)
+            total_ev = max(total_ev, len(r_events))
+            cap = ('최근 90일 · %d건' % total_ev if total_ev <= len(evs)
+                   else '최근 90일 %d건 중 최근 %d건' % (total_ev, len(evs)))
+            ev_html = ('<h3 class="small" style="margin:14px 0 4px">공단 등록 변경 이력 (%s)</h3>'
+                       '<ul style="list-style:none;padding:0;margin:0">%s</ul>' % (cap, ''.join(evs)))
         note_sec += ('<section class="card"><h2 class="mt0">📅 %s 공고 차수·일정</h2>'
                      '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>차수</th><th>게시일</th>'
                      '<th>접수기간</th><th>신청마감</th></tr></thead><tbody>%s</tbody></table></div>%s'
@@ -568,12 +609,14 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     # 형제 지역: 접수 가능(open→low→나머지) 우선 최대 8개 + 시도 허브 링크
     def sib_key(item):
         k, v = item
-        scls, _ = badge_of(status['data'].get(k) or {}, ctx['closed_map'][k])
+        scls, _ = badge_of(status['data'].get(k) or {}, ctx['closed_map'][k],
+                           (ctx.get('rounds_over') or {}).get(k))
         order = {'badge-open': 0, 'badge-low': 1, 'badge-shut': 2, 'badge-closed': 3}[scls]
         return (order, -(v.get('maxP') or 0))
     sib_html = []
     for k, v in sorted(((k, v) for k, v in sibs if k != cd), key=sib_key)[:8]:
-        scls, _ = badge_of(status['data'].get(k) or {}, ctx['closed_map'][k])
+        scls, _ = badge_of(status['data'].get(k) or {}, ctx['closed_map'][k],
+                           (ctx.get('rounds_over') or {}).get(k))
         col = {'badge-open': 'var(--badge-open)', 'badge-low': 'var(--badge-low)'}.get(scls, 'var(--badge-closed)')
         sib_html.append('<a class="chip" href="/region/%s.html"><i class="chip-dot" style="background:%s"></i>%s %s만원</a>'
                         % (k, col, esc(v['name']), fmt(v.get('maxP'))))
@@ -676,7 +719,9 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
                  sibs=None, status=None, ctx=None, models=None):
     """산문 5~6문단 — 데이터 조건 분기(순위·소진율·추이·마감 상태·단가 구조별로 서술 자체가
     달라짐) × 세그먼트 조합 풀(슬롯당 12~64형) × 문단 순서 시드 가변.
-    사실은 전부 데이터 실측. 점추정 예측·조건부 마감의 마감 단정 금지, WAV·미지원 차종 제외."""
+    사실은 전부 데이터 실측. 점추정 예측·조건부 마감의 마감 단정 금지, WAV·미지원 차종 제외.
+    conv_max(지역 최대 지방 전환분)는 **의도적으로 문장에 쓰지 않는다** — 지방 전환지원금 금액
+    단정 금지 정책(conversion-grant.html)에 따라 제거. 인자는 호출부 호환으로만 남겨 둔다."""
     name = r['name']
     P = lambda slot, opts: pick('%s:%s' % (cd, slot), opts)
     CC = lambda slot, *parts: compose(cd, slot, *parts)
@@ -1139,29 +1184,19 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
          '상한 %s만원으로 계산해야 합니다.' % fmt(r.get('maxS')),
          '%s만원 상한이 적용됩니다.' % fmt(r.get('maxS'))]))
     cn = fmt(meta.get('convNatMax', 100))
-    if conv_max > 0:
-        pC2.append(CC('conv',
-            ['기존 내연기관차를 폐차·처분하고 전환하는 경우 ',
-             '내연차를 정리하고 넘어오는 구매라면 ',
-             '폐차·처분을 동반한 전환 구매에는 ',
-             '내연기관차 처분 후 전환 조건이면 '],
-            ['국비 최대 %s만원의 전환지원금이 추가되고 ' % cn,
-             '전환지원금이 국비 최대 %s만원 따로 붙고 ' % cn,
-             '별도의 전환지원금(국비 최대 %s만원)이 있고 ' % cn],
-            ['이 지역 지방비 몫은 차종에 따라 최대 %s만원입니다.' % fmt(conv_max),
-             '지방비 전환지원금은 차종별 최대 %s만원까지 더해집니다.' % fmt(conv_max),
-             '지방비 쪽은 최대 %s만원(차종별 상이)입니다.' % fmt(conv_max)]))
-    else:
-        pC2.append(CC('noconv',
-            ['내연기관차 폐차·처분 후 전환 시에는 ',
-             '내연차에서 갈아타는 경우라면 ',
-             '전환 구매 조건이라면 '],
-            ['국비 전환지원금(최대 %s만원)이 별도로 있으며 ' % cn,
-             '국비 몫 전환지원금 최대 %s만원이 따로 있으며 ' % cn,
-             '전환지원금 국비 최대 %s만원을 챙길 수 있으며 ' % cn],
-            ['이 지역 지방비 전환 지원 여부는 공고문으로 확인해야 합니다.',
-             '지방비 쪽 전환 지원은 데이터에 잡히지 않아 공고 확인이 필요합니다.',
-             '지방비 전환 지원은 공고문 기준입니다.']))
+    # 전환지원금: **국비 몫만** 금액을 쓴다. 지방비 몫은 수집 데이터(v[1])가 공단 계산기·구 실측과
+    # 모순이라 채택 기각된 값이라 금액을 단정하지 않는다(conversion-grant.html 명문 정책과 동일).
+    # conv_max(지역 최대 지방 전환분)는 산문에 노출하지 않는다 — 분기 분리 없이 항상 '공고 확인' 문구.
+    pC2.append(CC('noconv',
+        ['내연기관차 폐차·처분 후 전환 시에는 ',
+         '내연차에서 갈아타는 경우라면 ',
+         '전환 구매 조건이라면 '],
+        ['국비 전환지원금(최대 %s만원)이 별도로 있으며 ' % cn,
+         '국비 몫 전환지원금 최대 %s만원이 따로 있으며 ' % cn,
+         '전환지원금 국비 최대 %s만원을 챙길 수 있으며 ' % cn],
+        ['이 지역 지방비 전환 지원 여부는 공고문으로 확인해야 합니다.',
+         '지방비 쪽 전환 지원은 데이터에 잡히지 않아 공고 확인이 필요합니다.',
+         '지방비 전환 지원은 공고문 기준입니다.']))
 
     # ── E 유형별 배정 (실데이터 분해 + 해석) ──
     pE = []
@@ -1737,7 +1772,10 @@ def car_prose(car, cars, rows, eff, cr, meta, status, ctx):
          '%s만원(전국 동일)입니다.' % fmt(car['nat']),
          '%s만원이 기준입니다.' % fmt(car['nat'])]))
     nm = meta.get('natMax')
-    if nm and car.get('nat') is not None:
+    # natMax는 **일반 승용 기준**(update.py에서 WAV·'미지원' 제외로 산출)이라 WAV류 트림에
+    # 적용하면 '국비 648만원 = 최고액 570만원' 같은 산술 모순이 난다 → 해당 차종은 문장 생략(I3).
+    special_car = 'WAV' in car['name'] or '미지원' in car['name']
+    if nm and car.get('nat') is not None and not special_car:
         nshare = round(car['nat'] / nm * 100)
         if car['nat'] >= nm:
             p2.append(CC('natshare',
@@ -2035,7 +2073,8 @@ def build_sido(sido, regions, meta, status, ctx):
     trs = []
     for k, v in sibs:
         stt = status['data'].get(k) or {}
-        cls, label = badge_of(stt, ctx['closed_map'].get(k) or detect_closed(stt.get('note')))
+        cls, label = badge_of(stt, ctx['closed_map'].get(k) or detect_closed(stt.get('note')),
+                              (ctx.get('rounds_over') or {}).get(k))
         trs.append('<tr data-cd="%s"><td><a href="/region/%s.html" style="font-weight:700">%s</a></td>'
                    '<td class="num">%s</td><td class="num" data-cell="left">%s</td>'
                    '<td><span class="badge %s" data-cell="badge"><span class="dot"></span>%s</span></td></tr>'
@@ -2152,7 +2191,7 @@ def build_model(entry, cars, regions, meta, status, ctx):
     rtrs = []
     for k, r, tot in rows[:15]:
         stt = status['data'].get(k) or {}
-        cls, label = badge_of(stt, ctx['closed_map'][k])
+        cls, label = badge_of(stt, ctx['closed_map'][k], (ctx.get('rounds_over') or {}).get(k))
         rtrs.append('<tr><td><a href="/region/%s.html" style="color:inherit;font-weight:700">%s</a>'
                     '<div class="small muted">%s</div></td>'
                     '<td class="num" style="font-weight:800;color:var(--money)">%s</td>'
@@ -2487,10 +2526,15 @@ def main():
            'open_base': sum(1 for cd in regions if cd != '9999'),
            'rounds': rounds or {},
            'region_noindex': load_region_noindex() & set(regions)}
+    # 공단 공식 신호: 등록 회차 접수기간이 모두 지난 지역 — 배지에서 초록·임박 금지(보수 판정)
+    kst_today = datetime.datetime.now(KST).date().isoformat()
+    ctx['rounds_over'] = {cd: rounds_over(rounds, cd, kst_today) for cd in regions}
     # 색인 대상 차종 = 모델그룹 대표 트림(국비 최고 비단종, 동률은 id 낮은 쪽) — 트림 근사중복의 색인 노출 차단
+    # WAV·'미지원' 트림은 일반 구매와 조건이 달라 대표에서 제외(build_model 트림 표와 동일 기준).
+    # 그룹의 비단종 트림이 전부 WAV류면 대표 없음 → 그 그룹은 전부 noindex·사이트맵 제외.
     rep_by_group = {}
     for c in cars:
-        if c['disc']:
+        if c['disc'] or 'WAV' in c['name'] or '미지원' in c['name']:
             continue
         g = model_group(c)
         cur = rep_by_group.get(g)
