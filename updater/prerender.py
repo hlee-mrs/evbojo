@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """EV보조금 정적 프리렌더 엔진 (stdlib 전용, /usr/bin/python3)
 
@@ -192,6 +192,64 @@ _NEXT_DATE = re.compile(r'[2-9]\s?차\s?(?:(?!마감|종료|소진)[^.!?★☆�
                         r'\s?(?:(?!마감|종료|소진)[^.!?★☆※]){0,30}?'
                         r'(?:\d{1,2}\s?[./월]\s?\d{1,2}|기간|개시|재개|시작|진행)')
 
+# ── 다음 회차 뱃지 구절 정리 ──────────────────────────────
+# _NEXT/_NEXT_DATE는 길이 상한이 있는 패턴이라 매치가 문장 중간에서 끊긴다. 끊긴 자리에
+# 남는 부스러기(열린 채 끝난 괄호, "2026. 8" 같은 미완성 날짜, 조사·접속)는 뜻을 왜곡하거나
+# 조건부 계획을 확정 예고처럼 보이게 한다 → **원문 범위 안에서 잘라 내기만** 하고(덧붙임 금지),
+# 잘라도 뜻이 서지 않으면 뱃지 자체를 만들지 않는다(I3 — 애매하면 표시하지 않는 쪽).
+_NR_LIMIT = 60          # 뱃지 최대 길이
+_NR_MIN = 12            # 이보다 짧게 남으면 뱃지 생략
+_NR_EDGE = ' \t,.·:;~∼-–—/\\|>＞<＜*※★☆'          # 양 끝에서 떨어내는 잉여 기호
+_NR_PAIRS = {'(': ')', '（': '）', '[': ']', '{': '}', '「': '」', '『': '』', '《': '》'}
+# 끝에 매달린 미완성 날짜("… 2026. 8" = 연·월만 남고 일이 잘림, "… 9." = 구분자로 끝남).
+# "7. 24"·"6월 26"처럼 그 자체로 월·일이 읽히는 형태는 손대지 않는다(원문 보존).
+_NR_PARTIAL = re.compile(r'(?:\d{4}\s?[.년/]\s?\d{1,2}\s?[.월/]?|\d{1,4}\s?[.년월/])$')
+# 끝에 매달린 조사·접속(뒤 문장이 잘려 나갔다는 신호)
+_NR_DANGLE = re.compile(r'(?:으로|에서|에게|부터|까지|보다|이며|이고|되어|되고|또는|그리고|하고|하여|해서'
+                        r'|[은는이가을를의에와과도만로및])$')
+
+
+def _clip_next(s):
+    """다음 회차 안내 구절을 뱃지용으로 정리 — 원문에서 자르기만 한다. 실패 시 None.
+
+    ① _NR_LIMIT 초과분은 문장 경계(_SENT_BREAK) → 없으면 마지막 공백에서 자른다.
+    ② 닫히지 않은 괄호가 있으면 그 괄호 앞에서 자른다(열린 채 끝난 인용 방지).
+    ③ 짝 없는 닫는 괄호가 있으면 그 앞에서 자른다(문장 중간부터 시작된 매치).
+    ④ 끝의 잉여 기호·미완성 날짜를 떼어 낸다.
+    ⑤ **잘라 낸 경우** 남은 길이가 _NR_MIN 미만이면 None(뱃지 생략).
+       조사·접속으로 끝나면 자름 여부와 무관하게 None(문장이 통째로 잘린 신호)."""
+    out = (s or '').strip()
+    trimmed = False
+    if len(out) > _NR_LIMIT:
+        cut = out[:_NR_LIMIT]
+        pos = max([cut.rfind(ch) for ch in _SENT_BREAK] or [-1])
+        if pos < 0:
+            pos = cut.rfind(' ')
+        out = cut[:pos] if pos > 0 else cut
+        trimmed = True
+    stack = []
+    end = len(out)
+    for i, ch in enumerate(out):
+        if ch in _NR_PAIRS:
+            stack.append((i, _NR_PAIRS[ch]))
+        elif stack and ch == stack[-1][1]:
+            stack.pop()
+        elif ch in _NR_PAIRS.values():
+            end = i                      # ③ 짝 없는 닫는 괄호 — 여기서 끊는다
+            break
+    if stack and stack[0][0] < end:
+        end = stack[0][0]                # ② 닫히지 않은 괄호 앞에서 끊는다
+    if end < len(out):
+        out = out[:end]
+        trimmed = True
+    out = out.strip(_NR_EDGE)
+    cut2 = _NR_PARTIAL.sub('', out).strip(_NR_EDGE)
+    if cut2 != out:
+        out, trimmed = cut2, True
+    if (trimmed and len(out) < _NR_MIN) or _NR_DANGLE.search(out):
+        return None
+    return out or None
+
 
 def detect_closed(note):
     res = {'closed': False, 'partial': False, 'closedDate': None, 'nextRound': None}
@@ -261,11 +319,29 @@ def detect_closed(note):
             pass
     nr = _NEXT.search(t) or _NEXT_DATE.search(t)
     if nr:
-        res['nextRound'] = nr.group(0).strip()[:60]
+        res['nextRound'] = _clip_next(nr.group(0))   # 정리 실패 시 None → 뱃지 생략
     return res
 
 
 # ── 공단 등록 회차 신호 (rounds.json 실측 — 예측 아님) ──
+_DT_RE = re.compile(r'(\d{4}-\d{2}-\d{2})(?:[ T](\d{2}:\d{2}))?')
+
+
+def _dl_before_start(s, d):
+    """신청마감(d)이 접수시작(s)보다 이른가 — 둘 다 읽히는 경우에만 True.
+
+    공단 시스템에서 신청마감은 회차 일정과 별개로 갱신되는 값이라, 접수기간보다 이른
+    날짜가 등록된 회차가 실제로 존재한다. 관측값은 보존하고 표시만 보류하기 위한 판정."""
+    ms, md = _DT_RE.match(str(s or '')), _DT_RE.match(str(d or ''))
+    if not ms or not md:
+        return False
+    if ms.group(1) != md.group(1):
+        return md.group(1) < ms.group(1)
+    if ms.group(2) and md.group(2):          # 같은 날이면 시각까지 비교
+        return md.group(2) < ms.group(2)
+    return False
+
+
 def rounds_over(rounds, cd, today):
     """이 지역에 등록된 회차의 접수기간이 **모두** 지났는가.
 
@@ -396,6 +472,14 @@ _NUM_RE = re.compile(r'[0-9][0-9,.:]*')
 # 값이 '사흘→나흘'로 바뀌는 것만으로 lastmod가 갱신되는 것을 막는다. 단위가 붙은 형태만 대상.
 _KNUM_RE = re.compile(r'하루|이틀|사흘|나흘|닷새|엿새|이레'
                       r'|(?:영|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)(?=\s?(?:개|곳|가지|번째))')
+# <main> 밖이지만 lastmod가 잡아야 하는 3요소 (제목·설명·정규 URL)
+_TITLE_RE = re.compile(r'<title[^>]*>(.*?)</title>', re.S | re.I)
+_DESC_RE = re.compile(r'<meta\s+name="description"\s+content="([^"]*)"', re.I)
+_CANON_RE = re.compile(r'<link\s+rel="canonical"\s+href="([^"]*)"', re.I)
+
+
+def _mask(s):
+    return _KNUM_RE.sub('#', _NUM_RE.sub('#', s))
 
 
 def content_hash(html):
@@ -408,12 +492,32 @@ def content_hash(html):
         return ''
     m = _MAIN_RE.search(html)
     body = m.group(1) if m else html
-    return hashlib.md5(_KNUM_RE.sub('#', _NUM_RE.sub('#', body)).encode('utf-8')).hexdigest()
+    return hashlib.md5(_mask(body).encode('utf-8')).hexdigest()
+
+
+def head_hash(html):
+    """<title>·meta description·canonical의 md5(본문과 같은 수치 마스킹).
+
+    이 셋은 <main> 밖이라 content_hash가 못 잡는다 — 제목·설명·정규 URL만 바뀐 날에도
+    lastmod가 움직이도록 별도 해시로 함께 비교한다(본문 해시와 분리해 두는 이유는
+    기존 캐시(hh 없음)와의 호환 — 아래 lm_of 주석 참조). 빈 입력은 ''."""
+    if not html:
+        return ''
+    head = html[:8192]                       # 세 요소 모두 문서 앞부분에 있음
+    t = _TITLE_RE.search(head)
+    d = _DESC_RE.search(head)
+    c = _CANON_RE.search(head)
+    parts = [(t.group(1) if t else ''), (d.group(1) if d else ''), (c.group(1) if c else '')]
+    return hashlib.md5(_mask('\x1f'.join(parts)).encode('utf-8')).hexdigest()
 
 
 def load_lastmod_store():
-    """{'<사이트 상대경로>': {'h': 해시, 'd': 'YYYY-MM-DD'}} — 없거나 깨졌으면 빈 dict.
-    빈 dict면 이번 회차 lastmod는 전부 오늘로 폴백된다(종전 동작). 빌드는 절대 실패시키지 않음."""
+    """{'<사이트 상대경로>': {'h': 본문해시, 'hh': 헤드해시, 'd': 'YYYY-MM-DD'}}.
+    없거나 깨졌으면 빈 dict → 이번 회차 lastmod는 전부 오늘로 폴백(종전 동작).
+    빌드는 절대 실패시키지 않는다.
+
+    날짜는 정규식만이 아니라 **실재하는 날짜인지** 파싱으로 확인하고(2026-02-31 같은 값 제거),
+    오늘보다 미래면 오늘로 강등한다(캐시 오염·시계 오차가 사이트맵으로 새는 것 차단)."""
     try:
         with open(LASTMOD_STORE, encoding='utf-8') as f:
             raw = json.load(f)
@@ -421,11 +525,23 @@ def load_lastmod_store():
             return {}
     except Exception:
         return {}
+    today = datetime.date.today()
     out = {}
     for k, v in raw.items():
-        if (isinstance(k, str) and isinstance(v, dict) and isinstance(v.get('h'), str) and v['h']
+        if not (isinstance(k, str) and isinstance(v, dict)
+                and isinstance(v.get('h'), str) and v['h']
                 and isinstance(v.get('d'), str) and re.fullmatch(r'\d{4}-\d{2}-\d{2}', v['d'])):
-            out[k] = {'h': v['h'], 'd': v['d']}
+            continue
+        try:
+            dd = datetime.date.fromisoformat(v['d'])
+        except ValueError:
+            continue                          # 존재하지 않는 날짜 — 레코드 폐기(→ 오늘로 폴백)
+        if dd > today:
+            dd = today                        # 미래 날짜는 오늘로 강등
+        rec = {'h': v['h'], 'd': dd.isoformat()}
+        if isinstance(v.get('hh'), str) and v['hh']:
+            rec['hh'] = v['hh']
+        out[k] = rec
     return out
 
 
@@ -513,15 +629,13 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
 
     # 모델·최고액 (WAV·'미지원' 차종은 최고액 서술에서 제외 — 일반 구매와 조건이 다름)
     models = [(c, car_v(r, c['id'])) for c in cars if not c['disc'] and car_v(r, c['id'])]
-    best = None
-    conv_max = 0
-    for c, v in models:
-        conv_max = max(conv_max, v[1] or 0)
-        if 'WAV' in c['name'] or '미지원' in c['name']:
-            continue
-        tot = c['nat'] + v[0]
-        if not best or tot > best[1]:
-            best = (c, tot)
+    conv_max = max((v[1] or 0) for _, v in models) if models else 0
+    # 1위 모델은 **아래 차종 표와 같은 정렬 기준**(합계 내림차순 → 이름 오름차순)으로 고른다.
+    # 예전에는 '먼저 나온 최댓값'을 잡아 동률일 때 산문의 1위와 표 첫 행이 어긋났다.
+    _cands = [(c, c['nat'] + v[0]) for c, v in models
+              if 'WAV' not in c['name'] and '미지원' not in c['name']]
+    best = min(_cands, key=lambda x: (-x[1], x[0]['name'])) if _cands else None
+    # 동률 건수는 바로 이어지는 pC2 'top-tie' 문장이 같은 문단에서 명시한다(tops도 동일 정렬).
 
     avg_maxp = round(sum((v.get('maxP') or 0) for _, v in all_r) / len(all_r))
     prose = region_prose(cd, r, st, closed, contradiction, rank, pct, len(all_r),
@@ -558,12 +672,20 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     # 공고 차수·공식 변경이력 — 이 지역에서만 참인 1차 데이터(차수 구성·일정·공단 등록 변경 기록)
     if r_rounds:
         rtr = []
+        dl_hidden = 0                    # 신청마감 < 접수시작 → 표시 보류한 행 수(각주 조건)
         for x in r_rounds:
             period = ('%s ~ %s' % (esc(x.get('s') or '?'), esc(x.get('e') or '?'))
                       if x.get('s') or x.get('e') else '—')
+            # 신청마감(d)이 접수시작(s)보다 이른 회차 — 관측값은 그대로 두고 **표시만** 보류한다.
+            # (원본 rounds.json 무수정. 날짜 논리가 깨진 값을 주석 없이 노출하지 않기 위함.)
+            dl = x.get('d') or ''
+            if _dl_before_start(x.get('s'), dl):
+                dl_cell, dl_hidden = '—', dl_hidden + 1
+            else:
+                dl_cell = esc(dl or '—')
             rtr.append('<tr><td style="font-weight:700">%s</td><td class="small">%s</td>'
                        '<td class="small">%s</td><td class="small">%s</td></tr>'
-                       % (esc(x.get('k') or '?'), esc(x.get('post') or '—'), period, esc(x.get('d') or '—')))
+                       % (esc(x.get('k') or '?'), esc(x.get('post') or '—'), period, dl_cell))
         ev_html = ''
         if r_events:
             evs = []
@@ -579,11 +701,14 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
                    else '최근 90일 %d건 중 최근 %d건' % (total_ev, len(evs)))
             ev_html = ('<h3 class="small" style="margin:14px 0 4px">공단 등록 변경 이력 (%s)</h3>'
                        '<ul style="list-style:none;padding:0;margin:0">%s</ul>' % (cap, ''.join(evs)))
+        dl_note = ('<p class="small muted" style="margin:8px 0 0">※ 등록된 신청마감이 접수 시작보다 이른 회차가 '
+                   '%s 있어, 해당 행의 신청마감은 표시하지 않았습니다(원본 값은 공고문·ev.or.kr에서 확인하세요).</p>'
+                   % knu(dl_hidden, '건')) if dl_hidden else ''
         note_sec += ('<section class="card"><h2 class="mt0">📅 %s 공고 차수·일정</h2>'
                      '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>차수</th><th>게시일</th>'
-                     '<th>접수기간</th><th>신청마감</th></tr></thead><tbody>%s</tbody></table></div>%s'
+                     '<th>접수기간</th><th>신청마감</th></tr></thead><tbody>%s</tbody></table></div>%s%s'
                      '<p class="stamp">출처: 무공해차 통합누리집(ev.or.kr) 보조금관리시스템 등록 정보 · 수집 %s</p></section>'
-                     % (esc(name), ''.join(rtr), ev_html, esc(updated.replace('T', ' '))))
+                     % (esc(name), ''.join(rtr), dl_note, ev_html, esc(updated.replace('T', ' '))))
 
     # 차종 표 (상위 25 정적 — 전체는 detail.js 확장)
     # WAV·미지원 모델은 일반 구매와 조건이 달라 본표에서 분리 — 헤드라인 최고액(maxP)과 표 1위가 일치하도록
@@ -684,7 +809,9 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
         'PROG': prog,
         'STATUS_LINES': ''.join(status_lines),
         'TEL_BTN': tel_btn,
-        'STAMP': '잔여현황 기준 %s · 단가 기준일 %s · 출처 ev.or.kr' % (esc(updated.replace('T', ' ')), esc(meta['updated'])),
+        # meta.updated는 '단가가 언제부터 유효한가'가 아니라 update.py가 단가표를 수집한 날짜다
+        # (update_full이 회차마다 today로 갱신) → '기준일'이 아니라 '수집일'로 표기한다.
+        'STAMP': '잔여현황 기준 %s · 단가 수집일 %s · 출처 ev.or.kr' % (esc(updated.replace('T', ' ')), esc(meta['updated'])),
         'PROSE': prose_html,
         'NOTE_SECTION': note_sec,
         'AD1': '', 'AD2': '',
@@ -1201,7 +1328,16 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
     # ── E 유형별 배정 (실데이터 분해 + 해석) ──
     pE = []
     dn = (st.get('d') or {}).get('n')
-    dl = (st.get('d') or {}).get('left')
+    dl_raw = (st.get('d') or {}).get('left')
+    # 유형별 잔여의 산술적 상한 = 전체 잔여. d.left[i]는 유형마다 max(0, n-r)로 계산돼
+    # 과접수 유형의 초과 출고분이 0으로 눌리는 반면, 전체 left는 max(0, Σ(n-r))라 상계된다
+    # → 유형 잔여가 전체 잔여를 넘는 집계 아티팩트가 생긴다. 원본 JSON은 그대로 두고
+    # **표시 단계에서만** 전체 잔여로 상한을 건다(관측값 보존, 서술은 보수적으로).
+    _cap = left if isinstance(left, int) and not isinstance(left, bool) and left >= 0 else None
+    dl = ([None if x is None else (min(x, _cap) if _cap is not None else x) for x in dl_raw]
+          if dl_raw else dl_raw)
+    dl_capped = bool(dl_raw) and _cap is not None and any(
+        x is not None and x > _cap for x in dl_raw)
     if dn and dl:
         lab = ['우선순위', '법인·기관', '택시', '일반']
         alloc = ' · '.join('%s %s대' % (lab[i], fmt(dn[i])) for i in range(4) if dn[i] is not None)
@@ -1232,13 +1368,21 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
                  '%s 칸이 %s으로 제일 큽니다.' % (bx[1], stxt)]))
         if dl[3] is not None:
             if (dl[3] or 0) > 0 and not (closed['closed'] and not closed['partial']):
+                # 원본 일반 잔여가 전체 잔여를 넘던 지역에서는 숫자를 단정하지 않는다.
+                gen_capped = _cap is not None and (dl_raw[3] or 0) > _cap
+                gen_mid = (['잔여가 전체 잔여(%s대)를 넘지 않는 범위로 잡히고 ' % fmt(left),
+                            '남은 수치를 전체 잔여(%s대) 안쪽으로 봐야 하고 ' % fmt(left),
+                            '실제 신청 가능한 물량은 전체 잔여(%s대) 범위이고 ' % fmt(left),
+                            '가용 물량을 전체 잔여(%s대) 한도로 보는 편이 안전하고 ' % fmt(left)]
+                           if gen_capped else
+                           ['잔여 %s대가 남아 있고 ' % fmt(dl[3]),
+                            '%s대가 남은 것으로 잡히고 ' % fmt(dl[3]),
+                            '남은 수치가 %s대이고 ' % fmt(dl[3]),
+                            '%s대가 남은 상태이고 ' % fmt(dl[3])])
                 pE.append(CC('gen-left',
                     ['개인 일반 구매자 기준으로 보면 ', '일반 유형 칸에는 ',
                      '개인이라면 일반 물량 기준 ', '일반 물량 쪽에는 '],
-                    ['잔여 %s대가 남아 있고 ' % fmt(dl[3]),
-                     '%s대가 남은 것으로 잡히고 ' % fmt(dl[3]),
-                     '남은 수치가 %s대이고 ' % fmt(dl[3]),
-                     '%s대가 남은 상태이고 ' % fmt(dl[3])],
+                    gen_mid,
                     ['우대 대상이면 우선순위 물량도 함께 보면 됩니다.',
                      '해당 유형 잔여가 판단 기준이 됩니다.',
                      '내 유형의 칸을 보는 것이 정확합니다.',
@@ -1252,15 +1396,28 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
                         ['남아 있는 것은 %s 몫입니다.' % wtxt,
                          '잔여는 %s 유형에만 있습니다.' % wtxt,
                          '%s 쪽 수치만 남아 있습니다.' % wtxt]))
-        pE.append(CC('alloc-tail',
-            ['', '읽는 법 하나: ', '한 가지 주의로 ', '해석 팁을 덧붙이면 '],
-            ['유형 합계는 ', '표의 유형 숫자는 ', '이 분해 값은 ', '유형별 칸의 수치는 '],
-            ['회차 이월 때문에 전체 수치와 어긋날 수 있습니다.',
-             '회차 구분 탓에 전체 합계와 다를 수 있습니다.',
-             '이월분이 섞이면 전체와 안 맞을 수 있습니다.',
-             '공고 회차가 나뉘면 전체와 차이 날 수 있습니다.',
-             '공고가 여러 차수로 쪼개진 지역에서는 전체와 어긋나기도 합니다.',
-             '이월 물량이 반영되는 시점에 따라 전체 수치와 달라질 수 있습니다.']))
+        if dl_capped:
+            # 원본 유형 잔여가 전체 잔여를 넘던 지역 — 표시값에 상한을 걸었다는 사실을 함께 알린다.
+            pE.append(CC('alloc-cap',
+                ['', '숫자를 읽을 때 하나만 더: ', '한 가지 단서를 달면 ', '해석 팁을 덧붙이면 '],
+                ['유형별 잔여는 유형마다 따로 계산되는 공고 기준값이라 ',
+                 '유형 칸의 잔여는 공고 물량에서 유형별 출고분을 뺀 계산값이라 ',
+                 '이 유형별 수치는 유형 단위로 산출된 공고 기준 계산값이어서 ',
+                 '유형별 잔여 값은 전체 집계와 계산 방식이 달라 '],
+                ['전체 잔여(%s대)와 다를 수 있습니다 — 이 페이지에서는 전체 잔여를 상한으로 표시했습니다.' % fmt(left),
+                 '전체 잔여(%s대)를 넘어설 수 있어, 표시값은 전체 잔여를 넘지 않도록 잡았습니다.' % fmt(left),
+                 '전체 잔여(%s대)와 어긋날 수 있습니다. 실제 신청 가능 물량은 전체 잔여 범위로 보세요.' % fmt(left),
+                 '전체 잔여(%s대)보다 크게 잡힐 수 있어, 여기서는 전체 잔여를 넘지 않게 표시했습니다.' % fmt(left)]))
+        else:
+            pE.append(CC('alloc-tail',
+                ['', '읽는 법 하나: ', '한 가지 주의로 ', '해석 팁을 덧붙이면 '],
+                ['유형 합계는 ', '표의 유형 숫자는 ', '이 분해 값은 ', '유형별 칸의 수치는 '],
+                ['회차 이월 때문에 전체 수치와 어긋날 수 있습니다.',
+                 '회차 구분 탓에 전체 합계와 다를 수 있습니다.',
+                 '이월분이 섞이면 전체와 안 맞을 수 있습니다.',
+                 '공고 회차가 나뉘면 전체와 차이 날 수 있습니다.',
+                 '공고가 여러 차수로 쪼개진 지역에서는 전체와 어긋나기도 합니다.',
+                 '이월 물량이 반영되는 시점에 따라 전체 수치와 달라질 수 있습니다.']))
 
     # ── F 안내 (선정 방식·연락처·서류·다음 확인 포인트·기준시각·출처) ──
     pF = []
@@ -1406,6 +1563,9 @@ _MODEL_RULES = [
     (re.compile(r'i4', re.I), 'i4'), (re.compile(r'i5', re.I), 'i5'),
     (re.compile(r'ATTO', re.I), 'BYD 아토3'), (re.compile(r'DOLPHIN', re.I), 'BYD 돌핀'),
     (re.compile(r'SEALION', re.I), 'BYD 씨라이언7'), (re.compile(r'SEAL', re.I), 'BYD 씰'),
+    # Rear Motor / Dual Motor는 같은 차의 구동 방식 차이 = 근사중복 트림 → 한 그룹으로 묶는다
+    # (묶지 않으면 트림마다 '단독 모델그룹'이 되어 전 트림이 색인 대상이 된다 — I9 위배).
+    (re.compile(r'Polestar\s?4', re.I), 'Polestar 4'),
 ]
 
 
@@ -1932,10 +2092,10 @@ def car_prose(car, cars, rows, eff, cr, meta, status, ctx):
         ['', '마지막으로, ', '정리하면 ', '끝으로, '],
         ['실제 지급액과 접수 가능 여부는 관할 지자체 공고로 확정되므로 ',
          '최종 금액·자격은 지자체 공고가 기준이므로 ',
-         '여기 적힌 금액은 %s 단가 기준이므로 ' % meta['updated'],
-         '이 페이지의 단가 기준일은 %s이므로 ' % meta['updated']],
-        ['계약 전 공고문과 무공해차 통합누리집(ev.or.kr)에서 확인하는 것이 안전합니다(단가 기준일 %s).' % meta['updated'],
-         '계약 전 공고문과 ev.or.kr에서 확정 조건을 확인하세요(단가 기준일 %s).' % meta['updated'],
+         '여기 적힌 금액은 %s 수집 단가 기준이므로 ' % meta['updated'],
+         '이 페이지의 단가 수집일은 %s이므로 ' % meta['updated']],
+        ['계약 전 공고문과 무공해차 통합누리집(ev.or.kr)에서 확인하는 것이 안전합니다(단가 수집일 %s).' % meta['updated'],
+         '계약 전 공고문과 ev.or.kr에서 확정 조건을 확인하세요(단가 수집일 %s).' % meta['updated'],
          '확정 조건은 관할 지자체 공고 원문과 ev.or.kr에서 최종 확인해야 합니다.',
          '계약 전 지자체 공고 원문으로 최종 조건을 확인하는 것이 순서입니다.']))
     paras = [p1, p2, p3]
@@ -2004,9 +2164,16 @@ def sido_auto_prose(sido, sibs, status, meta, asof):
     full = SIDO_FULL[sido]
     P = lambda slot, opts: pick('sido%s:%s' % (sido, slot), opts)
     n_r = len(sibs)
+    # sibs는 build_sido에서 (최대보조금 내림차순 → 이름 오름차순)으로 정렬돼 넘어온다.
+    # 최고·최저 대표는 그 정렬의 첫 해당 행으로 고른다(아래 표의 행 순서와 일치).
     maxs = [(v.get('maxP') or 0, v['name']) for _, v in sibs]
-    hi = max(maxs)
-    lo = min(maxs)
+    hi_v, lo_v = max(x[0] for x in maxs), min(x[0] for x in maxs)
+    hi = next(x for x in maxs if x[0] == hi_v)
+    lo = next(x for x in maxs if x[0] == lo_v)
+    hi_n = sum(1 for x in maxs if x[0] == hi_v)
+    lo_n = sum(1 for x in maxs if x[0] == lo_v)
+    hi_lbl = hi[1] if hi_n == 1 else '%s 등 %d곳 동률' % (hi[1], hi_n)
+    lo_lbl = lo[1] if lo_n == 1 else '%s 등 %d곳 동률' % (lo[1], lo_n)
     rep_cnt = sum(1 for _, v in sibs if v.get('rep'))
     total_n = sum((status['data'].get(k) or {}).get('n') or 0 for k, _ in sibs)
     total_left = sum((status['data'].get(k) or {}).get('left') or 0 for k, _ in sibs)
@@ -2031,9 +2198,9 @@ def sido_auto_prose(sido, sibs, status, meta, asof):
     else:
         paras.append(P('multi', [
             '%s에는 %d개 시·군이 각자 전기차 보조금 공고를 운영합니다. 2026년 승용 기준 최대 지원액은 %s(%s만원)이 가장 크고 %s(%s만원)이 가장 작아, 같은 도 안에서도 %s만원 차이가 납니다.'
-            % (full, n_r, hi[1], fmt(hi[0]), lo[1], fmt(lo[0]), fmt(hi[0] - lo[0])),
+            % (full, n_r, hi_lbl, fmt(hi[0]), lo_lbl, fmt(lo[0]), fmt(hi[0] - lo[0])),
             '%s %d개 시·군의 2026년 전기승용 최대 지원액은 %s만원(%s)부터 %s만원(%s)까지 분포합니다. 주소지에 따라 최대 %s만원까지 달라지는 셈입니다.'
-            % (full, n_r, fmt(lo[0]), lo[1], fmt(hi[0]), hi[1], fmt(hi[0] - lo[0])),
+            % (full, n_r, fmt(lo[0]), lo_lbl, fmt(hi[0]), hi_lbl, fmt(hi[0] - lo[0])),
         ]))
         if rep_cnt:
             paras.append('단가 구조를 보면 %d개 시·군 중 %d곳이 도 공통 단가(대표 단가 복제)를 적용하고 있습니다. 도 공통 단가 지역이라도 시·군 자체 추가 지원이 별도로 있을 수 있어 개별 공고 확인이 필요합니다.' % (n_r, rep_cnt))
@@ -2203,12 +2370,20 @@ def build_model(entry, cars, regions, meta, status, ctx):
         n = len(tots)
         # 표준 중앙값(짝수면 가운데 두 값 평균) — 에세이(md) 계산 관례와 통일
         med = tots[n // 2] if n % 2 else round((tots[n // 2 - 1] + tots[n // 2]) / 2)
+        # 최고·최저는 동률이 흔하다 → 한 곳만 지목하면 같은 페이지 표와 어긋나 보인다.
+        # 대표 지역은 **표와 같은 정렬 기준**(합계 내림차순 → 이름 오름차순)의 첫 행으로 고르고,
+        # 동률이 2곳 이상이면 건수를 함께 적는다(실측값 그대로).
+        def _edge(val):
+            first = next(x for x in rows if x[2] == val)         # rows는 (-합계, 이름) 정렬
+            cnt = sum(1 for x in rows if x[2] == val)
+            return ('%s만원(%s)' % (fmt(val), esc(first[1]['name'])) if cnt == 1
+                    else '%s만원(%s 등 %d곳 동률)' % (fmt(val), esc(first[1]['name']), cnt))
         dist = ('<p class="small" style="line-height:1.7;margin-top:10px">%s 수집 기준 %d개 지자체에서 '
-                '%s의 국비+지방비 합계는 최고 %s만원(%s), 최저 %s만원(%s), 중앙값 %s만원입니다. '
+                '%s의 국비+지방비 합계는 최고 %s, 최저 %s, 중앙값 %s만원입니다. '
                 '표의 금액은 공고 단가 기준이라 접수 마감 여부와는 별개이며, 실제 접수 가능 여부는 '
                 '각 지역 페이지의 상태 뱃지와 공지 원문으로 확인하세요.</p>'
-                % (esc(asof), len(rows), esc(rep['name']), fmt(rows[0][2]), esc(rows[0][1]['name']),
-                   fmt(rows[-1][2]), esc(rows[-1][1]['name']), fmt(med)))
+                % (esc(asof), len(rows), esc(rep['name']),
+                   _edge(rows[0][2]), _edge(rows[-1][2]), fmt(med)))
 
     related = ['<a class="chip" href="winter-range-ranking.html">❄️ 겨울 주행거리 랭킹</a>',
                '<a class="chip" href="price-tiers.html">💰 가격구간(기본가격) 바로 알기</a>',
@@ -2332,6 +2507,7 @@ def build_model_hub(entries, meta, status, ctx):
 #  brief (일간 브리핑 통합 — 날짜 파일은 daily_brief.py 산출물, 허브·사이트맵만 여기 소유)
 # ══════════════════════════════════════════════════════════
 BRIEF_RE = re.compile(r'(\d{4}-\d{2}-\d{2})\.html$')
+CAR_HREF_RE = re.compile(r'href="(?:[^"]*/)?car/(\d+)\.html"')
 
 
 def list_brief_days(today_iso):
@@ -2419,23 +2595,32 @@ def build_sitemap(regions, cars, today, model_entries=(), brief_days=(), car_rep
                   pages=None, store=None, region_noindex=()):
     """lastmod 신뢰 원칙: **실제 내용이 바뀐 날만** 기재.
 
-    - 정적 CORE + 데이터 페이지(region/car/sido/모델 허브) = <main> 내용 해시(수치 마스킹) 비교.
-      직전 회차와 해시가 같으면 저장된 날짜를 그대로 쓰고, 다르거나 기록이 없으면 오늘로 갱신.
-      캐시가 없거나 깨졌으면 전부 오늘로 폴백(종전 동작) — 빌드는 실패시키지 않는다.
-    - 모델 시리즈 = 발행일 고정 · 브리핑 = noindex 정책이라 사이트맵 전체 제외
+    - 정적 CORE + 데이터 페이지(region/car/sido/모델 허브·시리즈) = <main> 내용 해시(수치 마스킹)
+      + <title>·description·canonical 해시 비교. 직전 회차와 둘 다 같으면 저장된 날짜를 그대로 쓰고,
+      다르거나 기록이 없으면 오늘로 갱신. 캐시가 없거나 깨졌으면 전부 오늘로 폴백(종전 동작)
+      — 빌드는 실패시키지 않는다.
+    - 모델 시리즈는 내용 해시로 산정하되 **발행일이 하한**(publish 이전 날짜는 나가지 않음).
+    - 브리핑 = noindex 정책이라 사이트맵 전체 제외
     반환: (xml, URL 수, 갱신된 캐시 dict) — 캐시는 이번 사이트맵에 실린 URL만 남긴다(잔재 정리)."""
     pages = pages or {}
     prev = store or {}
     new_store = {}
     noidx = set(region_noindex or ())
 
-    def lm_of(key, html, fallback):
+    def lm_of(key, html, fallback, floor=None):
+        """floor: lastmod 하한(시리즈 발행일). 저장값도 클램프 후로 남겨 다음 회차와 일치시킨다."""
         h = content_hash(html)
         if not h:
-            return fallback                # 본문을 못 읽음 → 폴백(파일 mtime 또는 오늘)
+            return max(fallback, floor) if floor else fallback   # 본문 못 읽음 → 폴백
+        hh = head_hash(html)
         rec = prev.get(key)
-        d = rec['d'] if (rec and rec['h'] == h) else today
-        new_store[key] = {'h': h, 'd': d}
+        # 구버전 캐시에는 'hh'가 없다 → 헤드 해시는 '판단 불가'로 보고 본문 해시만으로 비교한다.
+        # (없는 필드를 불일치로 처리하면 전 URL lastmod가 근거 없이 오늘로 튄다.)
+        same = bool(rec) and rec['h'] == h and (rec.get('hh') is None or rec['hh'] == hh)
+        d = rec['d'] if same else today
+        if floor and d < floor:
+            d = floor
+        new_store[key] = {'h': h, 'hh': hh, 'd': d}
         return d
 
     urls = []
@@ -2473,7 +2658,13 @@ def build_sitemap(regions, cars, today, model_entries=(), brief_days=(), car_rep
     urls.append((BASE + '/model/', 'weekly',
                  lm_of('/model/', pages.get(os.path.join(SITE, 'model', 'index.html')), today)))
     for e in model_entries:                             # 발행 게이트 통과분만 — 미래 publish는 미포함
-        urls.append(('%s/model/%s.html' % (BASE, e['slug']), 'weekly', e.get('publish') or today))
+        # 시리즈도 내용 해시 회로를 탄다(원고를 고치면 lastmod가 움직인다).
+        # 단 발행일이 하한 — 원고가 그대로여도 발행일보다 이른 날짜는 내보내지 않는다.
+        pub = e.get('publish') or today
+        key = '/model/%s.html' % e['slug']
+        urls.append((BASE + key, 'weekly',
+                     lm_of(key, pages.get(os.path.join(SITE, 'model', e['slug'] + '.html')),
+                           pub, floor=pub)))
     # 브리핑(/brief/)은 자동 생성 콘텐츠 정책상 noindex — 사이트맵에서 전체 제외(발행·열람은 유지)
     body = '\n'.join('<url><loc>%s</loc><lastmod>%s</lastmod><changefreq>%s</changefreq></url>'
                      % (u, lm, f) for u, f, lm in urls)
@@ -2572,6 +2763,53 @@ def main():
         # 홈 상단 배너용 최신 브리핑 메타(JS가 fetch — 없으면 배너는 정적 문구로 강등)
         pages[os.path.join(SITE, 'brief', 'latest.json')] = json.dumps(
             {'d': brief_days[0], 'desc': _brief_desc(brief_days[0])}, ensure_ascii=False)
+
+    # ── 색인 도달성 가드 ──────────────────────────────────
+    # 대표 트림이라도 사이트 안에서 링크로 닿을 수 없으면(제원 미공개라 차종 랭킹에서 빠지는 등)
+    # 색인·사이트맵에 남길 이유가 없다 — 내부 링크 0인 URL이 사이트맵에만 있으면 심사·크롤 양쪽에
+    # 마이너스다(I9: 색인 표면에는 도달 가능한 대표 페이지만).
+    # 판정은 **도달성**(reachability)이다: 차종 페이지 밖(지역·시도·시리즈·루트 정적 페이지)에서
+    # 걸린 링크를 시드로 두고, 거기서 형제 트림 링크를 따라 확장한다. 서로만 가리키는 트림 쌍은
+    # 시드가 없으므로 도달 불가로 남는다.
+    car_dir = os.path.join(SITE, 'car')
+    seeds, car_links = set(), {}
+    for p, html in pages.items():
+        if not isinstance(html, str):
+            continue
+        ids = {int(x) for x in CAR_HREF_RE.findall(html)}
+        m = re.search(r'(\d+)\.html$', p)
+        if os.path.dirname(p) == car_dir and m:
+            car_links[int(m.group(1))] = ids
+        else:
+            seeds |= ids
+    for fn in sorted(os.listdir(SITE)):          # 루트 정적 페이지(차종 랭킹·비교표 등)
+        if not fn.endswith('.html'):
+            continue
+        try:
+            with open(os.path.join(SITE, fn), encoding='utf-8') as f:
+                seeds |= {int(x) for x in CAR_HREF_RE.findall(f.read())}
+        except OSError:
+            pass
+    reach, stack = set(), list(seeds)
+    while stack:                                  # 시드 → 형제 트림 링크로 확장
+        cid = stack.pop()
+        if cid in reach:
+            continue
+        reach.add(cid)
+        stack.extend(car_links.get(cid, ()))
+    orphan_reps = sorted(cid for cid in ctx['car_rep'] if cid not in reach)
+    # 절반 이상이 '도달 불가'로 나오면 링크 수집 자체가 실패한 것 → 가드를 적용하지 않는다(fail-safe).
+    if orphan_reps and len(orphan_reps) * 2 <= len(ctx['car_rep']):
+        ctx['car_rep'] = ctx['car_rep'] - set(orphan_reps)
+        by_id = {c['id']: c for c in cars}
+        for cid in orphan_reps:
+            print('경고: car/%d(%s) — 사이트 내부 인바운드 링크 0 → noindex·사이트맵 제외'
+                  % (cid, by_id[cid]['name']), file=sys.stderr)
+            html, _ = build_car(by_id[cid], cars, regions, meta, status, ctx)
+            pages[os.path.join(SITE, 'car', '%d.html' % cid)] = html
+    elif orphan_reps:
+        print('경고: 인바운드 0 대표 트림이 %d건 — 링크 수집 실패 의심으로 도달성 가드 미적용'
+              % len(orphan_reps), file=sys.stderr)
 
     n_region = sum(1 for p in pages if os.sep + 'region' + os.sep in p)
     n_car = sum(1 for p in pages if os.sep + 'car' + os.sep in p)

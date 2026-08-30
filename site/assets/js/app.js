@@ -249,6 +249,14 @@
       left = st.d.left[c.idx];
       quota = st.d.n ? st.d.n[c.idx] : null;
       pfx = c.label + ' ';
+      // 유형 잔여 > 전체 잔여 (161곳 중 148곳). 원본 산식이 유형별로 max(0, 공고−출고)라
+      // 과접수된 유형의 초과 출고분이 다른 유형과 상계되지 않아 생기는 집계 특성이다
+      // (전체 잔여는 상계 후 값 = 실제 상한). 유형 숫자를 '남은 물량'으로 내보내면
+      // 전체보다 큰 값이 노출돼 오해를 부르므로, 전체 기준 판정으로 강등하고 숫자는 표기하지 않는다(I3).
+      if (left != null && st.left != null && left > st.left) {
+        const b = window.statusBadge(st, statusUpdated);
+        return { cls: b.cls, label: `${b.label} · ${c.label} 잔여는 공고 기준 계산값이라 전체와 달라요`, stale: b.stale };
+      }
     }
     if (left == null) return { cls: 'badge-closed', label: pfx + '물량 정보 없음', stale: false };
     if (left <= 0) {
@@ -425,7 +433,9 @@
         body = bTxt ? (aTxt === bTxt
           ? `<b>꾸준히 줄고 있어요.</b> 지금 속도라면 잔여가 ${aTxt}쯤 0이 될 수 있어요`
           : `<b>꾸준히 줄고 있어요.</b> 지금 속도라면 잔여가 이르면 ${aTxt}, 늦으면 ${bTxt}쯤 0이 될 수 있어요`)
-          : `<b>꾸준히 줄고 있어요.</b> 지금 속도라면 잔여가 이르면 ${aTxt}쯤 0이 될 수 있어요 (속도가 느려지면 더 걸릴 수 있어요)`;
+          // 상한(늦은 쪽)이 계산 범위를 벗어난 단측 분기 — 하한만 있는데 날짜를 하나만 쓰면
+          // 점추정으로 읽힌다(I3). 방향이 드러나는 '빨라도 ~ 이후' 구간 표현만 쓰고 상한은 명시적으로 비운다.
+          : `<b>꾸준히 줄고 있어요.</b> 지금 속도라면 잔여가 0이 되는 시점은 <b>빨라도 ${aTxt} 이후</b>예요 — 늦어지는 쪽은 범위가 잡히지 않아 시점을 특정하지 않아요`;
       } else if (asOf - pts[0][0] >= FC.RELAX_DAYS && (r7 == null || r7 <= 1.3 * r28.r))
         body = `<b>천천히 줄고 있어요.</b> 이 속도라면 두 달 이상 남은 것으로 보여요. 다만 신청이 몰리면 갑자기 빨라질 수 있어요`;   // 낙관 해금 조건 충족 시만
       else body = `이 속도라면 두 달 이상으로 계산되지만 <b>기록이 짧아 확실하지 않아요</b>`;
@@ -445,17 +455,28 @@
     if (!mount) return;
     if (!st || !st.d || !st.d.left) { mount.innerHTML = ''; return; }
     const cur = myCategory.get();
+    // 유형 잔여의 상한 = 전체 잔여. 원본은 유형별로 max(0, 공고−출고)를 쓰기 때문에
+    // 과접수된 유형의 초과 출고분이 상계되지 않아 유형 숫자가 전체보다 커지는 지역이 많다(161곳 중 148곳).
+    // 원본 데이터는 그대로 두고, '남은 물량'으로 읽히는 표시값만 전체 잔여로 눌러 과대표시를 막는다(I3 보수 원칙).
+    const tot = st.left;
+    const cells = CATS.map(c => {
+      const raw = st.d.left[c.idx];
+      const over = raw != null && tot != null && raw > tot;
+      return { c, over, n: over ? tot : raw };
+    });
+    const capped = cells.some(x => x.over);
     mount.innerHTML = `
       <div class="cat-head">내 신청 유형 선택<button class="tip" type="button" data-tip="지자체는 물량을 신청 유형별로 나눠 배정해요. 내 유형의 잔여가 중요합니다 — 개인 구매자는 보통 '일반'(우대 대상이면 '우선순위')을 보세요." aria-label="신청 유형 설명">?</button></div>
-      <div class="cat-tabs">${CATS.map(c => {
-        const n = st.d.left[c.idx];
+      <div class="cat-tabs">${cells.map(({ c, over, n }) => {
         const state = n == null ? '' : (n > 0 ? 'has' : 'none');
         // cat-tab은 div(role=button) — 내부에 tip <button>이 있어 button 중첩(무효 HTML)을 피함
         return `<div class="cat-tab ${c.key === cur ? 'on' : ''} ${state}" data-cat="${c.key}" role="button" tabindex="0" aria-pressed="${c.key === cur}">
           <span class="cat-nm">${c.label}<button class="tip" type="button" data-tip="${esc(c.tip)}" aria-label="${c.label} 설명">?</button></span>
-          <b>${n == null ? '-' : fmt(n) + '대'}</b></div>`;
+          <b>${n == null ? '-' : fmt(n) + '대' + (over && n > 0 ? ' 이하' : '')}</b></div>`;
       }).join('')}</div>
-      <p class="small muted cat-note">숫자는 각 유형의 남은 물량이에요. 항목 합계는 '전체'와 다를 수 있어요<button class="tip" type="button" data-tip="본공고·추경 등 공고 회차가 나뉘면 이월분 때문에 항목 합계와 전체가 다를 수 있어요. ev.or.kr 원본 수치를 그대로 보여드립니다." aria-label="합계 차이 설명">?</button></p>
+      <p class="small muted cat-note">${capped
+        ? `이 지역은 유형별 잔여가 전체 잔여(${fmt(tot)}대)보다 크게 집계돼 있어요 — 유형별 잔여는 공고 기준 계산값이라 전체 잔여를 상한으로 표시했어요. 실제 신청 가능 물량은 지자체 공고로 확인하세요`
+        : `숫자는 각 유형의 남은 물량이에요. 항목 합계는 '전체'와 다를 수 있어요`}<button class="tip" type="button" data-tip="유형별 잔여는 원본에서 유형마다 '공고−출고'로 따로 계산해요. 어떤 유형이 배정보다 많이 출고되면 그 초과분이 다른 유형과 상계되지 않아, 유형 숫자의 합이 전체 잔여보다 커질 수 있어요. 본공고·추경으로 회차가 나뉜 지역에서도 같은 차이가 납니다. 원본 수치는 그대로 두되, 화면에는 전체 잔여를 넘지 않도록 표시합니다." aria-label="합계 차이 설명">?</button></p>
       ${st.n != null ? `<p class="small muted cat-alloc">올해 공고 물량: <b>전체 ${fmt(st.n)}대</b>${st.d && st.d.n ? ` (${CATS.map(c => `${c.label} ${fmt(st.d.n[c.idx])}`).join(' · ')})` : ''}<button class="tip" type="button" data-tip="지자체가 올해 공고한 보급 물량이에요(ev.or.kr 공고 기준). 추경·추가공고가 나면 늘어날 수 있고, 회차 구분 때문에 유형별 합계가 전체와 다를 수 있어요." aria-label="공고 물량 설명">?</button></p>` : ''}
       <div class="cat-forecast" data-forecast></div>`;
     renderForecast(mount.querySelector('[data-forecast]'), st, ctx);
@@ -556,7 +577,10 @@
     </div>`;
     window.EVData.meta().then(m => {
       const s = $('#foot-stamp');
-      if (s) s.innerHTML = `단가 기준일 <b>${m.updated}</b> · 출처 ${m.source} · 2026년 전기승용 기준`;
+      if (s) s.innerHTML = `단가 수집일 <b>${m.updated}</b> · 출처 ${m.source} · 2026년 전기승용 기준`;
+      // 본문 중 단가 기준일을 적어 둔 곳(예: law.html)을 meta.json 값으로 동기화 —
+      // 손으로 쓴 날짜가 굳어 페이지마다 기준일이 갈리는 것을 막는다. 정적 텍스트는 마지막 수집값 폴백.
+      $$('[data-meta-updated]').forEach(n => { n.textContent = m.updated; });
       freshness(m);
     }).catch(() => {});
   }
