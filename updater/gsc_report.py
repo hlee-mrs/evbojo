@@ -4,7 +4,8 @@
 매주 월요일 launchd(com.evbojo.gscreport)가 실행. 의존성 없음(표준라이브러리+openssl).
 - 인증: 서비스계정 JSON(updater/secrets/gsc-sa.json) → JWT를 openssl로 서명 → 액세스 토큰
 - 데이터: Search Analytics API (sc-domain:evbojo.co.kr, webmasters.readonly)
-- 출력: updater/reports/gsc-<종료일>.md (+ latest.md, raw/*.json) — repo가 public이라 git 미추적
+- 색인: URL Inspection API 실측("## 색인 현황" 섹션) — updater/index_watch.py, 하루 1회 스냅샷
+- 출력: updater/reports/gsc-<종료일>.md (+ latest.md, raw/*.json, index-<날짜>.json) — repo가 public이라 git 미추적
 - 알림: macOS 알림으로 주간 요약 1줄
 
 설정(키 발급·권한)은 docs/7-주간-GSC-리포트.md 참고.
@@ -165,6 +166,18 @@ def main():
     elif i:
         L.append("| 평균 게재순위 | {:.1f} | — | — |".format(pos))
 
+    # 색인 현황 — URL Inspection API 실측(하루 1회 스냅샷). 인증·API 실패 시 이 섹션만 생략하고
+    # 나머지 리포트는 그대로 생성한다(fail-safe).
+    idx_line = ""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import index_watch
+        idx_snap = index_watch.run(token=token, verbose=True)
+        L.extend(index_watch.render_section(idx_snap))
+        idx_line = index_watch.summary_line(idx_snap)
+    except Exception as ex:
+        print("[경고] 색인 현황 섹션 생략:", ex)
+
     L.append("")
     L.append("## 관심 키워드")
     L.append("| 키워드 | 노출 | 클릭 | 순위 | 전주 순위 |")
@@ -233,9 +246,12 @@ def main():
                    "queries": cur_q, "prev_queries": prev_q,
                    "pages": cur_p, "prev_pages": prev_p}, f, ensure_ascii=False)
 
-    print("[완료] {} (클릭 {} / 노출 {})".format(md_path, fnum(c), fnum(i)))
-    notify("EV보조금 주간 GSC 리포트",
-           "클릭 {} ({}) · 노출 {} ({})".format(fnum(c), delta(c, pc), fnum(i), delta(i, pi)))
+    print("[완료] {} (클릭 {} / 노출 {}{})".format(
+        md_path, fnum(c), fnum(i), " / " + idx_line if idx_line else ""))
+    msg = "클릭 {} ({}) · 노출 {} ({})".format(fnum(c), delta(c, pc), fnum(i), delta(i, pi))
+    if idx_line:
+        msg += " · " + idx_line
+    notify("EV보조금 주간 GSC 리포트", msg)
     return 0
 
 

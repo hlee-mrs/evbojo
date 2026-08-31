@@ -59,6 +59,15 @@ else
   git add site/brief >> "$LOG" 2>&1
 fi
 
+# 회귀 자동 검사(selfcheck) — run_auto.sh와 동일 기준.
+# --warn-only: 위반이 있어도 브리핑 배포는 계속(I2 정신). 로그에 ★★로 남긴다.
+SC_OUT=$(/usr/bin/python3 updater/selfcheck.py --warn-only --quiet 2>&1)
+case "$SC_OUT" in
+  *"selfcheck OK"*) log "OK selfcheck 위반 0";;
+  *) log "WARN ★★ selfcheck 위반 감지 — 배포는 계속(warn-only). 상세 ↓"
+     printf '%s\n' "$SC_OUT" >> "$LOG";;
+esac
+
 if git diff --cached --quiet; then log "OK 변경 없음"; exit 0; fi
 git commit -q -m "brief: 일간 브리핑 $(date '+%F')" || { log "FAIL commit"; exit 1; }
 # push 실패는 실패로 처리하지 않음 — 로컬 커밋이 남아 다음 시간 updater 커밋에 편승 배포됨

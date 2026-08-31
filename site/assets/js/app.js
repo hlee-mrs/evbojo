@@ -255,7 +255,7 @@
       // 전체보다 큰 값이 노출돼 오해를 부르므로, 전체 기준 판정으로 강등하고 숫자는 표기하지 않는다(I3).
       if (left != null && st.left != null && left > st.left) {
         const b = window.statusBadge(st, statusUpdated);
-        return { cls: b.cls, label: `${b.label} · ${c.label} 잔여는 공고 기준 계산값이라 전체와 달라요`, stale: b.stale };
+        return { cls: b.cls, label: `${b.label} · ${c.label} 잔여는 아래 설명 참고`, stale: b.stale };
       }
     }
     if (left == null) return { cls: 'badge-closed', label: pfx + '물량 정보 없음', stale: false };
@@ -523,7 +523,7 @@
      상위 메뉴 5개로 통폐합: 성격이 비슷한 항목은 드롭다운(details — JS 없이도 동작) 하위로.
      프리렌더 정적 내비(page.tpl)와 구조 동일해야 함 — 한쪽 수정 시 양쪽 동기화. */
   const NAV = [
-    ['index.html', '홈'],
+    ['/', '홈'],
     ['status.html', '전국 현황판'],
     ['도구', [['calc.html', '유지비 계산기'], ['check.html', '자격 진단'], ['refund.html', '환수 계산'], ['compare.html', '차종 비교']]],
     ['가이드', [['guide.html', '신청 절차'], ['law.html', '제도·법령'], ['faq.html', 'FAQ']]],
@@ -531,7 +531,9 @@
   ];
   function header() {
     const path = location.pathname;
-    const here = path.split('/').pop() || 'index.html';
+    // 홈은 '/'로 정규화 — /index.html 과 / 가 같은 페이지라 중복 URL이 색인되지 않게 링크를 '/'로 통일
+    const last = path.split('/').pop();
+    const here = (last === '' || last === 'index.html') ? '/' : last;
     const inDir = h => h.endsWith('/') && path.indexOf('/' + h) >= 0;   // brief/·model/ 하위 페이지 매칭
     const el = $('#site-header'); if (!el) return;
     el.className = 'site-header';
@@ -546,7 +548,7 @@
       return `<details class="nav-dd"><summary class="${on ? 'on' : ''}">${t}</summary><div class="dd">${items.map(([h, l]) => `<a href="${h}" class="${here === h || inDir(h) ? 'on' : ''}">${l}</a>`).join('')}</div></details>`;
     };
     el.innerHTML = `<div class="inner">
-      <a class="logo" href="index.html"><span class="bolt">⚡</span>${SITE.name}</a>
+      <a class="logo" href="/"><span class="bolt">⚡</span>${SITE.name}</a>
       <nav class="gnb" aria-label="주 메뉴">${NAV.map(n => Array.isArray(n[1]) ? group(n[0], n[1]) : item(n)).join('')}</nav>
     </div>`;
     // 드롭다운 UX: 하나 열면 나머지 닫기, 바깥 탭으로 닫기

@@ -37,6 +37,15 @@ if git diff --quiet -- site/data; then log "OK 변경 없음"; exit 0; fi
 # 실패해도 데이터 갱신·배포는 계속한다 — 기존 정적 페이지가 유지되므로 안전(fail-safe).
 if /usr/bin/python3 updater/prerender.py >> "$LOG" 2>&1; then
   git add site/region site/car site/sido site/model site/brief site/sitemap.xml updater/.page_lastmod.json >> "$LOG" 2>&1 || log "WARN prerender 산출물 add 실패"
+  # 회귀 자동 검사(selfcheck) — 상태 정합·산문↔표·광고 게이트·색인·금칙어·링크.
+  # **--warn-only**: 위반이 있어도 배포는 계속한다(I2 정신 — 검사 실패가 서비스 중단이
+  # 되면 안 됨). 대신 auto.log에 ★★ 표시로 남겨 다음 세션이 바로 찾을 수 있게 한다.
+  SC_OUT=$(/usr/bin/python3 updater/selfcheck.py --warn-only --quiet 2>&1)
+  case "$SC_OUT" in
+    *"selfcheck OK"*) log "OK selfcheck 위반 0";;
+    *) log "WARN ★★ selfcheck 위반 감지 — 배포는 계속(warn-only). 상세 ↓"
+       printf '%s\n' "$SC_OUT" >> "$LOG";;
+  esac
 else
   log "WARN prerender 실패 — 기존 정적 페이지 유지, 데이터만 배포"
 fi
