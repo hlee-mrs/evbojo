@@ -21,8 +21,8 @@
 <body>
 <!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
 <header id="site-header" class="site-header"><div class="inner">
-  <a class="logo" href="/index.html"><span class="bolt">⚡</span>EV보조금</a>
-  <nav class="gnb" aria-label="주 메뉴"><a href="/index.html">홈</a><a href="/status.html">전국 현황판</a><details class="nav-dd"><summary>도구</summary><div class="dd"><a href="/calc.html">유지비 계산기</a><a href="/check.html">자격 진단</a><a href="/refund.html">환수 계산</a><a href="/compare.html">차종 비교</a></div></details><details class="nav-dd"><summary>가이드</summary><div class="dd"><a href="/guide.html">신청 절차</a><a href="/law.html">제도·법령</a><a href="/faq.html">FAQ</a></div></details><details class="nav-dd"><summary>읽을거리</summary><div class="dd"><a href="/articles.html">읽을거리 전체</a><a href="/brief/">일일 브리핑</a><a href="/model/">모델별 시리즈</a></div></details></nav>
+  <a class="logo" href="/"><span class="bolt">⚡</span>EV보조금</a>
+  <nav class="gnb" aria-label="주 메뉴"><a href="/">홈</a><a href="/status.html">전국 현황판</a><details class="nav-dd"><summary>도구</summary><div class="dd"><a href="/calc.html">유지비 계산기</a><a href="/check.html">자격 진단</a><a href="/refund.html">환수 계산</a><a href="/compare.html">차종 비교</a></div></details><details class="nav-dd"><summary>가이드</summary><div class="dd"><a href="/guide.html">신청 절차</a><a href="/law.html">제도·법령</a><a href="/faq.html">FAQ</a></div></details><details class="nav-dd"><summary>읽을거리</summary><div class="dd"><a href="/articles.html">읽을거리 전체</a><a href="/brief/">일일 브리핑</a><a href="/model/">모델별 시리즈</a></div></details></nav>
 </div></header>
 
 <main class="container">
@@ -111,7 +111,7 @@
       위 항목 중 청년·다자녀·차상위는 <b>받는 금액이 늘어나는</b> 추가지원이에요. 그런데 지자체 물량 배분에서는 같은 조건이
       <b>'우선순위' 유형으로 먼저 배정받는</b> 우대로도 쓰여요 — 금액 우대와 순번 우대는 별개의 장치라서, 어느 쪽이 적용되는지는
       우리 지역 공고문의 우선순위 정의를 봐야 정확해요. 일반 물량이 소진돼도 우선순위 칸에 물량이 남는 지역이 실제로 있으니,
-      우대 대상이라면 <a href="index.html">지역 페이지</a>의 유형 탭도 함께 확인하세요.
+      우대 대상이라면 <a href="/">지역 페이지</a>의 유형 탭도 함께 확인하세요.
     </p>
     <div class="tbl-wrap"><table class="tbl">
       <thead><tr><th>구분</th><th>무엇이 좋아지나</th><th>근거·확인처</th></tr></thead>
@@ -155,7 +155,7 @@
     <p style="font-size:14.5px;color:var(--text2)">
       <b>⑤ 자격이 있어도 물량이 없으면 받지 못합니다.</b> 보조금은 예산 사업이라 지자체마다 올해 지원 대수가 정해져
       있어요. 진단 결과가 '가능'이어도 우리 지역 접수가 이미 마감됐다면 다음 차수나 재공고를 기다려야 합니다.
-      접수 잔여는 <a href="index.html">지역 현황판</a>에서, 마감 뒤에 물량이 다시 풀리는 패턴은
+      접수 잔여는 <a href="/">지역 현황판</a>에서, 마감 뒤에 물량이 다시 풀리는 패턴은
       <a href="second-round.html">2차 공고 해설</a>에서 확인하세요.
     </p>
     <p style="font-size:14.5px;color:var(--text2)">
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         : '<div class="callout mt16">기본 보조금(국비+지방비) 대상이에요. 추가 우대 항목은 해당사항이 없지만, 지자체별 자체 우대(택시·소상공인 등)가 있을 수 있어요.</div>'}
       <div class="callout-warn callout small">✋ 최종 자격·금액은 <b>거주지 지자체 공고문</b>이 기준이에요. 거주 요건은 <b>구매지원신청서 접수일 기준</b>으로 판정되고, 요구 기간(30일~1년)은 지자체별로 달라요.</div>
       <div class="grid2 mt16">
-        <a class="btn btn-primary" href="index.html">우리 지역 보조금 보기</a>
+        <a class="btn btn-primary" href="/">우리 지역 보조금 보기</a>
         <a class="btn btn-ghost" href="guide.html">신청 절차 7단계</a>
       </div>
       <p class="stamp">기준: 2026년 보조금 업무처리지침 · 입력값은 저장·전송되지 않아요</p>`;
