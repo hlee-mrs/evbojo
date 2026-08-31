@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.evbojo.indexwatch</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/Users/hlee/Projects/전기차 보조금 현황/updater/index_watch.py</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/hlee/Projects/전기차 보조금 현황</string>
+  <!-- 매일 07:40 — 매시 :10 updater, :25 adsense, 08:20 brief 와 어긋나게 배치 -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>7</integer>
+    <key>Minute</key><integer>40</integer>
+  </dict>
+  <!-- Mac이 꺼져 있던 날을 보상. 같은 날 스냅샷이 있으면 API 재조회 없이 즉시 종료(쿼터 보호) -->
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>/Users/hlee/Library/Logs/com.evbojo.indexwatch.log</string>
+  <key>StandardErrorPath</key><string>/Users/hlee/Library/Logs/com.evbojo.indexwatch.log</string>
+</dict>
+</plist>
