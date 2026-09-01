@@ -295,16 +295,19 @@ def build_rounds_section(evs, since_iso, until_iso):
     kind_txt = ' · '.join('%s %s건' % (k, pr.fmt(v)) for k, v in
                           sorted(kinds.items(), key=lambda x: -x[1]))
     n_region = len({e['cd'] for e in evs})
-    html = ('<section class="card"><h2 class="mt0">📋 공고 일정 변경 '
-            '<span class="sub">%s · %%s개 지자체 · %%s건</span></h2>' % span +
-            '<p class="small muted" style="margin:0 0 10px">%s</p>'
+    # 주의: %가 +보다 우선 결합하므로 헤더를 먼저 완성해 두고 이어붙인다(혼합하면 인자 수가 어긋남)
+    head = ('<section class="card"><h2 class="mt0">📋 공고 일정 변경 '
+            '<span class="sub">%s · %s개 지자체 · %s건</span></h2>'
+            % (pr.esc(span), pr.fmt(n_region), pr.fmt(len(evs))))
+    body = ('<p class="small muted" style="margin:0 0 10px">%s</p>'
             '<div class="tbl-wrap"><table class="tbl"><thead><tr>'
             '<th>지역</th><th>항목</th><th>변경</th><th>감지</th>'
             '</tr></thead><tbody>%s</tbody></table></div>%s'
             '<p class="small muted mt8">공고 일정은 지자체가 예고 없이 바꾸는 경우가 있어, '
             '이 표는 무공해차 통합누리집에 <b>등록된 값이 바뀐 시점</b>을 매시간 수집해 기록한 것입니다. '
             '공고문 원문과 다를 수 있으니 신청 전에는 해당 지자체 공고문을 확인하세요.</p></section>'
-            % (pr.fmt(n_region), pr.fmt(len(evs)), pr.esc(kind_txt), ''.join(rows), more))
+            % (pr.esc(kind_txt), ''.join(rows), more))
+    html = head + body
     # 헤드라인에 얹을 문장(가장 큰 변화 1건)
     top = evs[0]
     lead = ('공고 일정도 움직였습니다 — %s의 %s이 %s(%s개 지자체에서 %s건 감지).'
