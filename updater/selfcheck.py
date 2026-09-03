@@ -552,6 +552,57 @@ def check_structure(pages, ctx):
 
 
 # ── 실행부 ──────────────────────────────────────────────────
+# ── 11·12. 크롤 신호·내부 링크 구조 ─────────────────────────
+RX_LASTMOD = re.compile(r'<url>\s*<loc>([^<]+)</loc>\s*<lastmod>([^<]+)</lastmod>', re.S)
+CHURN_MAX = 0.30            # sitemap 전체 중 lastmod가 '오늘'인 비율 상한 — 매일 전 URL이 오늘이면 구글이 lastmod를 무시한다
+REL_MIN_LINKS = 3           # 색인 대상 지역 페이지의 '함께 읽으면 좋은 해설' 최소 링크 수
+
+
+def check_lastmod_churn(pages, ctx):
+    """sitemap lastmod 당일 비율 — 실변경만 갱신한다는 원칙이 무너졌는지(칩·뱃지 표기 변형 등 잡음)."""
+    p = os.path.join(ctx['site'], 'sitemap.xml')
+    if not os.path.isfile(p):
+        return []
+    with open(p, encoding='utf-8') as fh:
+        rows = RX_LASTMOD.findall(fh.read())
+    if not rows:
+        return []
+    today = ctx['today']
+    n_today = sum(1 for _, d in rows if d.startswith(today))
+    share = n_today / float(len(rows))
+    if share > CHURN_MAX:
+        by = {}
+        for u, d in rows:
+            if d.startswith(today):
+                seg = u.replace(BASE_URL, '').strip('/').split('/')[0]
+                seg = 'root' if (not seg or seg.endswith('.html')) else seg
+                by[seg] = by.get(seg, 0) + 1
+        return ['lastmod 당일 비율 %d%% (%d/%d, 상한 %d%%) — %s'
+                % (round(share * 100), n_today, len(rows), CHURN_MAX * 100,
+                   ', '.join('%s %d' % kv for kv in sorted(by.items(), key=lambda kv: -kv[1])))]
+    return []
+
+
+def check_region_related(pages, ctx):
+    """색인 대상 지역 페이지마다 해설 링크 섹션이 있고(≥3), 링크 대상이 실제 존재하는지."""
+    out = []
+    site = ctx['site']
+    for p in pages:
+        if p.kind != 'region' or p.noindex:
+            continue
+        m = re.search(r'<ul class="rel-list">(.*?)</ul>', p.main, re.S)
+        if not m:
+            out.append('%s — 함께 읽으면 좋은 해설 섹션 없음' % p.rel)
+            continue
+        hrefs = re.findall(r'<a href="([^"]+)"', m.group(1))
+        if len(hrefs) < REL_MIN_LINKS:
+            out.append('%s — 해설 링크 %d개(최소 %d)' % (p.rel, len(hrefs), REL_MIN_LINKS))
+        for h in hrefs:
+            if not os.path.isfile(os.path.join(site, h.lstrip('/'))):
+                out.append('%s — 해설 링크 대상 없음: %s' % (p.rel, h))
+    return out
+
+
 CHECKS = (
     ('1 상태 정합(마감·접수예정 지역의 초록/임박 뱃지)', check_status_badge),
     ('2 유형별 잔여 상한(전체 잔여 초과)', check_type_left),
@@ -564,6 +615,8 @@ CHECKS = (
     ('8b 고아 페이지(sitemap 등재·인바운드 0)', check_orphans),
     ('9 템플릿 누수({{ 잔존)', check_template_leak),
     ('10 구조(site-header/footer/main/h1)', check_structure),
+    ('11 크롤 신호(sitemap lastmod 당일 비율)', check_lastmod_churn),
+    ('12 지역→해설 내부 링크(함께 읽으면 좋은 해설)', check_region_related),
 )
 
 

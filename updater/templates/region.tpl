@@ -50,6 +50,8 @@
   <p class="small muted mt8"><i class="chip-dot" style="background:var(--badge-open)"></i>접수 중 · <i class="chip-dot" style="background:var(--badge-low)"></i>임박 · <i class="chip-dot" style="background:var(--badge-closed)"></i>마감/소진 — 보조금은 <b>주민등록 주소지</b> 기준이에요</p>
 </section>
 
+{{RELATED}}
+
 <section class="card">
   <h2 class="mt0">다음 단계</h2>
   <div class="chips">

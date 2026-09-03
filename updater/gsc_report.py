@@ -5,6 +5,7 @@
 - 인증: 서비스계정 JSON(updater/secrets/gsc-sa.json) → JWT를 openssl로 서명 → 액세스 토큰
 - 데이터: Search Analytics API (sc-domain:evbojo.co.kr, webmasters.readonly)
 - 색인: URL Inspection API 실측("## 색인 현황" 섹션) — updater/index_watch.py, 하루 1회 스냅샷
+- 준비도: 애드센스 재신청 준비도 게이트 GO/WAIT("## 재신청 준비도 게이트" 섹션) — updater/readiness.py
 - 출력: updater/reports/gsc-<종료일>.md (+ latest.md, raw/*.json, index-<날짜>.json) — repo가 public이라 git 미추적
 - 알림: macOS 알림으로 주간 요약 1줄
 
@@ -169,6 +170,7 @@ def main():
     # 색인 현황 — URL Inspection API 실측(하루 1회 스냅샷). 인증·API 실패 시 이 섹션만 생략하고
     # 나머지 리포트는 그대로 생성한다(fail-safe).
     idx_line = ""
+    idx_snap = None
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import index_watch
@@ -177,6 +179,16 @@ def main():
         idx_line = index_watch.summary_line(idx_snap)
     except Exception as ex:
         print("[경고] 색인 현황 섹션 생략:", ex)
+
+    # 재신청 준비도 게이트 — 색인 스냅샷 + selfcheck + sitemap + 클릭 추세 + 라이브 신선도로
+    # GO/WAIT 판정. 색인 섹션이 생략됐으면(스냅샷 없음) 이 섹션도 생략한다(fail-safe).
+    try:
+        if idx_snap is None:
+            raise RuntimeError("색인 스냅샷 없음")
+        import readiness
+        L.extend(readiness.render_lines(readiness.evaluate(idx_snap, token=token)))
+    except Exception as ex:
+        print("[경고] 준비도 섹션 생략:", ex)
 
     L.append("")
     L.append("## 관심 키워드")

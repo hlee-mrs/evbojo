@@ -352,6 +352,13 @@ def main():
     snap = run(force=force, verbose=True)
     print("[스냅샷] {} ({}{})".format(snapshot_path(snap["date"]), summary_line(snap),
                                      ", 캐시 재사용" if snap.get("cached") else ""))
+    # 재신청 준비도 게이트 — 오늘 스냅샷으로 GO/WAIT 판정 후 reports/readiness.* 갱신
+    try:
+        sys.path.insert(0, os.path.join(ROOT, "updater"))
+        import readiness
+        readiness.run(snap=snap)
+    except Exception as ex:      # 준비도 게이트 오류가 스냅샷 저장을 막지 않게
+        print("[경고] readiness 게이트 생략:", ex)
     if "--print" in sys.argv:
         print("\n".join(render_section(snap)))
     return 0

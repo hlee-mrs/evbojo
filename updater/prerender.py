@@ -20,8 +20,10 @@ site/data/*.json + updater/templates/*.tpl (+ updater/content/{sido,model}/*.md)
 - sitemap lastmod는 내용 해시(<main> 구간, 수치 마스킹) 기준. 잔여 대수만 바뀐 날은 lastmod 불변
   → 크롤 스케줄러가 "매일 전 URL 변경"으로 오인하지 않게 한다.
 """
+import collections
 import datetime
 import hashlib
+import html as _html
 import json
 import os
 import re
@@ -478,8 +480,21 @@ _DESC_RE = re.compile(r'<meta\s+name="description"\s+content="([^"]*)"', re.I)
 _CANON_RE = re.compile(r'<link\s+rel="canonical"\s+href="([^"]*)"', re.I)
 
 
+# 파생 상태 토큰 — 페이지의 '내용'이 아니라 다른 페이지의 상태가 흘러들어온 부분.
+#  · 칩 묶음(.chips): 형제 지역·관련 링크 — 이웃 한 곳의 접수 상태가 바뀌면 같은 도 전체의
+#    칩 순서·구성이 바뀌어 하루 40~50개 지역 페이지의 lastmod가 근거 없이 움직였다(2026-09-03 실측).
+#  · 뱃지 라벨: '공지상 접수 마감' ↔ '공단 등록 상태 마감'처럼 같은 상태의 표기 변형과
+#    표 안 타 지역 뱃지 문구는 제외하고, 상태 계급(class)만 남긴다 — 접수중→마감 전환은 여전히 잡힌다.
+_CHIPS_RE = re.compile(r'<div class="chips"[^>]*>.*?</div>', re.S)
+_BADGE_RE = re.compile(r'(<span class="badge[^"]*"[^>]*>)(?:<span class="dot"></span>)?[^<]*</span>')
+
+
 def _mask(s):
-    return _KNUM_RE.sub('#', _NUM_RE.sub('#', s))
+    s = _CHIPS_RE.sub('', s)
+    s = _BADGE_RE.sub(r'\1</span>', s)
+    s = _KNUM_RE.sub('#', _NUM_RE.sub('#', s))
+    # '하루 동안'(고유어 → '#')과 '3일 동안'(→ '#일')이 서로 다른 토큰이 되지 않게 단위 '일'을 접는다
+    return s.replace('#일', '#')
 
 
 def content_hash(html):
@@ -601,6 +616,278 @@ def car_v(r, cid):
 # ══════════════════════════════════════════════════════════
 #  region 페이지
 # ══════════════════════════════════════════════════════════
+# ── 지역 페이지 '함께 읽으면 좋은 해설' ─────────────────────
+# 배경: 색인된 표면(지역 페이지 122곳)에서 해설 아티클로 가는 본문 링크가 0이라 해설 22편 중
+# 4편만 색인됐다(2026-09-03 실측). 접수 상태 맥락에 맞는 해설을 지역 페이지마다 결정적으로 고른다.
+# 제목·요약은 해설 페이지 파일의 <title>·description에서 읽는다 — 지어낸 요약 금지, 원문과 자동 동기.
+_REL_BY_STATE = {
+    'badge-closed': ('sold-out', 'second-round', 'quota-reading'),      # 잔여 소진
+    'badge-shut':   ('timeline-traps', 'second-round', 'sold-out'),     # 공지·공단 마감/접수예정/회차종료
+    'badge-low':    ('quota-reading', 'timeline-traps', 'residency'),   # 마감 임박
+    'badge-open':   ('residency', 'buyer-types', 'timeline-traps'),     # 접수 중
+}
+# 4번째 슬롯 회전 풀 — 상위 20위 밖 지역은 지역 코드로 결정적으로 하나씩 배정해 인바운드를 고르게 나눈다
+_REL_POOL = ('extra-support', 'conversion-grant', 'refund-rules', 'myths', 'changes-2026-2027', 'faq')
+_EXPL_DESC_MAX = 56
+
+
+def explainer_meta(ctx, rel):
+    """rel('sold-out' 또는 'model/ev3') → (제목, 한 줄 요약) 또는 None(파일 없음). 회차 내 캐시."""
+    cache = ctx.setdefault('_expl_meta', {})
+    if rel in cache:
+        return cache[rel]
+    title = desc = ''
+    try:
+        with open(os.path.join(SITE, rel + '.html'), encoding='utf-8') as f:
+            head = f.read(8192)
+        t = _TITLE_RE.search(head)
+        d = _DESC_RE.search(head)
+        title = _html.unescape(t.group(1)).split(' | ')[0].strip() if t else ''
+        desc = _html.unescape(d.group(1)).strip() if d else ''
+    except OSError:
+        pass
+    if desc:
+        # 첫 절만 — ' — '·문장 끝 경계에서 자르고, 상한 초과 시 어절 단위로 줄인다(축약이지 재작성이 아님)
+        cut = re.split(r'\s—\s|(?<=[.!?])\s', desc, 1)[0]
+        if len(cut) > _EXPL_DESC_MAX:
+            cut = cut[:_EXPL_DESC_MAX].rsplit(' ', 1)[0] + '…'
+        desc = cut
+    cache[rel] = (title, desc) if title else None
+    return cache[rel]
+
+
+def _rel_title(title):
+    """앵커 텍스트 — 목록에 같은 접두어가 5번 반복되지 않게 '전기차 보조금 ' 선두만 뗀다(제목 자체는 그대로)."""
+    t = re.sub(r'^전기차 보조금\s+', '', title)
+    return t if len(t) >= 8 else title
+
+
+def related_for_region(cd, cls, rank, rows, ctx):
+    """상태(뱃지 계급)·순위·상위 모델로 고른 해설 3~6편 — 같은 입력이면 같은 결과(멱등).
+    미발행·부재 페이지는 건너뛴다(깨진 링크 금지)."""
+    picks = list(_REL_BY_STATE.get(cls) or _REL_BY_STATE['badge-open'])
+    if rank <= 20:
+        picks.append('region-ranking')
+    else:
+        picks.append(_REL_POOL[int(re.sub(r'\D', '', str(cd)) or 0) % len(_REL_POOL)])
+    m = datetime.datetime.now(KST).month
+    if m in (11, 12, 1, 2):
+        picks.append('winter-range')          # 계절 슬롯 — 겨울 주행거리
+    elif m >= 10:
+        picks.append('yearend-guide')         # 계절 슬롯 — 연말 출고·지급신청 마감
+    items = []
+    for slug in picks:
+        mt = explainer_meta(ctx, slug)
+        if not mt:
+            continue
+        title, desc = mt
+        items.append('<li><a href="/%s.html">%s</a>%s</li>'
+                     % (slug, esc(_rel_title(title)), ('<span class="desc">%s</span>' % esc(desc)) if desc else ''))
+    # 모델 시리즈 2편: ① 이 지역 1위 모델그룹(표 정렬 순 첫 발행편) ② 나머지 발행편 중 지역 코드 회전
+    #   — 1위는 전국이 거의 같은 모델이라 ②로 시리즈 8편에 인바운드를 고르게 나눈다(결정적·멱등)
+    pubs = ctx.get('model_pub') or {}
+    seen = []
+    for c, _loc, _tot in (rows or []):
+        if 'WAV' in c['name'] or '미지원' in c['name']:
+            continue
+        pub = pubs.get(model_group(c))
+        if pub:
+            seen.append(pub)
+            break
+    others = sorted(set(pubs.values()) - set(seen))
+    if others:
+        seen.append(others[int(re.sub(r'\D', '', str(cd)) or 0) % len(others)])
+    for pub in seen:
+        mt = explainer_meta(ctx, 'model/' + pub)
+        if mt:
+            items.append('<li><a href="/model/%s.html">%s</a>%s</li>'
+                         % (pub, esc(mt[0]), ('<span class="desc">%s</span>' % esc(mt[1])) if mt[1] else ''))
+    if not items:
+        return ''
+    return ('<section class="card"><h2 class="mt0">함께 읽으면 좋은 해설</h2>'
+            '<p class="small muted" style="margin:0 0 6px">이 지역의 현재 접수 상태와 순위에 맞춰 고른 글입니다.</p>'
+            '<ul class="rel-list">%s</ul></section>' % ''.join(items))
+
+
+# ── 지역 랭킹 페이지(/region-ranking.html) — 정적 원고를 데이터 기반 생성으로 편입 ──────────
+# 배경: 2026-08-26 스냅샷 정적 페이지가 단가 변경(고흥군 1,425→1,235) 뒤에도 그대로 남아
+# 색인된 해설 페이지가 지역 페이지와 모순됐다(I3). 표·수치 문장을 전부 regions.json에서 만든다.
+_METRO = ('서울', '부산', '대구', '인천', '광주', '대전', '울산')
+
+
+def _amt_ranks(all_r):
+    """[(code, r)] → [(rank, code, r)] 경쟁 순위(1,2,2,4…) — 동률은 가나다순."""
+    srt = sorted(all_r, key=lambda kv: (-(kv[1].get('maxP') or 0), kv[1]['name']))
+    out, prev_amt, prev_rank = [], None, 0
+    for i, (k, v) in enumerate(srt, 1):
+        amt = v.get('maxP') or 0
+        rank = prev_rank if amt == prev_amt else i
+        out.append((rank, k, v))
+        prev_amt, prev_rank = amt, rank
+    return out
+
+
+def _rlink(k, v, with_sido=False):
+    nm = ('%s %s' % (v.get('sido', ''), v['name'])).strip() if with_sido else v['name']
+    return '<a href="/region/%s.html">%s</a>' % (k, esc(nm))
+
+
+def _core_lastmod(key, page_html, prev_store, today):
+    """루트 생성 페이지의 최종 변경일 — build_sitemap의 lm_of와 같은 규칙(본문·헤드 해시 비교)."""
+    rec = (prev_store or {}).get(key)
+    h, hh = content_hash(page_html), head_hash(page_html)
+    if rec and rec.get('h') == h and (rec.get('hh') is None or rec.get('hh') == hh):
+        return rec['d']
+    return today
+
+
+def build_region_ranking(regions, meta, ctx, prev_store, today):
+    tpl = load_tpl('region_ranking.tpl')
+    all_r = [(k, v) for k, v in regions.items() if k != '9999' and v.get('maxP')]
+    ranked = _amt_ranks(all_r)
+    top = [x for x in ranked if x[0] <= 20]
+    n_all = len(all_r)
+    _, first_k, first_v = top[0]
+    first_amt = first_v['maxP']
+    amts = sorted(v['maxP'] for _, v in all_r)
+    last_amt = amts[0]
+    last_grp = sorted(((k, v) for k, v in all_r if v['maxP'] == last_amt), key=lambda kv: kv[1]['name'])
+    last_count = len(last_grp)
+    gap = first_amt - last_amt
+    metro_top = sum(1 for _, _, v in top if v.get('sido') in _METRO)
+    mix = collections.Counter(v.get('sido') for _, _, v in top).most_common(2)
+    sido_mix = '·'.join('%s %d곳' % (sd, n) for sd, n in mix)
+    top5, bot5 = round(sum(amts[-5:]) / 5), round(sum(amts[:5]) / 5)
+
+    # 최하위 동률 구성 — 시도별 묶음(많은 순)
+    by_sido = collections.defaultdict(list)
+    for k, v in last_grp:
+        by_sido[v.get('sido')].append(v['name'])
+    parts = []
+    for sd, names in sorted(by_sido.items(), key=lambda kv: (-len(kv[1]), kv[0] or '')):
+        parts.append(names[0] if len(names) == 1 else '%s %d곳(%s)' % (SIDO_FULL.get(sd, sd), len(names), '·'.join(names)))
+    last_list = ', '.join(parts)
+    if last_count == 1:
+        last_paren = '(%s)' % esc(last_grp[0][1]['name'])
+    else:
+        ex = next((v['name'] for sd in _METRO for _, v in last_grp if v.get('sido') == sd), last_grp[0][1]['name'])
+        last_paren = '(%s 등 %d곳 동률)' % (esc(ex), last_count)
+    # 바로 위 두 금액대
+    above = sorted({a for a in amts if a > last_amt})[:2]
+    nx = []
+    for a in above:
+        g = sorted((v for _, v in all_r if v['maxP'] == a), key=lambda v: v['name'])
+        label = '·'.join(v['name'] for v in g[:2]) + (' 등 %d곳' % len(g) if len(g) > 2 else '')
+        nx.append('%s(%s만원)' % (esc(label), fmt(a)))
+    next_above = ('%s도 그 바로 위입니다.' % ', '.join(nx)) if nx else ''
+    metro_in_last = [sd for sd in by_sido if sd in _METRO]
+    do_multi = sorted(((sd, len(n)) for sd, n in by_sido.items() if sd not in _METRO and sd != '세종' and len(n) >= 3),
+                      key=lambda x: -x[1])
+    if metro_in_last and do_multi:
+        last_shape = ('%s 같은 대도시권만이 아니라 %s처럼 도내 %d곳 시·군이 같은 최저 단가에 서 있는 경우도 있습니다 — '
+                      "'대도시라서 적다'는 통념만으로는 설명되지 않는 분포입니다."
+                      % (esc(SIDO_FULL.get(metro_in_last[0], metro_in_last[0])), esc(SIDO_FULL.get(do_multi[0][0], do_multi[0][0])), do_multi[0][1]))
+    elif metro_in_last:
+        last_shape = '특별·광역시가 %d곳으로 대부분을 차지합니다.' % len(metro_in_last)
+    elif do_multi:
+        last_shape = '특별·광역시보다 도내 시·군이 주로 들어 있습니다.'
+    else:
+        last_shape = '특정 유형으로 묶이지 않는 분포입니다.'
+
+    # 상위 표 안 최대 동률 묶음
+    tie_note = ''
+    rk_cnt = collections.Counter(r for r, _, _ in top).most_common(1)
+    if rk_cnt and rk_cnt[0][1] >= 3:
+        rk, n = rk_cnt[0]
+        grp = [(k, v) for r, k, v in top if r == rk]
+        amt = grp[0][1]['maxP']
+        sds = {v.get('sido') for _, v in grp}
+        if len(sds) == 1:
+            sd = next(iter(sds))
+            same_all = all(v['maxP'] == amt for _, v in all_r if v.get('sido') == sd)
+            if same_all:
+                tie_note = ('공동 %d위(%s만원)에 %s %d곳이 한꺼번에 들어온 것은 도 전체가 같은 단가를 쓰기 때문입니다. '
+                            % (rk, fmt(amt), esc(sd), n))
+            else:
+                tie_note = '공동 %d위(%s만원)에는 %s %d곳이 같은 금액으로 묶여 있습니다. ' % (rk, fmt(amt), esc(sd), n)
+        else:
+            tie_note = '공동 %d위(%s만원)에는 %d곳이 같은 금액으로 묶여 있습니다. ' % (rk, fmt(amt), n)
+    # 군 단위·도 공통 단가
+    guns = [v['name'] for _, _, v in top if v['name'].endswith('군')]
+    top_gun_list = '·'.join(esc(x) for x in guns[:4]) or '(해당 없음)'
+    common = []
+    for sd in sorted({v.get('sido') for _, _, v in top if v.get('sido') not in _METRO and v.get('sido') != '세종'}, key=lambda x: x or ''):
+        vals = {v['maxP'] for _, v in all_r if v.get('sido') == sd}
+        if len(vals) == 1 and sum(1 for _, v in all_r if v.get('sido') == sd) >= 3:
+            common.append(sd)
+    common_clause = ('이거나, %s처럼 <b>도 공통 단가</b>를 쓰는 지역' % esc('·'.join(common))) if common else ''
+    metro_ranks = [r for r, _, v in ranked if v.get('sido') in _METRO]
+    metro_pos = ('%d곳 모두 %d위 밖(하위권)' % (len(metro_ranks), min(metro_ranks) - 1)) if metro_ranks else '표에 없습니다'
+    # 같은 도 안 격차 사례 — 도내 3곳 이상인 시도 중 격차 상위 2
+    cases = []
+    for sd in {v.get('sido') for _, v in all_r}:
+        g = [(k, v) for k, v in all_r if v.get('sido') == sd]
+        if len(g) < 3 or sd in _METRO:
+            continue
+        mx, mn = max(v['maxP'] for _, v in g), min(v['maxP'] for _, v in g)
+        if mx == mn:
+            continue
+        cases.append((mx - mn, sd, g, mx, mn))
+    cases.sort(key=lambda x: (-x[0], x[1] or ''))
+    case_rows = []
+    for gp, sd, g, mx, mn in cases[:2]:
+        hi = sorted(((k, v) for k, v in g if v['maxP'] == mx), key=lambda kv: kv[1]['name'])
+        lo = sorted(((k, v) for k, v in g if v['maxP'] == mn), key=lambda kv: kv[1]['name'])
+        hi_txt = '·'.join(_rlink(k, v) for k, v in hi[:3]) + (' 등 %d곳' % len(hi) if len(hi) > 3 else '')
+        lo_txt = _rlink(*lo[0]) + (' 등 %d곳' % len(lo) if len(lo) > 1 else '')
+        hi_j = josa('곳' if len(hi) > 3 else hi[min(2, len(hi) - 1)][1]['name'], '은', '는')
+        lo_j = josa('곳' if len(lo) > 1 else lo[0][1]['name'], '은', '는')
+        case_rows.append('      <li><b>%s</b> — %s%s %s만원인데 %s%s %s만원. 같은 %s 안에서 <b>%s만원</b> 차이입니다.</li>'
+                         % (esc(sd), hi_txt, hi_j, fmt(mx), lo_txt, lo_j, fmt(mn), esc(SIDO_FULL.get(sd, sd)), fmt(gp)))
+    top_rows = '\n'.join('        <tr><td class="num">%d</td><td>%s</td><td class="num"><b>%s만원</b></td></tr>'
+                         % (r, _rlink(k, v, True), fmt(v['maxP'])) for r, k, v in top)
+    asof = meta.get('updated', '')
+    mapping = {
+        'GAP': fmt(gap), 'ASOF': esc(asof), 'MODIFIED': today, 'N_ALL': str(n_all),
+        'FIRST_SIDO': esc(first_v.get('sido', '')), 'FIRST_NAME': esc(first_v['name']), 'FIRST_AMT': fmt(first_amt),
+        'LAST_AMT': fmt(last_amt), 'LAST_PAREN': last_paren, 'LAST_COUNT': str(last_count),
+        'N_TOP': str(len(top)), 'METRO_TOP': str(metro_top), 'SIDO_MIX': esc(sido_mix),
+        'TOP_ROWS': top_rows, 'TIE_NOTE': tie_note,
+        'TOP5_AVG': fmt(top5), 'BOT5_AVG': fmt(bot5), 'AVG_GAP': fmt(top5 - bot5),
+        'LAST_LIST': esc(last_list), 'NEXT_ABOVE': next_above, 'LAST_SHAPE': last_shape,
+        'N_GUN': str(len(guns)), 'TOP_GUN_LIST': top_gun_list, 'COMMON_CLAUSE': common_clause, 'METRO_POS': metro_pos,
+        'N_CASES': str(len(case_rows)), 'CASE_ROWS': '\n'.join(case_rows), 'AD1': '',
+    }
+    gate = len(strip_tags(render(tpl, mapping)))
+    mapping['AD1'] = ad_slot('region-ranking-1', gate, False)
+    canonical = BASE + '/region-ranking.html'
+    title = esc('보조금 많이 주는 지역 TOP 20 — 최대 %s만원 격차의 이유 | EV보조금' % fmt(gap))
+    desc = esc('전국 %d개 지자체의 전기승용 최대 보조금(국비+지방비)을 전부 줄 세웠습니다. 1위 %s %s만원부터 최하위 %s만원(%d곳 동률)까지 격차 %s만원 — 상위 20위 전체 표와 군 단위가 위를 휩쓰는 이유, 주소지 기준의 함정.'
+               % (n_all, first_v['name'], fmt(first_amt), fmt(last_amt), last_count, fmt(gap)))
+
+    def page_of(modified):
+        mapping['MODIFIED'] = modified
+        ld = [{'@context': 'https://schema.org', '@type': 'Article',
+               'headline': '보조금 많이 주는 지역 TOP 20 — 최대 %s만원 격차의 이유' % fmt(gap),
+               'description': '전국 %d개 지자체의 전기승용 최대 보조금(국비+지방비) 상위 20위 전체 표와 격차의 구조를 실측 데이터로 정리했습니다.' % n_all,
+               'datePublished': '2026-08-08', 'dateModified': modified, 'inLanguage': 'ko',
+               'author': {'@type': 'Person', 'name': 'HyeongHun Lee', 'url': BASE + '/about.html#operator'},
+               'publisher': {'@type': 'Organization', 'name': 'EV보조금'}, 'mainEntityOfPage': canonical},
+              {'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
+                  {'@type': 'ListItem', 'position': 1, 'name': '홈', 'item': BASE + '/'},
+                  {'@type': 'ListItem', 'position': 2, 'name': '읽을거리', 'item': BASE + '/articles.html'},
+                  {'@type': 'ListItem', 'position': 3, 'name': '지역 TOP 20', 'item': canonical}]}]
+        return render(ctx['tpl_page'], {
+            'TITLE': title, 'DESC': desc, 'ROBOTS': '', 'CANONICAL': canonical,
+            'JSONLD': jsonld_script(ld),
+            'BREADCRUMB': '<a href="/">홈</a> › <a href="/articles.html">읽을거리</a> › <b>지역 TOP 20</b>',
+            'MAIN': render(tpl, mapping), 'META_UPDATED': esc(asof),
+        })
+    # 최종 변경일: 본문 해시가 직전 회차와 같으면 저장된 날짜 유지(수치만 바뀐 날은 갱신 아님)
+    lm = _core_lastmod('/region-ranking.html', page_of(today), prev_store, today)
+    return page_of(lm)
+
+
 def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     st = status['data'].get(cd) or {}
     updated = status.get('updated', '')
@@ -820,6 +1107,7 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
         'MODEL_COUNT': str(len(all_rows)),
         'SIDO_LABEL': esc(SIDO_FULL.get(sido, sido or '지역')),
         'SIBLINGS': sibs_html,
+        'RELATED': related_for_region(cd, cls, rank, rows, ctx),
     }
     # 광고 게이트: app.js renderAds와 동일하게 정적 <main> 전체 텍스트 기준(1,200자)
     gate = len(strip_tags(render(ctx['tpl_region'], mapping)))
@@ -2630,11 +2918,13 @@ def build_sitemap(regions, cars, today, model_entries=(), brief_days=(), car_rep
             fb = datetime.date.fromtimestamp(os.path.getmtime(fp)).isoformat()
         except OSError:
             fb = today
-        try:
-            with open(fp, encoding='utf-8') as f:
-                html = f.read()
-        except OSError:
-            html = ''
+        html = pages.get(fp)               # 이번 회차에 생성한 루트 페이지(지역 랭킹)는 메모리본 우선
+        if html is None:
+            try:
+                with open(fp, encoding='utf-8') as f:
+                    html = f.read()
+            except OSError:
+                html = ''
         urls.append((BASE + path, freq, lm_of(path, html, fb)))
     for cd in sorted(regions):
         if cd == '9999' or cd in noidx:
@@ -2755,6 +3045,9 @@ def main():
         pages[os.path.join(SITE, 'car', '%d.html' % c['id'])] = html
     for sido in SIDO_SLUG:
         pages[os.path.join(SITE, 'sido', SIDO_SLUG[sido] + '.html')] = build_sido(sido, regions, meta, status, ctx)
+    # 루트 해설 중 데이터 의존 페이지 — 지역 랭킹(표·수치 문장 전부 regions.json에서 생성)
+    prev_store = load_lastmod_store()
+    pages[os.path.join(SITE, 'region-ranking.html')] = build_region_ranking(regions, meta, ctx, prev_store, today_kst)
 
     # 일간 브리핑 허브 — 날짜 파일(daily_brief.py 산출물)은 여기서 생성하지 않고 목록만 읽음
     brief_days = list_brief_days(today_kst)
@@ -2823,7 +3116,7 @@ def main():
 
     sitemap, n_urls, lm_store = build_sitemap(
         regions, cars, today, pub_entries, brief_days, ctx.get('car_rep'),
-        pages=pages, store=load_lastmod_store(), region_noindex=ctx['region_noindex'])
+        pages=pages, store=prev_store, region_noindex=ctx['region_noindex'])
 
     for path, html in pages.items():
         atomic_write(path, html)
@@ -2841,6 +3134,14 @@ def main():
                 os.remove(fp)
     atomic_write(os.path.join(SITE, 'sitemap.xml'), sitemap)
     save_lastmod_store(lm_store)   # 사이트맵과 같은 회차의 해시만 남김(실패해도 빌드는 성공)
+    # IndexNow(네이버·빙 등) 제출용 — 이번 회차에 lastmod가 '오늘'로 새로 움직인 URL만(indexnow.py가 읽음)
+    try:
+        changed = sorted(BASE + k for k, v in lm_store.items()
+                         if v.get('d') == today_kst and (prev_store.get(k) or {}).get('d') != today_kst)
+        atomic_write(os.path.join(HERE, '.lastmod_changed.json'),
+                     json.dumps({'date': today_kst, 'urls': changed}, ensure_ascii=False))
+    except Exception as ex:                       # 부가 기능 — 빌드 결과에 영향 주지 않음
+        print('경고: lastmod 변경 목록 기록 실패 — %s' % ex, file=sys.stderr)
 
     dt = (datetime.datetime.now() - t0).total_seconds()
     n_rx = len(ctx['region_noindex']) + (1 if '9999' in regions else 0)   # 롱테일 + 한국환경공단

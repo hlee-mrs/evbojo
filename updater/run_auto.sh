@@ -36,7 +36,7 @@ if git diff --quiet -- site/data; then log "OK 변경 없음"; exit 0; fi
 # 프리렌더 (지역·차종·시도 정적 페이지 + sitemap 전량 재생성)
 # 실패해도 데이터 갱신·배포는 계속한다 — 기존 정적 페이지가 유지되므로 안전(fail-safe).
 if /usr/bin/python3 updater/prerender.py >> "$LOG" 2>&1; then
-  git add site/region site/car site/sido site/model site/brief site/sitemap.xml updater/.page_lastmod.json >> "$LOG" 2>&1 || log "WARN prerender 산출물 add 실패"
+  git add site/region site/car site/sido site/model site/brief site/sitemap.xml site/region-ranking.html updater/.page_lastmod.json >> "$LOG" 2>&1 || log "WARN prerender 산출물 add 실패"
   # 회귀 자동 검사(selfcheck) — 상태 정합·산문↔표·광고 게이트·색인·금칙어·링크.
   # **--warn-only**: 위반이 있어도 배포는 계속한다(I2 정신 — 검사 실패가 서비스 중단이
   # 되면 안 됨). 대신 auto.log에 ★★ 표시로 남겨 다음 세션이 바로 찾을 수 있게 한다.
@@ -57,6 +57,8 @@ git push origin HEAD:main >> "$LOG" 2>&1 || { log "FAIL push main — 다음 시
 SHA=$(git subtree split --prefix site HEAD 2>> "$LOG" | tail -1)
 if [ -n "$SHA" ] && git push -f origin "${SHA}:refs/heads/gh-pages" >> "$LOG" 2>&1; then
   log "OK 배포 완료 ($SHA)"
+  # IndexNow(네이버·빙 등) — 이번 회차에 lastmod가 움직인 URL만 제출(하루 1회/URL). 실패해도 배포 결과에는 영향 없음.
+  /usr/bin/python3 updater/indexnow.py >> "$LOG" 2>&1 || log "WARN indexnow 제출 실패(무시)"
 else
   log "FAIL gh-pages 배포"
   exit 1
