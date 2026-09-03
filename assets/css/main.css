@@ -198,6 +198,13 @@ details.acc .acc-body{padding:0 16px 16px;color:var(--text2);font-size:14.5px}
 .chip{padding:7px 13px;border-radius:999px;border:1.5px solid var(--line);font-size:13.5px;font-weight:600;color:var(--text2);background:var(--surface)}
 .chip:hover,.chip.on{border-color:var(--primary);color:var(--primary);background:var(--primary-soft)}
 .chip-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:1px;flex-shrink:0} /* 형제 지역 칩 상태 점 */
+/* 지역 페이지 '함께 읽으면 좋은 해설' — 상태 맥락별 해설 링크 목록(제목+한 줄 요약) */
+.rel-list{list-style:none;padding:0;margin:0}
+.rel-list li{padding:9px 0;border-bottom:1px solid var(--line2);line-height:1.5}
+.rel-list li:last-child{border-bottom:0}
+.rel-list a{font-weight:700;color:var(--text)}
+.rel-list a:hover{color:var(--primary)}
+.rel-list .desc{display:block;color:var(--text2);font-size:13px;margin-top:2px}
 
 /* ── ad slots (CLS 방지 고정 높이 · 라벨 명시) ── */
 .ad-slot{margin:20px 0;text-align:center}
