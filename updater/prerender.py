@@ -369,6 +369,9 @@ def badge_of(st, closed, over=None):
     엇갈릴 때는 라벨에 공단 등록 상태를 병기해 이용자가 직접 판단할 수 있게 한다."""
     if not st or st.get('left') is None:
         return ('badge-closed', '물량 정보 없음')
+    if not st.get('n') and (st.get('left') or 0) <= 0:
+        # 공고 0대 + 잔여 0 = 수집 결손(붕괴)이지 소진이 아님 — '소진' 단정 금지(I3)
+        return ('badge-closed', '물량 정보 확인 중')
     left = st['left']
     ost = (st.get('st') or '').strip()          # 공단 등록 접수상태(접수중·마감·접수예정)
     if left <= 0:
@@ -487,10 +490,17 @@ _CANON_RE = re.compile(r'<link\s+rel="canonical"\s+href="([^"]*)"', re.I)
 #    표 안 타 지역 뱃지 문구는 제외하고, 상태 계급(class)만 남긴다 — 접수중→마감 전환은 여전히 잡힌다.
 _CHIPS_RE = re.compile(r'<div class="chips"[^>]*>.*?</div>', re.S)
 _BADGE_RE = re.compile(r'(<span class="badge[^"]*"[^>]*>)(?:<span class="dot"></span>)?[^<]*</span>')
+#  · 관련 해설 목록(.rel-list): 내비성 링크 — 시리즈 추가 발행·계절 슬롯 전환으로 전 지역이 한꺼번에 바뀐다.
+#  · data-derived: 타 지역 상태로 만들어지는 파생 문장(도내 잔여 최다 지역 등) — 이웃 1곳 변화가
+#    같은 도 30곳 해시를 바꾸던 연쇄(2026-09-04 09:10 실측)를 끊는다.
+_RELLIST_RE = re.compile(r'<ul class="rel-list">.*?</ul>', re.S)
+_DERIVED_RE = re.compile(r'<span data-derived>.*?</span>', re.S)
 
 
 def _mask(s):
     s = _CHIPS_RE.sub('', s)
+    s = _RELLIST_RE.sub('', s)
+    s = _DERIVED_RE.sub('', s)
     s = _BADGE_RE.sub(r'\1</span>', s)
     s = _KNUM_RE.sub('#', _NUM_RE.sub('#', s))
     # '하루 동안'(고유어 → '#')과 '3일 동안'(→ '#일')이 서로 다른 토큰이 되지 않게 단위 '일'을 접는다
@@ -903,7 +913,8 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     # 데이터 모순 가드: 전체 잔여 0인데 유형 잔여가 남음 → 단정 문장 생략 대상
     d = st.get('d') or {}
     contradiction = (st.get('left') is not None and st['left'] <= 0
-                     and any((x or 0) > 0 for x in (d.get('left') or [])))
+                     and (any((x or 0) > 0 for x in (d.get('left') or []))
+                          or not st.get('n')))          # 공고 0대 = 수집 결손 → 소진 단정 생략
 
     # 순위·시도 통계 (9999 제외 160개 기준)
     all_r = [(k, v) for k, v in regions.items() if k != '9999']
@@ -929,7 +940,8 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
                          sido, sido_rank, len(sibs), sib_max, sib_min, best, conv_max,
                          trend_of(hist, cd, ctx['asof_day']), meta, asof, updated, avg_maxp,
                          sibs=sibs, status=status, ctx=ctx, models=models)
-    prose_html = ''.join('<p style="line-height:1.75;margin:10px 0">%s</p>' % p for p in prose)
+    prose_html = (''.join('<p style="line-height:1.75;margin:10px 0">%s</p>' % p for p in prose)
+                  .replace('\x02', '<span data-derived>').replace('\x03', '</span>'))   # 파생 문장 마커 → 해시 제외 span
 
     # 공고 차수·변경이력 데이터 (연혁 섹션에서 사용)
     rd = ctx.get('rounds') or {}
@@ -1321,10 +1333,12 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
              '평상 절차대로 진행하면 되는 시점입니다.',
              '통상적인 준비 순서로 접근하면 됩니다.']))
     if closed['closed'] and closed.get('nextRound'):
+        # 인용구 안의 키워드는 '…'로 생략 — 문단당 '전기차 보조금' 1회 상한(I4)을 인용문이 깨지 않게
+        nq = re.sub(r'\s*전기차 보조금\s*', ' … ', closed['nextRound']).strip()
         pA.append(CC('nextround',
-            ["공지에는 '%s' 안내도 함께 있어 " % closed['nextRound'],
-             "다만 '%s'라는 후속 안내가 있어 " % closed['nextRound'],
-             "'%s' 문구가 공지에 있으므로 " % closed['nextRound']],
+            ["공지에는 '%s' 안내도 함께 있어 " % nq,
+             "다만 '%s'%s 후속 안내가 있어 " % (nq, josa(nq, '이라는', '라는')),
+             "'%s' 문구가 공지에 있으므로 " % nq],
             ['다음 회차를 노린다면 원문을 확인해 둘 만합니다.',
              '재개 일정은 공지 원문에서 확인하세요.',
              '접수가 다시 열릴 여지가 있습니다.']))
@@ -1519,7 +1533,7 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
                  '한 계단 위 %s(%s만원)보다 %s만원 적습니다.' % (above[1], fmt(above[0]), fmt(above[0] - my_p)),
                  '%s(%s만원)와의 격차가 %s만원입니다.' % (above[1], fmt(above[0]), fmt(above[0] - my_p))]))
         if open_sib:
-            pC1.append(CC('opensib',
+            pC1.append('\x02' + CC('opensib',          # \x02…\x03 = 파생 문장 마커(esc() 통과 후 span으로 치환)
                 ['', '도내로 눈을 넓히면, ', '이 지역과 별개로, ', '주변까지 살피면, '],
                 ['%s에서 마감 공지 없이 잔여가 가장 많이 남은 곳은 ' % sido_full,
                  '같은 도 안에서 공지상 마감 없이 잔여 최다인 지역은 ',
@@ -1528,7 +1542,7 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
                 ['%s(%s대)입니다.' % (open_sib[1], fmt(open_sib[0])),
                  '%s로 %s대가 남아 있습니다.' % (open_sib[1], fmt(open_sib[0])),
                  '%s(잔여 %s대)입니다.' % (open_sib[1], fmt(open_sib[0])),
-                 '%s인데 %s대가 남은 것으로 집계됩니다.' % (open_sib[1], fmt(open_sib[0]))]))
+                 '%s인데 %s대가 남은 것으로 집계됩니다.' % (open_sib[1], fmt(open_sib[0]))]) + '\x03')
 
     # ── C2 차종·전환 (WAV·미지원 차종은 최고액·비교 서술에서 제외) ──
     pC2 = []

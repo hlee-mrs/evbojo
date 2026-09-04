@@ -237,6 +237,8 @@
      prerender.py badge_of()가 이 로직의 쌍둥이 — 규칙(초록 금지·마감 계열·병기)을 양쪽 동일하게 유지. */
   window.statusBadge = function (st, statusUpdated, catKey) {
     if (!st) return { cls: 'badge-closed', label: '현황 확인 필요', stale: true };
+    // 공고 0대 + 잔여 0 = 수집 결손(붕괴)이지 소진이 아님 — prerender badge_of와 같은 규칙(I3)
+    if (!st.n && (st.left == null || st.left <= 0)) return { cls: 'badge-closed', label: '물량 정보 확인 중', stale: false };
     const ageDays = statusUpdated ? (Date.now() - new Date(statusUpdated).getTime()) / 864e5 : 99;
     if (ageDays > SITE.staleDays) return { cls: 'badge-closed', label: '직접 확인 필요(데이터 오래됨)', stale: true };
     const regionClosed = (st.left != null && st.left <= 0);   // 지역 전체 소진 여부

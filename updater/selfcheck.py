@@ -603,6 +603,22 @@ def check_region_related(pages, ctx):
     return out
 
 
+# ── 13. 수집 붕괴 징후(공고 0대) ─────────────────────────────
+def check_collapse(pages, ctx):
+    """status.json에서 공고 0대(n=0)인데 공단 접수상태가 '접수중'이거나, 페이지가 '잔여 소진'을 단정하면 위반.
+    2026-09-04 경기 광주시(4161) 선례 — 원본 시트 결손이 그대로 배포돼 색인 페이지에 모순 산문 노출."""
+    out = []
+    for cd, v in (ctx['status_data'] or {}).items():
+        if v.get('n') or v.get('a') or v.get('r'):
+            continue
+        if (v.get('st') or '').strip() == '접수중':
+            out.append('status.json %s — 공고·접수·출고 0인데 공단 접수상태 접수중(수집 결손 의심)' % cd)
+        pg = ctx['by_rel'].get('region/%s.html' % cd)
+        if pg and '잔여 소진' in pg.main:
+            out.append('%s — 공고 0대인데 잔여 소진 단정' % pg.rel)
+    return out
+
+
 CHECKS = (
     ('1 상태 정합(마감·접수예정 지역의 초록/임박 뱃지)', check_status_badge),
     ('2 유형별 잔여 상한(전체 잔여 초과)', check_type_left),
@@ -617,6 +633,7 @@ CHECKS = (
     ('10 구조(site-header/footer/main/h1)', check_structure),
     ('11 크롤 신호(sitemap lastmod 당일 비율)', check_lastmod_churn),
     ('12 지역→해설 내부 링크(함께 읽으면 좋은 해설)', check_region_related),
+    ('13 수집 붕괴 징후(공고 0대·접수중/소진 단정)', check_collapse),
 )
 
 

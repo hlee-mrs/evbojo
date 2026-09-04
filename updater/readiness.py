@@ -174,8 +174,11 @@ def sitemap_entries(path=SITEMAP):
 
 
 def _is_editorial(path):
-    """편집 표면 = 데이터 페이지(/region/·/car/)를 뺀 나머지 sitemap URL."""
-    return not (path.startswith("/region/") or path.startswith("/car/"))
+    """R5의 편집 표면 = 루트 정적·해설 페이지.
+    /region/·/car/(데이터 페이지)뿐 아니라 /sido/·/model/ 시리즈도 제외한다 — 시리즈는 잔여·상태에
+    연동돼 거의 매일 lastmod가 움직여 '14일 안정'이 구조적으로 불가능했다(2026-09-01~04 실측: 편집
+    URL 무변경일 0일). 원고 자체를 고친 날만 R5가 리셋되게 루트 페이지 기준으로 잰다."""
+    return not path.startswith(("/region/", "/car/", "/sido/", "/model/"))
 
 
 # ── 기준별 측정 ──────────────────────────────────────────────

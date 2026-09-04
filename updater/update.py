@@ -251,6 +251,21 @@ def update_status(sheets):
     known = sum(1 for cd in data if cd in regions)
     if known < 150:
         raise ValueError(f'regions.json과 겹치는 지역 수 이상: {known}')
+    # 지역 단위 fail-safe(I2 확장): 한 지역의 공고·접수·출고가 한꺼번에 0으로 떨어지는 것은
+    # 실제 보급 사업에서 일어나지 않는다(공고 0대인 '접수중'은 없음) — 원본 시트의 일시 결손이다.
+    # 2026-09-04 09:10 경기 광주시(4161) 1526/1361/1040 → 0/0/0(st '접수중'·sel 유지)이 그대로
+    # 배포돼 '잔여 소진' 뱃지와 모순 산문이 색인 페이지에 노출된 선례. 직전 값을 유지하고 로그만 남긴다.
+    # 단, 붕괴 지역이 20곳을 넘으면 시트 구조 변경으로 보고 회차 전체를 버린다(기존 fail-safe).
+    prev = (read_json(os.path.join(DATA, 'status.json')) or {}).get('data') or {}
+    collapsed = []
+    for cd, entry in list(data.items()):
+        p = prev.get(cd) or {}
+        if (p.get('n') or 0) > 0 and not entry.get('n') and not entry.get('a') and not entry.get('r'):
+            collapsed.append(cd)
+            data[cd] = p
+            log(f'⚠ {cd} 단일 지역 붕괴(n {p.get("n")}→0, st {entry.get("st")!r}) — 직전 값 유지(fail-safe)')
+    if len(collapsed) > 20:
+        raise ValueError(f'붕괴 지역 {len(collapsed)}곳 — 시트 구조 변경 의심, 회차 폐기')
     now = datetime.now(KST).isoformat(timespec='minutes')
     atomic_write(os.path.join(DATA, 'status.json'),
                  {'updated': now, 'data': data})
