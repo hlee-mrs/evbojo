@@ -631,11 +631,13 @@ def car_v(r, cid):
 # 4편만 색인됐다(2026-09-03 실측). 접수 상태 맥락에 맞는 해설을 지역 페이지마다 결정적으로 고른다.
 # 제목·요약은 해설 페이지 파일의 <title>·description에서 읽는다 — 지어낸 요약 금지, 원문과 자동 동기.
 _REL_BY_STATE = {
-    'badge-closed': ('sold-out', 'second-round', 'quota-reading'),      # 잔여 소진
-    'badge-shut':   ('timeline-traps', 'second-round', 'sold-out'),     # 공지·공단 마감/접수예정/회차종료
-    'badge-low':    ('quota-reading', 'timeline-traps', 'residency'),   # 마감 임박
-    'badge-open':   ('residency', 'buyer-types', 'timeline-traps'),     # 접수 중
+    'badge-closed': ('sold-out', 'second-round', 'quota-reading', 'buyer-types'),   # 잔여 소진
+    'badge-shut':   ('timeline-traps', 'second-round', 'sold-out', 'buyer-types'),  # 공지·공단 마감/접수예정/회차종료
+    'badge-low':    ('quota-reading', 'timeline-traps', 'residency', 'extra-support'),  # 마감 임박
+    'badge-open':   ('residency', 'buyer-types', 'timeline-traps', 'extra-support'),   # 접수 중
 }
+# buyer-types·extra-support는 접수 중 소수 지역·회전 풀에만 걸려 인바운드 13·18에 그쳤고, 색인 요청 2회에도
+# 크롤되지 않았다(2026-09-07 감사). 상태 목록 4번째 슬롯으로 넣어 지역 전반에서 닿게 한다(.rel-list는 해시 제외).
 # 4번째 슬롯 회전 풀 — 상위 20위 밖 지역은 지역 코드로 결정적으로 하나씩 배정해 인바운드를 고르게 나눈다
 _REL_POOL = ('extra-support', 'conversion-grant', 'refund-rules', 'myths', 'changes-2026-2027', 'faq')
 _EXPL_DESC_MAX = 56
