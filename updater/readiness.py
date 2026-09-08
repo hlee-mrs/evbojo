@@ -178,7 +178,9 @@ def _is_editorial(path):
     /region/·/car/(데이터 페이지)뿐 아니라 /sido/·/model/ 시리즈도 제외한다 — 시리즈는 잔여·상태에
     연동돼 거의 매일 lastmod가 움직여 '14일 안정'이 구조적으로 불가능했다(2026-09-01~04 실측: 편집
     URL 무변경일 0일). 원고 자체를 고친 날만 R5가 리셋되게 루트 페이지 기준으로 잰다."""
-    return not path.startswith(("/region/", "/car/", "/sido/", "/model/"))
+    # /region-ranking.html도 prerender가 regions.json에서 전량 생성하는 데이터 페이지다 — 단가 변동으로
+    # 순위·문장이 바뀌면 lastmod가 움직여 R5가 리셋됐다(2026-09-08 실측: 성남시 단가 변경). 원고 수정이 아니므로 제외.
+    return not path.startswith(("/region/", "/car/", "/sido/", "/model/", "/region-ranking.html"))
 
 
 # ── 기준별 측정 ──────────────────────────────────────────────
