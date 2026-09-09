@@ -235,43 +235,43 @@
 "hh": "81de65c62798e9cbd86e2e007af71415"
 },
 "/model/casper.html": {
-"d": "2026-09-08",
-"h": "6c15bf011a9675d27fa83ef69d39549b",
+"d": "2026-09-09",
+"h": "59b9a8ed915f37a16eec827ac9ee884e",
 "hh": "e991934490e481bf33928683b0470416"
 },
 "/model/ev3.html": {
-"d": "2026-09-08",
-"h": "e289b47288af737cfb93bcde4d3d5ee6",
+"d": "2026-09-09",
+"h": "298d7cb1f349853a8adc906dcf92b962",
 "hh": "773d6922ca905161d447b4b7286fe94b"
 },
 "/model/ev6.html": {
-"d": "2026-09-08",
-"h": "a440d07154c429c93d434ba4d7283f9b",
+"d": "2026-09-09",
+"h": "4f2d0f513bcfd4dd38adbf87e6f954d8",
 "hh": "03facfc655d79dee547f235b4c2fd774"
 },
 "/model/ioniq5.html": {
-"d": "2026-09-08",
-"h": "599eee6d57c946dcd1dc0809e83fd276",
+"d": "2026-09-09",
+"h": "ee20c8a56da6085537cbf6aac86afb0c",
 "hh": "9a9d86e44cc87b238258354ab5db9abf"
 },
 "/model/ioniq6.html": {
-"d": "2026-09-08",
-"h": "3437a4af333580b20f39ed4e77924bd4",
+"d": "2026-09-09",
+"h": "7bdaf1ed9799ebdf3efefb4d3eb25bfb",
 "hh": "1628a0ebf8a9f961e84af45805086a91"
 },
 "/model/kona.html": {
-"d": "2026-09-08",
-"h": "c3db1f98835b806807fc3f5483919865",
+"d": "2026-09-09",
+"h": "b68139d2e5a9cdea8c337f2f9778b8fb",
 "hh": "84c14c2bb4ac9e2bf65bfb88447c1090"
 },
 "/model/model-y.html": {
-"d": "2026-09-08",
-"h": "7553a8ffe45b7043042e52dbce5d0899",
+"d": "2026-09-09",
+"h": "f8a157acd94c85cc8f404db8a96c0254",
 "hh": "07f800b4d3b0853fd9152c65d8da0f0e"
 },
 "/model/ray.html": {
-"d": "2026-09-08",
-"h": "28ac8b47f83b3c18ef589ae03bd5690e",
+"d": "2026-09-09",
+"h": "432162e50df3ea3cefb362b65d792384",
 "hh": "b046105a902ca5479bbe33a2da229707"
 },
 "/myths.html": {
@@ -356,7 +356,7 @@
 },
 "/region/4113.html": {
 "d": "2026-09-09",
-"h": "9977b64421e29dee7a61449a3aa5e74b",
+"h": "6b56ad2701521047ec02bef70063ff7e",
 "hh": "7f1fdd1cfdc9456a783b9af8dafbab2f"
 },
 "/region/4115.html": {
@@ -385,8 +385,8 @@
 "hh": "4bfbb575bde21d2d14d17ce0384a2aa4"
 },
 "/region/4125.html": {
-"d": "2026-09-04",
-"h": "bad513d3da809a608dc6953aa65da3eb",
+"d": "2026-09-09",
+"h": "26fe726888e1237e2ff93ef46c477919",
 "hh": "81a713b0212af5daeb61f91897f3f8b2"
 },
 "/region/4127.html": {
@@ -526,7 +526,7 @@
 },
 "/region/4223.html": {
 "d": "2026-09-09",
-"h": "ef59232223def310b6b4b024499ad3fe",
+"h": "e8e64407c637577aefc3ca4f859a39ad",
 "hh": "e9b991588df298235d7284cb76836809"
 },
 "/region/4273.html": {
@@ -966,7 +966,7 @@
 },
 "/sido/gyeongbuk.html": {
 "d": "2026-09-09",
-"h": "c9a5b3a35e3babffaa6993e4b26d898f",
+"h": "81d18de8f37b6ab02f32ec93b5d408fc",
 "hh": "18d20ef3b3c7a70be3a21024dd757a13"
 },
 "/sido/gyeonggi.html": {
@@ -976,7 +976,7 @@
 },
 "/sido/gyeongnam.html": {
 "d": "2026-09-09",
-"h": "9647b4ae613b5a321510b974859c7481",
+"h": "ec5f12949250a8097f11d905d1741118",
 "hh": "8025c3fde2974e15d1cd33fb24ce44e6"
 },
 "/sido/incheon.html": {
