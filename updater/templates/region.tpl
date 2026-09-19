@@ -7,7 +7,7 @@
   <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
     <span data-live="badge" data-cd="{{CD}}"><span class="badge {{BADGE_CLS}}" style="font-size:14px;padding:6px 14px"><span class="dot"></span>{{BADGE_LABEL}}</span></span>
     {{HEAD_NUMS}}
-  </div>
+  </div>{{NEXT_ROUND}}
   {{PROG}}
   {{STATUS_LINES}}
   <div data-live="cats" data-cd="{{CD}}"></div>

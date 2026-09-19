@@ -495,12 +495,18 @@ _BADGE_RE = re.compile(r'(<span class="badge[^"]*"[^>]*>)(?:<span class="dot"></
 #    같은 도 30곳 해시를 바꾸던 연쇄(2026-09-04 09:10 실측)를 끊는다.
 _RELLIST_RE = re.compile(r'<ul class="rel-list">.*?</ul>', re.S)
 _DERIVED_RE = re.compile(r'<span data-derived>.*?</span>', re.S)
+#  · derived 블록(<!--derived:start-->…<!--derived:end-->): 루트 페이지에 매시 다시 그려 넣는 데이터 블록
+#    (홈 '접수 일정' 카드). 지역 일정 변화가 루트 편집 표면(R5·R7)의 lastmod를 흔들지 않게 통째로 제외한다.
+_DERIVED_BLOCK_RE = re.compile(r'<!--derived:start-->.*?<!--derived:end-->', re.S)
+# index.html 안에서 홈 카드가 들어가는 슬롯 — 마커 사이만 갱신하고 나머지 손편집 마크업은 건드리지 않는다
+_SCHED_SLOT_RE = re.compile(r'<!--sched:start-->(.*?)<!--sched:end-->', re.S)
 
 
 def _mask(s):
     s = _CHIPS_RE.sub('', s)
     s = _RELLIST_RE.sub('', s)
     s = _DERIVED_RE.sub('', s)
+    s = _DERIVED_BLOCK_RE.sub('', s)
     s = _BADGE_RE.sub(r'\1</span>', s)
     s = _KNUM_RE.sub('#', _NUM_RE.sub('#', s))
     # '하루 동안'(고유어 → '#')과 '3일 동안'(→ '#일')이 서로 다른 토큰이 되지 않게 단위 '일'을 접는다
@@ -900,6 +906,117 @@ def build_region_ranking(regions, meta, ctx, prev_store, today):
     return page_of(lm)
 
 
+# ── 접수 회차 일정 (rounds.json 등록값 그대로 — 예측·D-day 아님, I3) ──
+_WD = ['월', '화', '수', '목', '금', '토', '일']
+
+
+def _parse_dt(s):
+    """'YYYY-MM-DD[ HH:MM]' → (date, 'HH:MM' | ''). 못 읽으면 (None, '')."""
+    m = _DT_RE.match(str(s or ''))
+    if not m:
+        return None, ''
+    try:
+        return datetime.date.fromisoformat(m.group(1)), (m.group(2) or '')
+    except ValueError:
+        return None, ''
+
+
+def _md_wd(d, today=None):
+    """'9/21(월)' — today를 주면 당일에 ' 오늘'을 붙인다(상대 표현이라 해시 제외 블록에서만 사용)."""
+    lab = '%d/%d(%s)' % (d.month, d.day, _WD[d.weekday()])
+    return lab + ' 오늘' if today is not None and d == today else lab
+
+
+def next_round_of(r_rounds, today):
+    """지역의 '지금 접수 중' 회차, 없으면 '다음 접수 시작' 회차 (등록 일정 기준).
+
+    반환 (kind, round, s_date, s_time, e_date, e_time), kind ∈ {'open', 'next'}. 과거 회차만 있으면 None.
+    접수 중이 여럿이면 가장 늦게 시작한 회차, 미래 회차가 여럿이면 가장 이른 회차."""
+    open_, nxt = None, None
+    for x in r_rounds or []:
+        sd, stm = _parse_dt(x.get('s'))
+        ed, etm = _parse_dt(x.get('e'))
+        if sd is None:
+            continue
+        if sd <= today and (ed is None or ed >= today):
+            if open_ is None or sd > open_[2]:
+                open_ = ('open', x, sd, stm, ed, etm)
+        elif sd > today:
+            if nxt is None or sd < nxt[2]:
+                nxt = ('next', x, sd, stm, ed, etm)
+    return open_ or nxt
+
+
+def next_round_html(r_rounds, today):
+    """지역 페이지 상단 한 줄 — '추경2차 접수 중 (시작 9/17(목) 10:00 · 마감 11/30(월) 18:00)'.
+
+    절대 날짜만 쓴다(상대 표현·D-day 없음). derived 블록이라 lastmod 해시에는 들어가지 않는다."""
+    nr = next_round_of(r_rounds, today)
+    if not nr:
+        return ''
+    kind, x, sd, stm, ed, etm = nr
+    k = esc(x.get('k') or '회차')
+    when = lambda d, t: _md_wd(d) + (' ' + esc(t) if t else '')
+    end = ' · 마감 %s' % when(ed, etm) if ed else ''
+    body = ('<b>%s</b> 접수 중 (시작 %s%s)' % (k, when(sd, stm), end) if kind == 'open'
+            else '<b>%s</b> 접수 시작 %s%s' % (k, when(sd, stm), end))
+    # derived 블록: 같은 사실이 아래 '공고 차수·일정' 표에 이미 있어 표현 추가일 뿐 → 해시 제외(lastmod 무영향)
+    return ('<!--derived:start--><p class="small next-round mt8">📅 %s <span class="muted">— 공단 등록 일정 기준, '
+            '지자체 사정으로 바뀔 수 있어요</span></p><!--derived:end-->' % body)
+
+
+def build_home_schedule(regions, rounds, today, updated, horizon=14):
+    """홈 '📅 접수 일정' 카드 — 앞으로 horizon일 안의 접수 시작·마감(공단 등록 회차 일정).
+
+    사실만 나열한다(I3): 일정은 rounds.json 등록값 그대로, '임박'·D-day·소진 예측 없음.
+    derived 블록으로 감싸 루트 lastmod 해시에서 제외한다(매시 다시 그려도 편집 표면은 불변)."""
+    rr = (rounds or {}).get('rounds') or {}
+    starts, ends = {}, {}
+    for cd, lst in rr.items():
+        r = regions.get(cd)
+        if not r or cd == '9999':
+            continue
+        for x in lst or []:
+            k = x.get('k') or '회차'
+            sd, stm = _parse_dt(x.get('s'))
+            ed, etm = _parse_dt(x.get('e'))
+            if sd and 0 <= (sd - today).days <= horizon:
+                starts.setdefault(sd, []).append((r['name'], cd, k, stm))
+            if ed and 0 <= (ed - today).days <= horizon:
+                ends.setdefault(ed, []).append((r['name'], cd, k, etm))
+
+    def group_html(title, dot, groups, empty):
+        n = sum(len(v) for v in groups.values())
+        if not n:
+            return '<div class="sched-h">%s %s <span class="n">— 앞으로 %d일 안에 %s</span></div>' % (dot, title, horizon, empty)
+        days = sorted(groups)
+        lis = []
+        for d in days:
+            parts = ['<a href="/region/%s.html" data-sched-cd="%s">%s</a> <span class="k">%s%s</span>'
+                     % (cd, cd, esc(nm), esc(k), ' ' + esc(tm) if tm else '')
+                     for nm, cd, k, tm in sorted(groups[d], key=lambda t: t[0])]
+            lis.append('<li><span class="sd%s">%s</span><span class="si">%s</span></li>'
+                       % (' today' if d == today else '', _md_wd(d, today), '<span class="sep">·</span>'.join(parts)))
+        head = ('<div class="sched-h">%s %s <span class="n">앞으로 %d일 · %d건</span></div>'
+                % (dot, title, horizon, n))
+        show, more = lis[:4], lis[4:]
+        html = head + '<ul class="sched">%s</ul>' % ''.join(show)
+        if more:
+            rest = sum(len(groups[d]) for d in days[4:])
+            html += ('<details class="acc"><summary>%d건 더 보기</summary><ul class="sched">%s</ul></details>'
+                     % (rest, ''.join(more)))
+        return html
+
+    body = (group_html('접수 시작', '🟢', starts, '등록된 시작 일정이 없어요')
+            + group_html('접수 마감', '🔴', ends, '등록된 마감 일정이 없어요'))
+    return ('<!--derived:start--><section class="card" id="sched-card" aria-label="접수 일정">'
+            '<h2 class="mt0">📅 접수 일정 <span class="sub">시작·마감 예정 지역 — 공단 등록 회차 기준</span></h2>'
+            '%s<p class="stamp">출처: 무공해차 통합누리집(ev.or.kr) 보조금관리시스템 등록 일정 · 수집 %s · '
+            '일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고문을 확인하세요. 접수 중인 지역의 잔여는 '
+            '<a href="/status.html">전국 현황판</a>에서 보세요.</p></section><!--derived:end-->'
+            % (body, esc((updated or '').replace('T', ' '))))
+
+
 def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     st = status['data'].get(cd) or {}
     updated = status.get('updated', '')
@@ -1108,6 +1225,8 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
         'HEAD_NUMS': ('<span class="muted small">공고 %s대 · 접수 %s · 출고 %s</span>'
                       % (fmt(st['n']), fmt(st['a']), fmt(st['r']))) if st.get('n') is not None else '',
         'PROG': prog,
+        'NEXT_ROUND': next_round_html(r_rounds, datetime.date.fromisoformat(ctx['today']))
+                      if ctx.get('today') else '',
         'STATUS_LINES': ''.join(status_lines),
         'TEL_BTN': tel_btn,
         # meta.updated는 '단가가 언제부터 유효한가'가 아니라 update.py가 단가표를 수집한 날짜다
@@ -3025,6 +3144,7 @@ def main():
            'region_noindex': load_region_noindex() & set(regions)}
     # 공단 공식 신호: 등록 회차 접수기간이 모두 지난 지역 — 배지에서 초록·임박 금지(보수 판정)
     kst_today = datetime.datetime.now(KST).date().isoformat()
+    ctx['today'] = kst_today
     ctx['rounds_over'] = {cd: rounds_over(rounds, cd, kst_today) for cd in regions}
     # 색인 대상 차종 = 모델그룹 대표 트림(국비 최고 비단종, 동률은 id 낮은 쪽) — 트림 근사중복의 색인 노출 차단
     # WAV·'미지원' 트림은 일반 구매와 조건이 달라 대표에서 제외(build_model 트림 표와 동일 기준).
@@ -3072,6 +3192,24 @@ def main():
         # 홈 상단 배너용 최신 브리핑 메타(JS가 fetch — 없으면 배너는 정적 문구로 강등)
         pages[os.path.join(SITE, 'brief', 'latest.json')] = json.dumps(
             {'d': brief_days[0], 'desc': _brief_desc(brief_days[0])}, ensure_ascii=False)
+
+    # ── 홈 '접수 일정' 카드 — index.html의 <!--sched:start-->…<!--sched:end--> 사이만 갱신 ──
+    # 슬롯이 없으면 건너뛴다(손편집 마크업 보존·fail-safe). 카드는 derived 블록이라 루트 lastmod 무영향.
+    try:
+        idx_fp = os.path.join(SITE, 'index.html')
+        with open(idx_fp, encoding='utf-8') as f:
+            idx_html = f.read()
+        m = _SCHED_SLOT_RE.search(idx_html)
+        if m:
+            card = build_home_schedule(regions, rounds, datetime.date.fromisoformat(kst_today),
+                                       status.get('updated', ''))
+            new_idx = idx_html[:m.start(1)] + '\n' + card + '\n' + idx_html[m.end(1):]
+            if new_idx != idx_html:
+                pages[idx_fp] = new_idx
+        else:
+            print('경고: index.html에 접수 일정 슬롯(<!--sched:start-->)이 없어 홈 카드 생성을 건너뜀', file=sys.stderr)
+    except Exception as ex:                       # 부가 기능 — 빌드 결과에 영향 주지 않음
+        print('경고: 홈 접수 일정 카드 생성 실패 — %s' % ex, file=sys.stderr)
 
     # ── 색인 도달성 가드 ──────────────────────────────────
     # 대표 트림이라도 사이트 안에서 링크로 닿을 수 없으면(제원 미공개라 차종 랭킹에서 빠지는 등)

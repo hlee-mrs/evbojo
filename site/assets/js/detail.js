@@ -48,6 +48,15 @@
         categoryBar(cats, st, paint, { cd: cd, updated: updated });
       });
 
+      /* ②′ 잔여 추이 스파크라인 — 유형 탭 바로 위에 동적 삽입(정적 템플릿 무변경 → lastmod 무영향) */
+      if (cats && st && window.sparkline) safe(function () {
+        var box = document.createElement('div'); box.setAttribute('data-live', 'spark');
+        cats.parentNode.insertBefore(box, cats);
+        EVData.history().then(function (hist) { safe(function () { box.innerHTML = sparkline(hist, cd, st, updated); }); });
+      });
+      /* 최근 본 지역 기록 — 검색으로 지역 페이지에 바로 온 사용자도 홈에서 '내 지역' 카드를 보게 */
+      if (cats && cd && window.recentRegion) safe(function () { recentRegion.set(cd); });
+
       /* ③ 표 전체 펼치기 — 정적 상위 N행과 같은 마크업으로 전체 렌더 */
       if (tbl && exp) safe(function () {
         var tbody = tbl.querySelector('tbody');
