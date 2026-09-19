@@ -1011,9 +1011,9 @@ def build_home_schedule(regions, rounds, today, updated, horizon=7):
             + group_html('접수 마감', '🔴', ends, '등록된 마감 일정이 없어요'))
     return ('<!--derived:start--><section class="card" id="sched-card" aria-label="접수 일정">'
             '<h2 class="mt0">📅 접수 일정 <span class="sub">시작·마감 예정 지역 — 공단 등록 회차 기준</span></h2>'
-            '%s<p class="stamp">출처: 무공해차 통합누리집(ev.or.kr) 보조금관리시스템 등록 일정 · 수집 %s · '
-            '일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고문을 확인하세요. 접수 중인 지역의 잔여는 '
-            '<a href="/status.html">전국 현황판</a>에서 보세요.</p></section><!--derived:end-->'
+            '%s<p class="small muted mt8">접수 중인 지역의 잔여·마감 상태는 <a href="/status.html">전국 현황판</a>에서 보세요.</p>'
+            '<p class="stamp">출처: 무공해차 통합누리집(ev.or.kr) 보조금관리시스템 등록 일정 · 수집 %s · '
+            '일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고문을 확인하세요.</p></section><!--derived:end-->'
             % (body, esc((updated or '').replace('T', ' '))))
 
 
