@@ -965,7 +965,7 @@ def next_round_html(r_rounds, today):
             '지자체 사정으로 바뀔 수 있어요</span></p><!--derived:end-->' % body)
 
 
-def build_home_schedule(regions, rounds, today, updated, horizon=14):
+def build_home_schedule(regions, rounds, today, updated, horizon=7):
     """홈 '📅 접수 일정' 카드 — 앞으로 horizon일 안의 접수 시작·마감(공단 등록 회차 일정).
 
     사실만 나열한다(I3): 일정은 rounds.json 등록값 그대로, '임박'·D-day·소진 예측 없음.
