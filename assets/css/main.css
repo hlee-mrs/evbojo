@@ -327,3 +327,32 @@ input[type=range]{flex:1;accent-color:var(--primary);height:32px}
 
 /* ── 비활성 셀렉터(광역시 등 하위 지역 없음) ── */
 .select:disabled{opacity:.65;cursor:default;background-color:var(--surface2);color:var(--text2)}
+
+/* ── 접수 일정 카드(홈) ── */
+.sched{list-style:none;padding:0;margin:6px 0 0}
+.sched li{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line2);font-size:13.5px;line-height:1.55;align-items:flex-start}
+.sched li:last-child{border-bottom:0}
+.sched .sd{flex:0 0 84px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text2);white-space:nowrap}
+.sched .sd.today{color:var(--money)}
+.sched .si{flex:1;min-width:0;word-break:keep-all}
+.sched .si a{font-weight:700;color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+.sched .si a.mine{background:var(--money-soft);color:var(--badge-open);border-radius:5px;padding:0 5px;border-bottom:0}
+.sched .si a.mine::before{content:"📍 "}
+.sched .si .k{color:var(--text3);font-size:12.5px}
+.sched .si .sep{color:var(--line);margin:0 5px}
+.sched-h{font-weight:800;font-size:14px;margin:14px 0 0}
+.sched-h:first-child{margin-top:4px}
+.sched-h .n{color:var(--text3);font-weight:600;font-size:12.5px}
+#sched-card details.acc{margin-top:6px}
+/* ── 잔여 추이 스파크라인 ── */
+.spark{margin-top:12px;padding:10px 12px 8px;background:var(--surface2);border-radius:var(--radius-s)}
+.spark svg{width:100%;height:56px;display:block}
+.spark-cap{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-top:3px;font-variant-numeric:tabular-nums}
+.spark-cap b{color:var(--text)}
+.spark-note{font-size:12.5px;color:var(--text2);margin:6px 0 0}
+/* ── 내 지역 카드 KPI ── */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.kpi-row .st-tile b{font-size:17px}
+@media(max-width:360px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+/* ── 회차 일정 한 줄(지역 페이지·내 지역 카드) ── */
+.next-round{background:var(--surface2);border-radius:var(--radius-s);padding:8px 10px;line-height:1.6}

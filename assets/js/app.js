@@ -64,6 +64,7 @@
     meta: () => load('meta'),
     status: () => load('status').catch(() => null),
     history: () => load('history').catch(() => null),   // 소진 예측용 잔여 이력(없으면 무소음 강등)
+    rounds: () => load('rounds').catch(() => null),     // 공고 차수·접수 일정(등록값 — 예측 아님)
     all: () => Promise.all([load('cars'), load('regions'), load('meta'), load('status').catch(() => null)]),
   };
 
@@ -93,6 +94,12 @@
   window.myRegion = {
     get: () => { try { return localStorage.getItem(LS.region); } catch (e) { return null; } },
     set: cd => { try { cd ? localStorage.setItem(LS.region, cd) : localStorage.removeItem(LS.region); } catch (e) {} },
+  };
+
+  /* ── 최근 본 지역 — 지역 페이지 방문 시 자동 기록. 홈 '내 지역' 카드의 폴백(명시 선택은 myRegion) ── */
+  window.recentRegion = {
+    get: () => { try { return localStorage.getItem('ev.recentRegion'); } catch (e) { return null; } },
+    set: cd => { try { cd ? localStorage.setItem('ev.recentRegion', cd) : localStorage.removeItem('ev.recentRegion'); } catch (e) {} },
   };
 
   /* ── 비교 바구니 (최대 3) ── */
@@ -449,6 +456,68 @@
       done();
     });
   }
+
+  /* ── 잔여 추이 스파크라인 (history.json 실측 기록 — 예측 없음, I3) ──
+     sparkline(hist, cd, st, updatedISO) → HTML('' = 표시 안 함). 최근 28일 '전체 잔여(l)' 선 + 추가공고(리셋) 점선.
+     지난 7일 변화는 실측 증감만 적고, 그 사이 추가공고가 있으면 증감 대신 공고 사실을 적는다. */
+  window.sparkline = function (hist, cd, st, updatedISO) {
+    const e = hist && hist.v === 1 && hist.r && hist.r[cd];
+    if (!e || !Array.isArray(e.l) || !Array.isArray(hist.days)) return '';
+    const asOf = isoToDay(updatedISO) || hist.days[hist.days.length - 1];
+    let pts = hist.days.map((d, i) => [d, e.l[i]]).filter(p => p[1] != null && p[0] >= asOf - 27 && p[0] <= asOf);
+    if (st && st.left != null) {                                             // 라이브 값을 마지막 점으로
+      if (!pts.length || asOf > pts[pts.length - 1][0]) pts.push([asOf, Math.max(0, st.left)]);
+      else pts[pts.length - 1][1] = Math.max(0, st.left);
+    }
+    if (pts.length < 3) return `<div class="spark"><p class="spark-note muted">📈 잔여 추이: 기록을 모으는 중이에요 (관측 ${pts.length}일)</p></div>`;
+    const W = 280, H = 56, PX = 4, PT = 6, PB = 6;
+    const d0 = pts[0][0], d1 = pts[pts.length - 1][0];
+    const vs = pts.map(p => p[1]), vMax = Math.max(...vs), vMin = Math.min(...vs);
+    const x = d => (d1 === d0 ? PX : PX + (d - d0) / (d1 - d0) * (W - 2 * PX)).toFixed(1);
+    const y = v => (vMax === vMin ? H / 2 : PT + (vMax - v) / (vMax - vMin) * (H - PT - PB)).toFixed(1);
+    const path = pts.map((p, i) => (i ? 'L' : 'M') + x(p[0]) + ' ' + y(p[1])).join(' ');
+    const resets = ((e.L && e.L.ev) || []).filter(v => v[1] === 0 && v[0] > d0 && v[0] <= d1);
+    const marks = resets.map(v => `<line x1="${x(v[0])}" y1="2" x2="${x(v[0])}" y2="${H - 2}" stroke="var(--warn)" stroke-dasharray="3 3" stroke-width="1" vector-effect="non-scaling-stroke"><title>${md(v[0])} 추가공고</title></line>`).join('');
+    const last = pts[pts.length - 1];
+    const p7 = [...pts].reverse().find(p => p[0] <= asOf - 7) || pts[0];
+    const span = Math.max(1, asOf - p7[0]);
+    const r7 = resets.filter(v => v[0] > p7[0]);
+    let note;
+    if (r7.length) { const v = r7[r7.length - 1]; note = `${md(v[0])} 추가공고로 잔여 ${fmt(v[2])}대 → ${fmt(v[3])}대`; }
+    else { const dlt = last[1] - p7[1]; note = dlt <= 0 ? `지난 ${span}일 동안 ${fmt(-dlt)}대 감소` : `지난 ${span}일 동안 ${fmt(dlt)}대 증가(환입·재집계)`; }
+    return `<div class="spark">
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="최근 ${asOf - d0 + 1}일 전체 잔여 추이">
+        <path d="${path}" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>${marks}
+        <path d="M${x(last[0])} ${y(last[1])} l0 0.01" stroke="var(--money)" stroke-width="7" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      </svg>
+      <div class="spark-cap"><span>${md(d0)} ${fmt(pts[0][1])}대</span><span>${md(last[0])} <b>${fmt(last[1])}대</b></span></div>
+      <p class="spark-note">📈 전체 잔여 추이 · ${note}<button class="tip tip--wide" type="button" data-tip="ev.or.kr의 '남은 대수(전체)'를 이 사이트가 갱신될 때마다 기록한 실측값이에요. 예측이 아니라 지나간 기록이고, 점선은 추가공고로 물량이 늘어난 날이에요. 많은 지역에서 잔여는 신청이 아니라 출고 시점에 줄기 때문에 실제 접수 여유와 다를 수 있어요." aria-label="추이 설명">?</button></p>
+    </div>`;
+  };
+
+  /* ── 접수 회차 한 줄 (rounds.json 등록값 — 예측·D-day 없음). prerender next_round_html의 쌍둥이 ── */
+  window.nextRoundText = function (rounds, cd, todayISO) {
+    const lst = rounds && rounds.rounds && rounds.rounds[cd];
+    if (!lst || !lst.length) return '';
+    const T = isoToDay(todayISO);
+    if (T == null) return '';
+    const parse = s => { const m = /^(\d{4}-\d{2}-\d{2})(?:[ T](\d{2}:\d{2}))?/.exec(s || ''); return m ? [isoToDay(m[1]), m[2] || ''] : [null, '']; };
+    const WD = ['월', '화', '수', '목', '금', '토', '일'];
+    const lab = d => { const t = dayDate(d); return `${t.getUTCMonth() + 1}/${t.getUTCDate()}(${WD[(t.getUTCDay() + 6) % 7]})`; };
+    let open = null, next = null;
+    lst.forEach(x => {
+      const [sd, stm] = parse(x.s), [ed, etm] = parse(x.e);
+      if (sd == null) return;
+      if (sd <= T && (ed == null || ed >= T)) { if (!open || sd > open.sd) open = { x, sd, stm, ed, etm }; }
+      else if (sd > T) { if (!next || sd < next.sd) next = { x, sd, stm, ed, etm }; }
+    });
+    const nr = open || next;
+    if (!nr) return '';
+    const k = esc(nr.x.k || '회차');
+    const when = (d, t) => lab(d) + (t ? ' ' + esc(t) : '');
+    const end = nr.ed != null ? ` · 마감 ${when(nr.ed, nr.etm)}` : '';
+    return open ? `<b>${k}</b> 접수 중 (시작 ${when(nr.sd, nr.stm)}${end})` : `<b>${k}</b> 접수 시작 ${when(nr.sd, nr.stm)}${end}`;
+  };
 
   /* ── 신청 유형 선택 바 ──
      mount에 4개 유형 탭(잔여 미리보기 포함)을 렌더. 선택 시 유형을 저장하고 onChange(catKey) 호출.

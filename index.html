@@ -64,6 +64,10 @@
   </section>
 
   <!-- 차종 검색 -->
+  <!--sched:start-->
+<!--derived:start--><section class="card" id="sched-card" aria-label="접수 일정"><h2 class="mt0">📅 접수 일정 <span class="sub">시작·마감 예정 지역 — 공단 등록 회차 기준</span></h2><div class="sched-h">🟢 접수 시작 <span class="n">앞으로 14일 · 17건</span></div><ul class="sched"><li><span class="sd">9/21(월)</span><span class="si"><a href="/region/4282.html" data-sched-cd="4282">고성군</a> <span class="k">추경1차 09:00</span><span class="sep">·</span><a href="/region/4157.html" data-sched-cd="4157">김포시</a> <span class="k">추경2차 09:30</span><span class="sep">·</span><a href="/region/4275.html" data-sched-cd="4275">영월군</a> <span class="k">추경1차 13:00</span><span class="sep">·</span><a href="/region/4689.html" data-sched-cd="4689">완도군</a> <span class="k">추경2차 09:00</span><span class="sep">·</span><a href="/region/4872.html" data-sched-cd="4872">의령군</a> <span class="k">추경1차 10:00</span><span class="sep">·</span><a href="/region/4817.html" data-sched-cd="4817">진주시</a> <span class="k">추경2차 09:00</span></span></li><li><span class="sd">9/22(화)</span><span class="si"><a href="/region/4213.html" data-sched-cd="4213">원주시</a> <span class="k">추경2차 09:00</span><span class="sep">·</span><a href="/region/2800.html" data-sched-cd="2800">인천광역시</a> <span class="k">추경1차 10:00</span></span></li><li><span class="sd">9/23(수)</span><span class="si"><a href="/region/4127.html" data-sched-cd="4127">안산시</a> <span class="k">추경2차 14:00</span></span></li><li><span class="sd">9/29(화)</span><span class="si"><a href="/region/4128.html" data-sched-cd="4128">고양시</a> <span class="k">추경2차 14:00</span><span class="sep">·</span><a href="/region/4672.html" data-sched-cd="4672">곡성군</a> <span class="k">추경2차 09:00</span><span class="sep">·</span><a href="/region/4827.html" data-sched-cd="4827">밀양시</a> <span class="k">추경2차 10:00</span><span class="sep">·</span><a href="/region/4886.html" data-sched-cd="4886">산청군</a> <span class="k">추경2차 10:00</span><span class="sep">·</span><a href="/region/4155.html" data-sched-cd="4155">안성시</a> <span class="k">추경3차 10:00</span></span></li></ul><details class="acc"><summary>3건 더 보기</summary><ul class="sched"><li><span class="sd">10/1(목)</span><span class="si"><a href="/region/4728.html" data-sched-cd="4728">문경시</a> <span class="k">본공고 10:00</span><span class="sep">·</span><a href="/region/4167.html" data-sched-cd="4167">여주시</a> <span class="k">추경1차 15:00</span><span class="sep">·</span><a href="/region/4375.html" data-sched-cd="4375">진천군</a> <span class="k">추경2차 10:00</span></span></li></ul></details><div class="sched-h">🔴 접수 마감 <span class="n">앞으로 14일 · 8건</span></div><ul class="sched"><li><span class="sd">9/21(월)</span><span class="si"><a href="/region/4427.html" data-sched-cd="4427">당진시</a> <span class="k">추경2차 18:00</span></span></li><li><span class="sd">9/30(수)</span><span class="si"><a href="/region/4672.html" data-sched-cd="4672">곡성군</a> <span class="k">추경2차 18:00</span><span class="sep">·</span><a href="/region/4380.html" data-sched-cd="4380">단양군</a> <span class="k">추경2차 18:00</span><span class="sep">·</span><a href="/region/4280.html" data-sched-cd="4280">양구군</a> <span class="k">추경1차 18:00</span><span class="sep">·</span><a href="/region/4167.html" data-sched-cd="4167">여주시</a> <span class="k">본공고 18:00</span><span class="sep">·</span><a href="/region/5000.html" data-sched-cd="5000">제주특별자치도</a> <span class="k">추경1차 18:00</span><span class="sep">·</span><a href="/region/4874.html" data-sched-cd="4874">창녕군</a> <span class="k">추경2차 09:00</span></span></li><li><span class="sd">10/1(목)</span><span class="si"><a href="/region/4161.html" data-sched-cd="4161">광주시</a> <span class="k">추경2차 10:07</span></span></li></ul><p class="stamp">출처: 무공해차 통합누리집(ev.or.kr) 보조금관리시스템 등록 일정 · 수집 2026-09-19 17:10+09:00 · 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고문을 확인하세요. 접수 중인 지역의 잔여는 <a href="/status.html">전국 현황판</a>에서 보세요.</p></section><!--derived:end-->
+<!--sched:end-->
+
   <section class="card" aria-label="차종 검색">
     <h2 class="mt0">🚗 차종으로 찾기</h2>
     <input class="input" id="car-search" type="search" placeholder="차종 검색 — 아이오닉, EV3, 모델Y…" autocomplete="off" aria-label="차종 검색">
@@ -200,7 +204,9 @@
 <script src="assets/js/app.js" defer></script>
 <script defer>
 document.addEventListener('DOMContentLoaded', async () => {
+  const roundsP = EVData.rounds();                       // 회차 일정(병렬 로드, 실패 시 null)
   const [cars, regions, meta, statusFile] = await EVData.all();
+  const rounds = await roundsP;
   const status = statusFile && statusFile.data || {};
   const statusUpdated = statusFile && statusFile.updated;
 
@@ -241,6 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!r) {                                   // 지역 해제 → 내 지역 카드와 TOP3 카드 모두 정리
       myBox.innerHTML = '';
       const t3 = document.getElementById('top3-card'); if (t3) t3.hidden = true;
+      document.querySelectorAll('#sched-card a.mine').forEach(a => a.classList.remove('mine'));
       return;
     }
     const st = status[cd];
@@ -261,14 +268,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="grow"><div class="tit">${medal[i]} ${t.c.name}</div>
         <div class="desc">${makerShort(t.c.maker)} · 국비 ${manwon(t.c.nat)} + 지방비 ${manwon(r.v[t.c.id][0])}</div></div>
         <div class="amt">${manwon(t.tot)}</div></a>`).join('');
+    const explicit = !!myRegion.get();                      // 직접 고른 지역 vs 최근 본 지역(폴백)
+    const kpi = `<div class="kpi-row">
+        <div class="st-tile"><b>${st && st.left != null ? fmt(Math.max(0, st.left)) + '대' : '-'}</b><span>전체 잔여</span></div>
+        <div class="st-tile"><b>${st && st.n != null ? fmt(st.n) + '대' : '-'}</b><span>올해 공고 물량</span></div>
+        <div class="st-tile"><b style="color:var(--money)">${manwon(r.maxP)}</b><span>승용 최고 보조금</span></div>
+      </div>`;
     myBox.innerHTML = `
       <div class="callout-green callout" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
         <div style="flex:1;min-width:200px">
+          <div class="small muted">${explicit ? '📍 내 지역' : '🕘 최근 본 지역 — 아래에서 바꿀 수 있어요'}</div>
           <b style="font-size:17px">${r.name}</b>
           <div class="small muted mt8">${st ? '접수방법: ' + st.m : ''}</div>
         </div>
         <span id="mr-badge">${badgeHTML()}</span>
       </div>
+      ${kpi}
+      <div id="mr-round"></div>
+      <div id="mr-spark"></div>
       <div id="mr-note"></div>
       <div id="mr-cats"></div>
       <div class="grid2 mt8">
@@ -276,6 +293,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">ev.or.kr 원본에서 직접 확인 ↗</a>
       </div>
       <p class="stamp">📞 ${r.dept}${/0000-?0000/.test(r.tel) ? '' : ' ' + r.tel} · 잔여현황 기준 ${statusUpdated ? new Date(statusUpdated).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'numeric'}) : '-'} · 단가 기준 ${meta.updated}</p>`;
+    // 회차 일정 한 줄(rounds.json 등록값) + 잔여 추이(history.json 실측) — 둘 다 예측 아님
+    const rt = window.nextRoundText ? nextRoundText(rounds, cd, statusUpdated) : '';
+    document.getElementById('mr-round').innerHTML = rt
+      ? `<p class="small next-round mt8">📅 ${rt} <a href="#sched-card" style="color:var(--primary);white-space:nowrap">전국 일정 ↓</a></p>` : '';
+    EVData.history().then(hist => { const el = document.getElementById('mr-spark'); if (el && window.sparkline) el.innerHTML = sparkline(hist, cd, st, statusUpdated); });
+    document.querySelectorAll('#sched-card [data-sched-cd]').forEach(a => a.classList.toggle('mine', a.dataset.schedCd === cd));
     // 지자체 공지 — 원문 + 더보기/접기, 공지상 마감이면 danger 승격 (app.js noteCallout 공용)
     noteCallout(document.getElementById('mr-note'), st);
     // 승용 TOP 3 — '차종으로 찾기' 아래 별도 카드로 분리.
@@ -295,7 +318,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sb = document.getElementById('car-search');
     render(sb ? sb.value.trim() : '');   // 현재 검색어 유지한 채 지역가 반영
   }
-  regionPicker(document.getElementById('region-picker'), { onPick: pickRegion });
+  const initCd = (myRegion.get() && regions[myRegion.get()]) ? myRegion.get()
+               : (recentRegion.get() && regions[recentRegion.get()]) ? recentRegion.get() : null;
+  regionPicker(document.getElementById('region-picker'), { onPick: pickRegion, value: initCd });
 
   /* ── 차종 리스트/검색 ── */
   const listEl = document.getElementById('car-list');
@@ -343,7 +368,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   // 초기 렌더: ?q= 검색 딥링크(구글 SearchAction) 우선, 그다음 저장된 지역, 없으면 국비만 리스트
   const initQ = qs('q');
-  if (myRegion.get() && regions[myRegion.get()]) pickRegion(myRegion.get());
+  if (initCd) pickRegion(initCd);
   else render('');
   if (initQ) { const sb = document.getElementById('car-search'); sb.value = initQ; sb.focus(); render(initQ); }
 
