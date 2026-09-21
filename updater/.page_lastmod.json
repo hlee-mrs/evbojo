@@ -236,42 +236,42 @@
 },
 "/model/casper.html": {
 "d": "2026-09-21",
-"h": "8b3b550fa48cb11d3757ef67d0a2b5f8",
+"h": "b8a64fa84f80cb6f3a2ffb4458acac9a",
 "hh": "e991934490e481bf33928683b0470416"
 },
 "/model/ev3.html": {
 "d": "2026-09-21",
-"h": "a8d2572578e08005fe3f6bea4233aea4",
+"h": "225fd1a5287e871f6400c1bcc7e36e60",
 "hh": "773d6922ca905161d447b4b7286fe94b"
 },
 "/model/ev6.html": {
 "d": "2026-09-21",
-"h": "62e91645a2f115615db3dbc8bfff28c4",
+"h": "b3488c5692adf51b384a12485da47a8a",
 "hh": "03facfc655d79dee547f235b4c2fd774"
 },
 "/model/ioniq5.html": {
 "d": "2026-09-21",
-"h": "642249112ca646497c5de5ac98fce321",
+"h": "1fce8c0e90daf4f6373967a5c569b629",
 "hh": "9a9d86e44cc87b238258354ab5db9abf"
 },
 "/model/ioniq6.html": {
 "d": "2026-09-21",
-"h": "8f5e3266a44d563bffaeb6acc98c17ac",
+"h": "c40cbcd9c0696cedfe3fadb855ce08da",
 "hh": "1628a0ebf8a9f961e84af45805086a91"
 },
 "/model/kona.html": {
 "d": "2026-09-21",
-"h": "6843c2e84b3af61753540206cf9164cf",
+"h": "e34c5de144c3b351a9453c10173eae81",
 "hh": "84c14c2bb4ac9e2bf65bfb88447c1090"
 },
 "/model/model-y.html": {
 "d": "2026-09-21",
-"h": "6b977082275a28eecc45c80feea770fa",
+"h": "d1621bd287818ab16f634ba20c0a21b1",
 "hh": "07f800b4d3b0853fd9152c65d8da0f0e"
 },
 "/model/ray.html": {
 "d": "2026-09-21",
-"h": "22321b5128d33031ec3967cbb7136386",
+"h": "a0c7394f5417e56ab80ca27f3d0703f8",
 "hh": "b046105a902ca5479bbe33a2da229707"
 },
 "/myths.html": {
@@ -356,7 +356,7 @@
 },
 "/region/4113.html": {
 "d": "2026-09-21",
-"h": "07fdf1c5b2a03b01b55e2caea4dfcf1d",
+"h": "7b1c91305ce536674fbd60e1ae331b6f",
 "hh": "b8c2d16cbea4135b145a905e1c516605"
 },
 "/region/4115.html": {
@@ -370,9 +370,9 @@
 "hh": "eb31f619b3f48d15114bf2c2b10f808e"
 },
 "/region/4119.html": {
-"d": "2026-09-18",
-"h": "b0d6a7b2b25f316d6174bfeaa65c4ad9",
-"hh": "333bd10a71fba5970e9f9424fbe18000"
+"d": "2026-09-21",
+"h": "a1dc966087cf133357fe93789ba2e53b",
+"hh": "023d9dc5a73bad56bb815eeda05a4db9"
 },
 "/region/4121.html": {
 "d": "2026-09-21",
@@ -390,9 +390,9 @@
 "hh": "81a713b0212af5daeb61f91897f3f8b2"
 },
 "/region/4127.html": {
-"d": "2026-09-18",
-"h": "862b80ea10bbc072bcc42669b7414b92",
-"hh": "cdeb1ede976cad420de5afc9d88a87fd"
+"d": "2026-09-21",
+"h": "d4cee21ec6723327613142af05add2de",
+"hh": "11236c8c5f7f79b5cb3a779267d0cbe4"
 },
 "/region/4128.html": {
 "d": "2026-09-21",
@@ -400,8 +400,8 @@
 "hh": "a7e1798bfc9089cbee4c774260794905"
 },
 "/region/4129.html": {
-"d": "2026-09-18",
-"h": "337debb1d3f632b0d0851939a6ce34d8",
+"d": "2026-09-21",
+"h": "fa0a0fe34cce2fe492eab5c8559541f0",
 "hh": "daa60b005083dceb67d93c2854f03243"
 },
 "/region/4131.html": {
@@ -466,8 +466,8 @@
 },
 "/region/4159.html": {
 "d": "2026-09-21",
-"h": "e8cd7bfe9637cbc65b2895ed86c03fe1",
-"hh": "f6569bc84a9459754ba70acdb535cf11"
+"h": "78804f2b4109de02d2fb3e87f2bc4ef1",
+"hh": "8cb19675ef60fc3d73506dc4730a9501"
 },
 "/region/4161.html": {
 "d": "2026-09-12",
@@ -485,8 +485,8 @@
 "hh": "4f31ff0611fce8968b88df861e707b93"
 },
 "/region/4167.html": {
-"d": "2026-09-17",
-"h": "96723aaacdfd7e9e8fad19559966d0e6",
+"d": "2026-09-21",
+"h": "891ec6e2caad1dbf7b91c4ac0031d166",
 "hh": "7c687e67456226975c379936042d0437"
 },
 "/region/4183.html": {
@@ -521,7 +521,7 @@
 },
 "/region/4221.html": {
 "d": "2026-09-21",
-"h": "02dd5a157bc5793567202e62fb725d36",
+"h": "3956e30b7c2ba733394b2c17637b69ba",
 "hh": "ea032983afdcdffe172b64b37ebfb242"
 },
 "/region/4223.html": {
@@ -716,7 +716,7 @@
 },
 "/region/4615.html": {
 "d": "2026-09-21",
-"h": "fc982cbe9c676f699c561d5e03f764a8",
+"h": "44b2db2ff96a1415f19652f29573526c",
 "hh": "c907e42f8d8a24e079124418c987b19c"
 },
 "/region/4617.html": {
@@ -731,8 +731,8 @@
 },
 "/region/4673.html": {
 "d": "2026-09-21",
-"h": "29cbaded545bc196007702f3877a196d",
-"hh": "6126ba60efa26df1c21b363db6971442"
+"h": "608fca03bfa9a4fb5a418bc6254be9c1",
+"hh": "4a282bb28a705546f08e34f858ee2642"
 },
 "/region/4677.html": {
 "d": "2026-09-21",
@@ -971,7 +971,7 @@
 },
 "/sido/gyeonggi.html": {
 "d": "2026-09-21",
-"h": "c5d96ab49636c562078961f69f573afc",
+"h": "d569f64ae791079cef7da3e44cfb8178",
 "hh": "a12268edf8eb6c0d109f57c0519028c9"
 },
 "/sido/gyeongnam.html": {
@@ -996,7 +996,7 @@
 },
 "/sido/jeonnam.html": {
 "d": "2026-09-21",
-"h": "9c51230f7a35c0ad5bde499c4925ce22",
+"h": "cad8849bde35cf271b9e59e8c85e6498",
 "hh": "9020ed5becb6c1481f32cb9f5f2d8499"
 },
 "/sido/sejong.html": {
