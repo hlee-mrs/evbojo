@@ -19,6 +19,10 @@
   8  링크 무결성   깨진 내부 링크 · sitemap 등재 고아 페이지
   9  템플릿 누수   산출물에 '{{' 잔존
   10 구조         site-header/site-footer/main/h1 중복·누락
+  11 크롤 신호     sitemap lastmod 당일 비율 ≤30% (실변경만 갱신 원칙)
+  12 지역→해설    지역 페이지의 「함께 읽으면 좋은 해설」 링크 ≥3·대상 존재
+  13 수집 붕괴     공고 0대인데 접수중/잔여 소진 단정
+  14 홈 접수 일정  index.html 슬롯·derived 마커 짝·카드 존재·지역 링크 대상 존재
 
 사용
   /usr/bin/python3 updater/selfcheck.py              위반 0 → exit 0, 있으면 exit 1
@@ -619,6 +623,45 @@ def check_collapse(pages, ctx):
     return out
 
 
+# ── 14. 홈 접수 일정 카드 ─────────────────────────────────
+RX_SCHED_SLOT = re.compile(r'<!--sched:start-->(.*?)<!--sched:end-->', re.S)
+
+
+def check_home_schedule(pages, ctx):
+    """index.html의 접수 일정 슬롯이 prerender 산출로 채워져 있고 구조가 온전한지.
+
+    - 슬롯(<!--sched:start/end-->)이 있어야 하고, 그 안에 derived 마커가 정확히 한 쌍(루트 lastmod 해시 제외 조건)
+    - 카드(id=sched-card)가 있고, data-sched-cd 링크 대상 지역 파일이 실제로 존재(9999 제외)
+    - 지역 페이지의 derived 블록 마커는 시작·끝 개수가 같아야 한다(짝이 어긋나면 마스킹이 본문을 통째로 삼킴)"""
+    out = []
+    site = ctx['site']
+    idx = ctx['by_rel'].get('index.html')
+    if idx is None:
+        return out                                  # 홈 없음 = 판단 불가(보수적)
+    html = getattr(idx, 'html', None) or idx.main
+    m = RX_SCHED_SLOT.search(html)
+    if not m:
+        return ['index.html — 접수 일정 슬롯(<!--sched:start-->…<!--sched:end-->) 없음']
+    body = m.group(1)
+    ns, ne = body.count('<!--derived:start-->'), body.count('<!--derived:end-->')
+    if (ns, ne) != (1, 1):
+        out.append('index.html — 슬롯 안 derived 마커 %d/%d개(정확히 1쌍이어야 루트 lastmod 해시에서 제외됨)' % (ns, ne))
+    if 'id="sched-card"' not in body:
+        out.append('index.html — 슬롯이 비어 있음(prerender가 카드를 생성하지 않음)')
+    for cd in sorted(set(re.findall(r'data-sched-cd="(\d+)"', body))):
+        if cd == '9999':
+            out.append('index.html — 접수 일정에 한국환경공단(9999) 포함')
+        elif not os.path.isfile(os.path.join(site, 'region', cd + '.html')):
+            out.append('index.html — 접수 일정 링크 대상 없음: region/%s.html' % cd)
+    for p in pages:
+        if p.kind != 'region':
+            continue
+        a, b = p.main.count('<!--derived:start-->'), p.main.count('<!--derived:end-->')
+        if a != b:
+            out.append('%s — derived 마커 짝 불일치(start %d / end %d)' % (p.rel, a, b))
+    return out
+
+
 CHECKS = (
     ('1 상태 정합(마감·접수예정 지역의 초록/임박 뱃지)', check_status_badge),
     ('2 유형별 잔여 상한(전체 잔여 초과)', check_type_left),
@@ -634,6 +677,7 @@ CHECKS = (
     ('11 크롤 신호(sitemap lastmod 당일 비율)', check_lastmod_churn),
     ('12 지역→해설 내부 링크(함께 읽으면 좋은 해설)', check_region_related),
     ('13 수집 붕괴 징후(공고 0대·접수중/소진 단정)', check_collapse),
+    ('14 홈 접수 일정 카드(슬롯·derived 마커·링크)', check_home_schedule),
 )
 
 

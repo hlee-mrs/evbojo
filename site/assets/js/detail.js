@@ -55,7 +55,7 @@
         EVData.history().then(function (hist) { safe(function () { box.innerHTML = sparkline(hist, cd, st, updated); }); });
       });
       /* 최근 본 지역 기록 — 검색으로 지역 페이지에 바로 온 사용자도 홈에서 '내 지역' 카드를 보게 */
-      if (cats && cd && window.recentRegion) safe(function () { recentRegion.set(cd); });
+      if (cats && cd && cd !== '9999' && window.recentRegion) safe(function () { recentRegion.set(cd); });
 
       /* ③ 표 전체 펼치기 — 정적 상위 N행과 같은 마크업으로 전체 렌더 */
       if (tbl && exp) safe(function () {
