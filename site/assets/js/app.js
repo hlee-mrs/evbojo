@@ -9,7 +9,7 @@
     name: 'EV보조금',
     tagline: '전기차 구매보조금 한눈에',
     // ── 광고 설정 ─────────────────────────────────────────
-    // 1) 카카오 애드핏 승인 후: provider:'adfit' + adfitUnits에 슬롯별 광고단위 ID 입력 + enabled:true
+    // 1) 카카오 애드핏 승인 후: provider:'adfit' + adfit.top/bottom.unit에 광고단위 ID(DAN-…) 입력 + enabled:true
     // 2) AdSense 승인 후:      provider:'adsense' + client에 본인 ca-pub ID 입력 + enabled:true
     //    (각 페이지 슬롯의 data-ad-slot 번호는 AdSense 광고단위 생성 후 기입)
     ads: {
@@ -22,10 +22,13 @@
         top: '5347890513',                    // EV보조금 - 본문 상단
         bottom: '7246727325',                 // EV보조금 - 본문 하단
       },
-      adfitUnits: {                           // 애드핏: 슬롯이름 → 광고단위 ID (예: 'DAN-xxxxxxxx')
-        // 'home-1': 'DAN-XXXXXXXX', 'region-1': 'DAN-XXXXXXXX', ...
+      // 카카오 애드핏 광고단위 — AdSense와 같은 규칙: 슬롯 이름이 '-2'로 끝나면 하단, 그 외는 상단.
+      // 애드핏은 반응형이 없어 크기가 단위에 고정된다(지원: 320x100·320x50·300x250·250x250·728x90·160x600).
+      // 트래픽 대부분이 모바일(네이버 모바일 검색 유입)이라 상단 320x100, 하단 300x250(모바일 폭 343px에 들어감).
+      adfit: {
+        top:    { unit: '', w: 320, h: 100 },   // 예: 'DAN-xxxxxxxxxxxxxxxx' — 애드핏 콘솔에서 발급
+        bottom: { unit: '', w: 300, h: 250 },
       },
-      adfitSize: { width: 320, height: 100 }, // 애드핏 반응형 미지원 → 모바일 배너 기준
     },
     // ── 후원(기부) 설정 ───────────────────────────────────
     // Payoneer '결제 요청(Request a Payment)' 링크를 넣으면 후원 버튼이 활성화됨.
@@ -706,18 +709,28 @@
         setTimeout(() => { if (!ins.getAttribute('data-ad-status')) slot.style.display = 'none'; }, 4000);
       });
     } else if (SITE.ads.enabled && SITE.ads.provider === 'adfit') {
-      const s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://t1.daumcdn.net/kas/static/ba.min.js';
-      document.head.appendChild(s);
+      // 카카오 애드핏 — 공식 웹 SDK 규격(adfit.github.io · github.com/adfit/adfit-web-sdk):
+      //   ins.kakao_ad_area + data-ad-unit/width/height, 스크립트 t1.kakaocdn.net/kas/static/ba.min.js(구 daumcdn 아님).
+      //   광고 없음(NO-AD) 콜백 data-ad-onfail은 해당 ins를 인자로 받고, 단위마다 콜백 이름이 달라야 한다.
+      // 운영정책: 페이지당 애드핏 광고 4개 이하(우리 슬롯은 페이지당 최대 2개) · 고정 배치 · 클릭 유도 금지.
+      let n = 0;
       slots.forEach(slot => {
-        const unit = SITE.ads.adfitUnits[slot.dataset.slot];
         const box = slot.querySelector('.ad-box');
-        if (!unit || !box) return;
-        box.innerHTML = `<ins class="kakao_ad_area" style="display:none" data-ad-unit="${unit}" data-ad-width="${SITE.ads.adfitSize.width}" data-ad-height="${SITE.ads.adfitSize.height}"></ins>`;
+        const u = /-2$/.test(slot.dataset.slot || '') ? SITE.ads.adfit.bottom : SITE.ads.adfit.top;
+        if (!box || !u || !u.unit) return;                    // 단위 ID 없으면 그 자리는 아무것도 안 함
+        const cb = 'evAdfitNoAd' + (++n);
+        window[cb] = ins => { const s = ins && ins.closest && ins.closest('.ad-slot'); if (s) s.style.display = 'none'; };   // 미채움 → 자리째 숨김
+        box.innerHTML = `<ins class="kakao_ad_area" style="display:none;width:100%;" data-ad-unit="${u.unit}" data-ad-width="${u.w}" data-ad-height="${u.h}" data-ad-onfail="${cb}"></ins>`;
         box.style.border = 'none';
-        box.style.minHeight = SITE.ads.adfitSize.height + 'px';
+        box.style.background = 'transparent';
+        box.style.minHeight = u.h + 'px';                     // 단위 높이로 자리 고정(CLS 방지)
       });
+      if (n) {                                                // ins를 먼저 넣고 스크립트는 1회만 — 로드 시 ins를 스캔한다
+        const s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://t1.kakaocdn.net/kas/static/ba.min.js';
+        document.head.appendChild(s);
+      }
     } else {
       slots.forEach(slot => {
         const box = slot.querySelector('.ad-box');
