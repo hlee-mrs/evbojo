@@ -484,7 +484,7 @@
     const r7 = resets.filter(v => v[0] > p7[0]);
     let note;
     if (r7.length) { const v = r7[r7.length - 1]; note = `${md(v[0])} 추가공고로 잔여 ${fmt(v[2])}대 → ${fmt(v[3])}대`; }
-    else { const dlt = last[1] - p7[1]; note = dlt <= 0 ? `지난 ${span}일 동안 ${fmt(-dlt)}대 감소` : `지난 ${span}일 동안 ${fmt(dlt)}대 증가(환입·재집계)`; }
+    else { const dlt = last[1] - p7[1]; note = dlt === 0 ? `지난 ${span}일 동안 변화 없음` : dlt < 0 ? `지난 ${span}일 동안 ${fmt(-dlt)}대 감소` : `지난 ${span}일 동안 ${fmt(dlt)}대 증가(환입·재집계)`; }
     return `<div class="spark">
       <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="최근 ${asOf - d0 + 1}일 전체 잔여 추이">
         <path d="${path}" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>${marks}
