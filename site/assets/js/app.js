@@ -46,8 +46,17 @@
       coupang: {
         id: 'AF8832379',
         pages: {
-          '/calc.html': [],            // 유지비 계산기 — 충전기·케이블류
-          '/winter-range.html': [],    // 겨울 주행거리 해설 — 겨울철 차량 용품
+          // 2026-10-02 콘솔 생성 — 모두 '검색 결과' 링크(특정 상품을 지목하지 않음 · 품절로 죽지 않음)
+          '/calc.html': [              // 유지비 계산기
+            { t: '전기차 휴대용 충전기', u: 'https://link.coupang.com/a/hvhD5UltFk', d: '220V 콘센트용 휴대용(비상) 완속 충전기 검색 결과' },
+            { t: '충전 케이블 보관 가방', u: 'https://link.coupang.com/a/hvhMhghssu', d: '충전 케이블·휴대용 충전기 보관용 가방 검색 결과' },
+            { t: '타이어 공기압 게이지', u: 'https://link.coupang.com/a/hvhO3ZxxsW', d: '공기압 점검용 게이지 검색 결과' },
+          ],
+          '/winter-range.html': [      // 겨울 주행거리 해설
+            { t: '차량용 열선 시트', u: 'https://link.coupang.com/a/hvhQhEkN4K', d: '시트에 얹어 쓰는 열선 방석·커버 검색 결과' },
+            { t: '앞유리 성에 방지 커버', u: 'https://link.coupang.com/a/hvhRxL9EB2', d: '주차 중 앞유리를 덮는 커버 검색 결과' },
+            { t: '겨울용 워셔액', u: 'https://link.coupang.com/a/hvhSJFXiAm', d: '저온용 워셔액 검색 결과' },
+          ],
         },
       },
     },
@@ -757,7 +766,9 @@
   /* ── 제휴 링크 박스 (쿠팡 파트너스) ──
      설정(SITE.partners.coupang.pages)에 이 페이지용 링크가 있을 때만 <main> 맨 끝에 카드 1개를 붙인다.
      · 본문·입력폼·광고 슬롯 아래(문서 끝)라 레이아웃 이동이 없고 계산 버튼과도 떨어져 있다(I4 정신).
-     · 대가성 고지 문구는 쿠팡 파트너스 약관 필수 문구 그대로, 링크와 같은 카드 안에 항상 함께 표시.
+     · 대가성 고지: 쿠팡 '경제적 이해관계 표시 가이드'(2025-10-15, 공정위 심사지침 2024-12 개정 반영) —
+       제목에 [광고] + 문구를 링크보다 먼저(카드 첫 부분), 본문보다 눈에 띄는 색·굵기.
+       '받을 수 있음'·'링크가 포함되어 있습니다' 같은 조건부·불확정 표현은 금지 → 문구를 바꾸지 말 것.
      · rel="sponsored nofollow" — 검색엔진에 제휴 링크임을 명시. 링크 주소는 link.coupang.com만 허용. */
   function renderPartners() {
     const cp = SITE.partners && SITE.partners.coupang;
@@ -769,11 +780,12 @@
     const box = document.createElement('section');
     box.className = 'card aff-box';
     box.setAttribute('aria-label', '제휴 상품 링크');
-    box.innerHTML = `<h2 class="mt0">🛒 함께 준비하면 좋은 용품 <span class="sub">제휴 링크 · 광고</span></h2>
+    box.innerHTML = `<h2 class="mt0">🛒 [광고] 함께 준비하면 좋은 용품 <span class="sub">쿠팡 파트너스 제휴 링크</span></h2>
+      <p class="aff-note">이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
       <div class="rowlist">${items.map(x => `<a class="row" href="${esc(x.u)}" target="_blank" rel="sponsored nofollow noopener">
         <div class="grow"><div class="tit">${esc(x.t)}</div>${x.d ? `<div class="desc">${esc(x.d)}</div>` : ''}</div>
         <div class="aff-go">쿠팡에서 보기 ↗</div></a>`).join('')}</div>
-      <p class="aff-note">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다. 가격·재고·사양은 쿠팡 상품 페이지에서 확인하세요.</p>`;
+      <p class="aff-sub">링크는 쿠팡 검색 결과로 연결돼요. 특정 상품을 추천하는 것은 아니며, 가격·재고·사양은 쿠팡에서 확인하세요.</p>`;
     mainEl.appendChild(box);
   }
 
