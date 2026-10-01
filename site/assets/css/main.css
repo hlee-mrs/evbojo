@@ -356,3 +356,7 @@ input[type=range]{flex:1;accent-color:var(--primary);height:32px}
 @media(max-width:360px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
 /* ── 회차 일정 한 줄(지역 페이지·내 지역 카드) ── */
 .next-round{background:var(--surface2);border-radius:var(--radius-s);padding:8px 10px;line-height:1.6}
+
+/* ── 제휴 링크 박스(쿠팡 파트너스) ── */
+.aff-box .aff-go{font-size:12.5px;font-weight:700;color:var(--primary);white-space:nowrap}
+.aff-box .aff-note{font-size:12px;color:var(--text3);margin:10px 0 0;line-height:1.6}

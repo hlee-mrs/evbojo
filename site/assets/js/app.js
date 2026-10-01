@@ -36,6 +36,21 @@
     donate: {
       payoneerUrl: 'https://link.payoneer.com/Token?t=BC4B67FF13CD4007A359F1F7E8BB9EA9&src=pl',  // 지급인이 금액 입력(USD)
     },
+    // ── 제휴 링크 (쿠팡 파트너스) ─────────────────────────
+    // 정적 링크만 쓴다 — 쿠팡 동적 배너 스크립트(g.js)는 넣지 않는다(애드핏 운영정책의
+    // '타 광고 네트워크 스크립트 여러 개 동시 게재' 조항 회피 + 추적 스크립트 최소화).
+    // pages: 경로 → 상품 목록 [{ t: 표시명, u: 파트너스 콘솔에서 만든 단축 링크(https://link.coupang.com/a/…), d: 한 줄 설명 }]
+    //   · 페이지당 최대 3개만 그린다. 목록이 비었거나 링크 형식이 다르면 그 페이지엔 아무것도 그리지 않는다.
+    //   · 링크는 반드시 콘솔 '링크 생성'으로 만든 것만 — ID로 주소를 조립하지 않는다(추적 누락·약관 위반 방지).
+    partners: {
+      coupang: {
+        id: 'AF8832379',
+        pages: {
+          '/calc.html': [],            // 유지비 계산기 — 충전기·케이블류
+          '/winter-range.html': [],    // 겨울 주행거리 해설 — 겨울철 차량 용품
+        },
+      },
+    },
     staleDays: 14,
   };
   window.SITE = SITE;
@@ -739,6 +754,29 @@
     }
   }
 
+  /* ── 제휴 링크 박스 (쿠팡 파트너스) ──
+     설정(SITE.partners.coupang.pages)에 이 페이지용 링크가 있을 때만 <main> 맨 끝에 카드 1개를 붙인다.
+     · 본문·입력폼·광고 슬롯 아래(문서 끝)라 레이아웃 이동이 없고 계산 버튼과도 떨어져 있다(I4 정신).
+     · 대가성 고지 문구는 쿠팡 파트너스 약관 필수 문구 그대로, 링크와 같은 카드 안에 항상 함께 표시.
+     · rel="sponsored nofollow" — 검색엔진에 제휴 링크임을 명시. 링크 주소는 link.coupang.com만 허용. */
+  function renderPartners() {
+    const cp = SITE.partners && SITE.partners.coupang;
+    const mainEl = $('main');
+    if (!cp || !cp.pages || !mainEl || $('.aff-box')) return;
+    const path = location.pathname.replace(/\/index\.html$/, '/');
+    const items = (cp.pages[path] || []).filter(x => x && x.t && /^https:\/\/link\.coupang\.com\//.test(x.u || '')).slice(0, 3);
+    if (!items.length) return;
+    const box = document.createElement('section');
+    box.className = 'card aff-box';
+    box.setAttribute('aria-label', '제휴 상품 링크');
+    box.innerHTML = `<h2 class="mt0">🛒 함께 준비하면 좋은 용품 <span class="sub">제휴 링크 · 광고</span></h2>
+      <div class="rowlist">${items.map(x => `<a class="row" href="${esc(x.u)}" target="_blank" rel="sponsored nofollow noopener">
+        <div class="grow"><div class="tit">${esc(x.t)}</div>${x.d ? `<div class="desc">${esc(x.d)}</div>` : ''}</div>
+        <div class="aff-go">쿠팡에서 보기 ↗</div></a>`).join('')}</div>
+      <p class="aff-note">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다. 가격·재고·사양은 쿠팡 상품 페이지에서 확인하세요.</p>`;
+    mainEl.appendChild(box);
+  }
+
   /* ── 지역 셀렉터 (시도 → 시군구) ──
      mount(el, {onPick, value}) */
   window.regionPicker = async function (el, opts) {
@@ -782,7 +820,7 @@
 
   /* ── 부팅 ── */
   document.addEventListener('DOMContentLoaded', () => {
-    header(); footer(); renderCmpBar(); renderAds();
+    header(); footer(); renderCmpBar(); renderAds(); renderPartners();
   });
 
   /* ── (?)툴팁: 모바일 탭 토글, 바깥 탭으로 닫기 ── */
