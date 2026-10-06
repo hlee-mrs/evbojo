@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');</script>
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7688026325140831" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 하위 경로(/region/ 등)에서도 상대 URL이 루트 기준으로 풀리도록 base 고정 — app.js의 data/*.json fetch·nav 링크가 그대로 동작 -->
+<base href="/">
+<title>추가공고 뒤 잔여는 얼마나 빨리 줄었나 — 45일 실측으로 본 소진 속도 | EV보조금</title>
+<meta name="description" content="2026년 8월 23일부터 10월 6일까지 45일 동안 160개 지자체의 승용 잔여 대수를 매시간 기록했습니다. 추가공고로 잔여가 늘어난 사례 138건 중 40건은 관측 기간 안에 다시 0이 됐고 소요 일수의 중앙값은 28일이었습니다. 지난 7일 동안 잔여가 전혀 줄지 않은 지역이 3분의 2라는 사실도 함께 읽습니다.">
+<link rel="canonical" href="https://evbojo.co.kr/articles/quota-depletion-speed-45days.html">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<meta name="naver-site-verification" content="29413de3319d0b4b5a504cdbb92084043d6d663b" />
+<meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
+<meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":"https://evbojo.co.kr/"},{"@type":"ListItem","position":2,"name":"읽을거리","item":"https://evbojo.co.kr/articles.html"},{"@type":"ListItem","position":3,"name":"소진 속도 실측","item":"https://evbojo.co.kr/articles/quota-depletion-speed-45days.html"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"추가공고 뒤 잔여는 얼마나 빨리 줄었나 — 45일 실측으로 본 소진 속도","description":"2026년 8월 23일부터 10월 6일까지 45일 동안 160개 지자체의 승용 잔여 대수를 매시간 기록했습니다. 추가공고로 잔여가 늘어난 사례 138건 중 40건은 관측 기간 안에 다시 0이 됐고 소요 일수의 중앙값은 28일이었습니다. 지난 7일 동안 잔여가 전혀 줄지 않은 지역이 3분의 2라는 사실도 함께 읽습니다.","datePublished":"2026-10-06","dateModified":"2026-10-06","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/articles/quota-depletion-speed-45days.html"}</script>
+</head>
+<body>
+<!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
+<header id="site-header" class="site-header"><div class="inner">
+  <a class="logo" href="/"><span class="bolt">⚡</span>EV보조금</a>
+  <nav class="gnb" aria-label="주 메뉴"><a href="/">홈</a><a href="status.html">전국 현황판</a><details class="nav-dd"><summary>도구</summary><div class="dd"><a href="calc.html">유지비 계산기</a><a href="check.html">자격 진단</a><a href="refund.html">환수 계산</a><a href="compare.html">차종 비교</a></div></details><details class="nav-dd"><summary>가이드</summary><div class="dd"><a href="guide.html">신청 절차</a><a href="law.html">제도·법령</a><a href="faq.html">FAQ</a></div></details><details class="nav-dd"><summary>읽을거리</summary><div class="dd"><a href="articles.html">읽을거리 전체</a><a href="brief/">일일 브리핑</a><a href="model/">모델별 시리즈</a></div></details></nav>
+</div></header>
+
+<main class="container">
+<nav class="small muted" aria-label="현재 위치" style="margin:14px 0 0"><a href="/">홈</a> › <a href="/articles.html">읽을거리</a> › <b>소진 속도 실측</b></nav>
+<div class="hero" style="text-align:left;padding-bottom:0">
+  <p class="muted small">전기차 보조금 해설 · 데이터 분석</p>
+  <h1>추가공고 뒤 잔여는 얼마나 빨리 줄었나 — 45일 실측으로 본 소진 속도</h1>
+  <p>예측이 아니라 기록입니다. 어떤 지역은 나흘 만에, 어떤 지역은 한 달 넘게 걸렸습니다.</p>
+</div>
+
+<p class="stamp"><span>글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 게시 2026-10-06 · 데이터 기준 2026-10-06 · 수치는 무공해차 통합누리집(ev.or.kr) 공고 데이터를 이 사이트가 매시간 수집한 실측값</span></p>
+
+<section class="card"><p style="line-height:1.75;margin:10px 0">&quot;지금 신청하면 받을 수 있나요&quot;라는 질문에 정직하게 답하려면 &#39;얼마나 빨리 줄어드는가&#39;를 알아야 합니다. 이 사이트는 2026년 8월 23일부터 160개 지자체(한국환경공단 제외)의 승용 <b>전체 잔여 대수</b>를 매시간 기록해 왔습니다. 이 글은 10월 6일까지 45일 치 기록을 정리한 것입니다. 미래를 맞히는 글이 아니라 지나간 숫자를 읽는 글이며, 지역 페이지의 &#39;잔여 추이&#39; 그래프가 보여 주는 선이 바로 이 기록입니다.</p></section>
+<section class="card"><h2>관측 결과 한눈에</h2>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>항목</th><th>값</th></tr></thead><tbody><tr><td>관측 지역</td><td class="num">160곳</td></tr><tr><td>10월 6일 기준 승용 잔여 0인 지역</td><td>59곳 (37%)</td></tr><tr><td>관측 기간 중 잔여가 늘어난 사례 (추가공고·회차 전환)</td><td class="num">138건</td></tr><tr><td>그중 관측 기간 안에 다시 잔여 0이 된 사례</td><td class="num">40건</td></tr><tr><td>늘어난 뒤 0이 되기까지 걸린 일수의 중앙값</td><td class="num">28일</td></tr><tr><td>지난 7일 동안 잔여가 전혀 줄지 않은 지역</td><td>104곳 (비교 가능한 154곳 중)</td></tr></tbody></table></div>
+<p style="line-height:1.75;margin:10px 0">가장 눈에 띄는 숫자는 마지막 줄입니다. 지난 7일(9월 29일~10월 6일) 사이 잔여가 늘어난 곳과 기록이 모자란 곳을 뺀 154곳 가운데 104곳, 즉 열 곳 중 일곱 곳 가까이는 <b>한 주 동안 잔여가 1대도 줄지 않았습니다</b>. 잔여가 매일 또박또박 줄어드는 지역은 소수입니다.</p></section>
+<div class="ad-slot" data-slot="article-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
+<section class="card"><h2>왜 &#39;빠르게 줄지 않는&#39; 지역이 많은가</h2>
+<p style="line-height:1.75;margin:10px 0">잔여 대수는 신청한 순간 줄어드는 숫자가 아닙니다. 공단 통계의 잔여는 <b>공고 대수에서 출고 대수를 뺀 값</b>이라, 접수가 다 차도 출고가 이뤄지기 전까지는 줄지 않습니다. 접수는 이미 마감됐는데 잔여 숫자는 몇 주째 그대로인 지역이 생기는 이유입니다. 반대로 잔여가 수백 대 남아 보여도 접수가 끝난 경우가 있습니다. 숫자가 멈춰 있다는 것은 &#39;여유가 있다&#39;가 아니라 &#39;집계가 출고를 기다리고 있다&#39;일 때가 많습니다.</p>
+<p style="line-height:1.75;margin:10px 0">그래서 이 사이트는 지역 페이지에서 잔여 수치와 함께 공단 등록 접수상태, 지자체 공지 원문, 회차 일정을 나란히 보여 줍니다. 네 가지가 같은 방향을 가리킬 때만 &#39;지금 넣을 수 있다&#39;고 판단하는 것이 안전합니다. 숫자 하나로 판단하는 법은 <a href="quota-reading.html">잔여대수 읽는 법</a>에 정리돼 있습니다.</p></section>
+<section class="card"><h2>빨리 줄어든 사례</h2>
+<p style="line-height:1.75;margin:10px 0">관측 기간에 잔여가 늘어난 뒤 가장 빨리 0이 된 지역은 경기 <a href="/region/4161.html">광주시</a>였습니다. 추경2차 접수가 시작된 8월 31일 잔여가 160대에서 486대로 늘었고, 9월 4일에 0이 됐습니다. <b>나흘</b>입니다. 잔여가 늘어난 날 바로 0으로 기록된 집계상 사례는 제외했습니다. 40건의 중앙값이 28일이니, 나흘은 예외적으로 빠른 쪽입니다.</p>
+<p style="line-height:1.75;margin:10px 0">이 숫자를 &#39;우리 지역도 나흘&#39;로 옮기면 안 됩니다. 지역마다 공고 물량, 대기 수요, 차감 방식이 다르고 같은 지역도 회차마다 다릅니다. 다만 한 가지 교훈은 공통입니다. 추가공고가 뜨면 <b>며칠 안에 결정이 끝나는 지역이 실제로 있다</b>는 것입니다. 계약 조건과 서류를 미리 갖춰 두어야 하는 이유입니다.</p></section>
+<section class="card"><h2>숫자를 읽는 세 가지 규칙</h2>
+<ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px;line-height:1.7"><li style="margin:4px 0"><b>잔여 0은 접수 마감이 아닙니다.</b> 취소·미출고 대비 접수를 계속 받는 지자체가 많습니다. 반대로 잔여가 남아도 접수가 끝났을 수 있습니다.</li><li style="margin:4px 0"><b>내 유형의 칸을 보세요.</b> 전체 잔여가 남아도 일반 칸은 0인 경우, 그 반대인 경우가 모두 있습니다. 지역 페이지의 유형 탭이 칸별 잔여를 보여 줍니다.</li><li style="margin:4px 0"><b>그래프의 점선을 보세요.</b> 잔여 추이 그래프에서 세로 점선은 추가공고로 물량이 늘어난 날입니다. 점선 이후의 기울기가 그 회차의 속도입니다.</li></ul></section>
+<section class="card"><h2>이 기록을 어디서 보나</h2>
+<p style="line-height:1.75;margin:10px 0">지역 페이지 상단, 잔여 숫자 아래에 최근 28일 추이 그래프가 있습니다. 홈에서 내 지역을 고르면 같은 그래프가 카드에 나옵니다. 그래프 아래의 &#39;지난 7일 동안 N대 감소&#39;는 실측 증감이고, 추가공고가 있었던 주에는 증감 대신 공고 사실을 적습니다. 이 사이트는 &#39;언제 0이 되는지&#39;를 날짜로 점찍어 적지 않습니다. 기록으로 알 수 있는 것과 없는 것을 구분하는 것이 이 데이터를 다루는 원칙입니다.</p>
+<p style="line-height:1.75;margin:10px 0">이 글의 숫자는 2026년 8월 23일~10월 6일 관측 기준입니다. 이후의 변화는 지역 페이지와 <a href="status.html">전국 현황판</a>에서 확인하세요.</p></section>
+
+<section class="card">
+  <h2 class="mt0">함께 보면 좋은 자료</h2>
+  <div class="chips"><a class="chip" href="quota-reading.html">잔여대수 읽는 법</a><a class="chip" href="sold-out.html">소진됐다면 할 일</a><a class="chip" href="status.html">전국 현황판</a><a class="chip" href="second-round.html">추경·2차 공고 패턴</a><a class="chip" href="articles.html">📚 읽을거리 전체 보기</a></div>
+</section>
+
+<div class="ad-slot" data-slot="article-2"><div class="ad-label">광고</div><div class="ad-box"></div></div>
+
+</main>
+
+<footer id="site-footer" class="site-footer"><div class="inner">
+  <div class="links">
+    <a href="about.html">사이트 소개</a><a href="articles.html">읽을거리</a><a href="privacy.html">개인정보처리방침</a>
+    <a href="donate.html">💛 후원하기</a>
+    <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
+    <a href="report.html">오류 제보</a>
+  </div>
+  <div id="foot-stamp">단가 수집일 <b>2026-10-06</b> · 출처 무공해차 통합누리집(ev.or.kr) · 2026년 전기승용 기준</div>
+  <div class="disclaimer">
+    본 사이트는 <b>정부·공공기관과 무관한 개인 운영 정보 사이트</b>입니다. 게시된 보조금·제도 정보는 참고용이며 법적 효력이 없습니다.
+    실제 지원 금액·자격·잔여 물량은 반드시 <b>무공해차 통합누리집(ev.or.kr)</b>과 관할 지자체 공고문으로 확인하세요.
+    본 사이트는 광고(Google AdSense 등)를 게재하며, 광고 수익으로 운영됩니다.
+  </div>
+  <div class="mt8">© 2026 EV보조금 · 데이터 출처: 무공해차 통합누리집(ev.or.kr)</div>
+</div></footer>
+<script src="assets/js/app.js" defer></script>
+<script src="assets/js/detail.js" defer></script>
+</body>
+</html>
