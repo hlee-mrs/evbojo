@@ -1,18 +1,28 @@
 {
 "/": {
-"d": "2026-09-29",
-"h": "e88cea1e6a8f90523a0a0632f7a61612",
+"d": "2026-10-06",
+"h": "e352201ae848e5728fe366a2737426df",
 "hh": "4902732d42fa11eb156d984237497d2a"
 },
 "/about.html": {
-"d": "2026-08-31",
-"h": "bb739fce2c7e1c0b8a86772de58f3870",
+"d": "2026-10-06",
+"h": "999ffe8f6c64010e5e371485b4b46690",
 "hh": "4edf38b275ea6f925bb6cb20e0932dd5"
 },
 "/articles.html": {
-"d": "2026-09-04",
-"h": "88798a1b13276deb4af9abc3b3636cfa",
+"d": "2026-10-06",
+"h": "d757b2fd890383ce8ada7c0a3e5bbf5e",
 "hh": "b0698eab29af25003c875c68f79d7996"
+},
+"/articles/quota-depletion-speed-45days.html": {
+"d": "2026-10-06",
+"h": "945ff7f1a143707984db00e65c76259e",
+"hh": "25399230841ebf9860e6be7daf905b21"
+},
+"/articles/supplementary-rounds-2026.html": {
+"d": "2026-10-06",
+"h": "48d88f8ff2ae18cc1a7b3506f702ceb8",
+"hh": "6cf11bb7766f24b5a73063cc3d0a1790"
 },
 "/buyer-types.html": {
 "d": "2026-08-31",

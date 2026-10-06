@@ -37,6 +37,7 @@ DATA = os.path.join(SITE, 'data')
 TPL_DIR = os.path.join(HERE, 'templates')
 SIDO_MD_DIR = os.path.join(HERE, 'content', 'sido')
 MODEL_MD_DIR = os.path.join(HERE, 'content', 'model')
+ARTICLE_MD_DIR = os.path.join(HERE, 'content', 'articles')   # 해설 글 시리즈(발행 게이트) → site/articles/
 LASTMOD_STORE = os.path.join(HERE, '.page_lastmod.json')   # 페이지별 내용 해시·최종 변경일(빌드 캐시)
 REGION_NOINDEX = os.path.join(DATA, 'region_noindex.json')   # 롱테일 지역 noindex 목록(cd 배열)
 BASE = 'https://evbojo.co.kr'
@@ -2565,6 +2566,12 @@ def md_to_html(md_text):
             href = tgt
         return '<a href="%s">%s</a>' % (href, txt)
 
+    def inline(text):
+        t = esc(text)                                            # 이스케이프 먼저(링크 문법은 보존됨)
+        t = re.sub(r'\[([^\]]+)\]\(([^)\s]+)\)', link_repl, t)
+        return re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', t)
+
+    NUM_CELL = re.compile(r'[\d,.%~+\-\s]+(?:만원|대|곳|일|건|km|%)?')
     out = []
     for block in re.split(r'\n\s*\n', md_text.strip()):
         block = block.strip()
@@ -2575,10 +2582,23 @@ def md_to_html(md_text):
             continue
         if block.startswith('# '):
             continue  # 문서 제목은 페이지 h1이 대신함
-        body = esc(re.sub(r'\s*\n\s*', ' ', block))          # 이스케이프 먼저(링크 문법은 보존됨)
-        body = re.sub(r'\[([^\]]+)\]\(([^)\s]+)\)', link_repl, body)
-        body = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', body)
-        out.append('<p style="line-height:1.75;margin:10px 0">%s</p>' % body)
+        lines = [l.strip() for l in block.split('\n') if l.strip()]
+        if lines and all(l.startswith('- ') for l in lines):      # 불릿 목록(해설 글 시리즈용)
+            out.append('<ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px;line-height:1.7">%s</ul>'
+                       % ''.join('<li style="margin:4px 0">%s</li>' % inline(l[2:]) for l in lines))
+            continue
+        if len(lines) >= 2 and all(l.startswith('|') for l in lines):   # 파이프 표(첫 줄 머리글, 구분선 행 무시)
+            rows = [[c.strip() for c in l.strip('|').split('|')] for l in lines
+                    if not re.fullmatch(r'\|?[\s:|-]+\|?', l)]
+            if rows:
+                head = ''.join('<th>%s</th>' % inline(c) for c in rows[0])
+                body_rows = ''.join('<tr>%s</tr>' % ''.join(
+                    '<td%s>%s</td>' % (' class="num"' if NUM_CELL.fullmatch(c) else '', inline(c)) for c in r)
+                    for r in rows[1:])
+                out.append('<div class="tbl-wrap"><table class="tbl"><thead><tr>%s</tr></thead><tbody>%s</tbody></table></div>'
+                           % (head, body_rows))
+                continue
+        out.append('<p style="line-height:1.75;margin:10px 0">%s</p>' % inline(re.sub(r'\s*\n\s*', ' ', block)))
     return '\n'.join(out), fm
 
 
@@ -2740,6 +2760,103 @@ def load_model_entries(today_kst):
         entries.append({'slug': slug, 'group': group, 'prose': prose, 'fm': fm, 'publish': pub})
     entries.sort(key=lambda e: (e['publish'], e['slug']))
     return entries
+
+
+# ── 해설 글 시리즈 (updater/content/articles/{slug}.md → site/articles/{slug}.html) ──────────
+def load_article_entries(today_kst):
+    """해설 글 원고 로드. 프런트매터: title·description·publish(필수) / modified·asof·crumb·kicker·sub·h1·related(선택).
+    related = "href|라벨;href|라벨". publish가 KST 오늘보다 미래면 어디에도 노출하지 않는다(I9 발행 게이트)."""
+    entries = []
+    if not os.path.isdir(ARTICLE_MD_DIR):
+        return entries
+    for fn in sorted(os.listdir(ARTICLE_MD_DIR)):
+        if not fn.endswith('.md'):
+            continue
+        slug = fn[:-3]
+        if not re.fullmatch(r'[a-z0-9-]+', slug):
+            print('경고: articles/%s 슬러그 형식 불일치 — 제외' % fn, file=sys.stderr)
+            continue
+        with open(os.path.join(ARTICLE_MD_DIR, fn), encoding='utf-8') as f:
+            prose, fm = md_to_html(f.read())
+        pub = (fm.get('publish') or '').strip()
+        if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', pub):
+            print('경고: articles/%s publish 형식 불일치 %r — 제외' % (fn, pub), file=sys.stderr)
+            continue
+        if pub > today_kst:
+            continue                                    # 시차 발행 — 도래 전엔 어디에도 노출하지 않음
+        if not fm.get('title') or not fm.get('description'):
+            print('경고: articles/%s title/description 누락 — 제외' % fn, file=sys.stderr)
+            continue
+        mod = (fm.get('modified') or '').strip()
+        if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', mod) or mod < pub:
+            mod = pub
+        entries.append({'slug': slug, 'prose': prose, 'fm': fm, 'publish': pub, 'modified': mod})
+    entries.sort(key=lambda e: (e['publish'], e['slug']))
+    return entries
+
+
+def build_article(entry, ctx):
+    """해설 글 한 편 — 원고(md)만으로 완성되는 정적 페이지(데이터 섹션 없음, 수치는 원고의 '데이터 기준'일에 고정).
+    첫 소제목 앞은 리드 카드, 소제목마다 카드 하나. 광고 1은 두 번째 카드 뒤(I4 게이트는 ad_slot이 판정)."""
+    slug, fm = entry['slug'], entry['fm']
+    title, desc = fm['title'], fm['description']
+    crumb = fm.get('crumb') or (title.split(' — ')[0] if ' — ' in title else title)
+    canonical = '%s/articles/%s.html' % (BASE, slug)
+    cards = ['<section class="card">%s</section>' % p.strip()
+             for p in re.split(r'(?=<h2>)', entry['prose']) if p.strip()]
+    related = []
+    for item in (fm.get('related') or '').split(';'):
+        if '|' in item:
+            href, label = item.split('|', 1)
+            related.append('<a class="chip" href="%s">%s</a>' % (esc(href.strip()), esc(label.strip())))
+    related.append('<a class="chip" href="articles.html">📚 읽을거리 전체 보기</a>')
+    gate = len(strip_tags('\n'.join(cards) + ''.join(related)))
+    ad1, ad2 = ad_slot('article-1', gate, False), ad_slot('article-2', gate, False)
+    if ad1:
+        cards.insert(min(2, len(cards)), ad1)
+    mapping = {
+        'KICKER': esc(fm.get('kicker') or '전기차 보조금 해설 · 데이터 분석'),
+        'H1': esc(fm.get('h1') or title), 'SUB': esc(fm.get('sub') or ''),
+        'PUBLISHED': esc(entry['publish']),
+        'MODIFIED': (' · 수정 %s' % esc(entry['modified'])) if entry['modified'] != entry['publish'] else '',
+        'ASOF': esc(fm.get('asof') or entry['publish']),
+        'PROSE': '\n'.join(cards), 'RELATED': ''.join(related), 'AD2': ad2,
+    }
+    main = render(ctx['tpl_article'], mapping)
+    ld = [{'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
+              {'@type': 'ListItem', 'position': 1, 'name': '홈', 'item': BASE + '/'},
+              {'@type': 'ListItem', 'position': 2, 'name': '읽을거리', 'item': BASE + '/articles.html'},
+              {'@type': 'ListItem', 'position': 3, 'name': crumb, 'item': canonical}]},
+          {'@context': 'https://schema.org', '@type': 'Article', 'headline': title, 'description': desc,
+           'datePublished': entry['publish'], 'dateModified': entry['modified'], 'inLanguage': 'ko',
+           'author': {'@type': 'Person', 'name': 'HyeongHun Lee', 'url': BASE + '/about.html#operator'},
+           'publisher': {'@type': 'Organization', 'name': 'EV보조금'}, 'mainEntityOfPage': canonical}]
+    return render(ctx['tpl_page'], {
+        'TITLE': esc('%s | EV보조금' % title), 'DESC': esc(desc), 'ROBOTS': '', 'CANONICAL': canonical,
+        'JSONLD': jsonld_script(ld),
+        'BREADCRUMB': '<a href="/">홈</a> › <a href="/articles.html">읽을거리</a> › <b>%s</b>' % esc(crumb),
+        'MAIN': main, 'META_UPDATED': esc(entry['modified']),
+    })
+
+
+def build_latest_block(manifest, n, home):
+    """홈·읽을거리 허브의 '최신 글' derived 블록 — articles.json 상위 n편. 발행된 글이 없으면 빈 문자열(슬롯만 남음)."""
+    items = manifest[:n]
+    if not items:
+        return ''
+    rows = ''.join('<a class="row" href="%s"><div class="grow"><div class="tit">%s</div><div class="desc">%s</div></div>'
+                   '<div class="amt" style="font-size:12.5px;color:var(--text3);font-weight:600">%s</div></a>'
+                   % (esc(a['url']), esc(a['title']),
+                      esc(a['description'][:96] + ('…' if len(a['description']) > 96 else '')),
+                      esc(a['publish'][5:].replace('-', '/'))) for a in items)
+    if home:
+        return ('<!--derived:start--><section class="card" id="latest-card" aria-label="최신 해설">'
+                '<h2 class="mt0">📰 최신 해설 <span class="sub">실측 데이터로 쓰는 보조금 이야기 · 매주 발행</span></h2>'
+                '<div class="rowlist">%s</div><p class="small muted mt8"><a href="/articles.html">읽을거리 전체 보기 →</a></p>'
+                '</section><!--derived:end-->' % rows)
+    return ('<!--derived:start--><section class="card" id="latest-card" aria-label="새로 올라온 글">'
+            '<h2>🆕 새로 올라온 글 <span class="sub">게시일 순 · 실측 데이터 기반 해설</span></h2>'
+            '<div class="rowlist">%s</div></section><!--derived:end-->' % rows)
 
 
 def build_model(entry, cars, regions, meta, status, ctx):
@@ -3015,7 +3132,7 @@ def build_brief_hub(brief_days, meta, status, ctx):
 #  sitemap · 쓰기 · 메인
 # ══════════════════════════════════════════════════════════
 def build_sitemap(regions, cars, today, model_entries=(), brief_days=(), car_rep=None,
-                  pages=None, store=None, region_noindex=()):
+                  pages=None, store=None, region_noindex=(), article_entries=()):
     """lastmod 신뢰 원칙: **실제 내용이 바뀐 날만** 기재.
 
     - 정적 CORE + 데이터 페이지(region/car/sido/모델 허브·시리즈) = <main> 내용 해시(수치 마스킹)
@@ -3090,6 +3207,11 @@ def build_sitemap(regions, cars, today, model_entries=(), brief_days=(), car_rep
         urls.append((BASE + key, 'weekly',
                      lm_of(key, pages.get(os.path.join(SITE, 'model', e['slug'] + '.html')),
                            pub, floor=pub)))
+    for e in article_entries:                           # 해설 글 시리즈 — 모델 시리즈와 같은 규칙(내용 해시, 발행일 하한)
+        pub = e.get('publish') or today
+        key = '/articles/%s.html' % e['slug']
+        urls.append((BASE + key, 'weekly',
+                     lm_of(key, pages.get(os.path.join(SITE, 'articles', e['slug'] + '.html')), pub, floor=pub)))
     # 브리핑(/brief/)은 자동 생성 콘텐츠 정책상 noindex — 사이트맵에서 전체 제외(발행·열람은 유지)
     body = '\n'.join('<url><loc>%s</loc><lastmod>%s</lastmod><changefreq>%s</changefreq></url>'
                      % (u, lm, f) for u, f, lm in urls)
@@ -3133,7 +3255,7 @@ def main():
                    if cd != '9999'
                    and ((status['data'].get(cd) or {}).get('left') or 0) > 0
                    and not closed_map[cd]['closed'])
-    ctx = {'tpl_page': load_tpl('page.tpl'), 'tpl_region': load_tpl('region.tpl'),
+    ctx = {'tpl_page': load_tpl('page.tpl'), 'tpl_region': load_tpl('region.tpl'), 'tpl_article': load_tpl('article.tpl'),
            'tpl_car': load_tpl('car.tpl'), 'tpl_sido': load_tpl('sido.tpl'),
            'tpl_model': load_tpl('model.tpl'),
            'asof_day': asof_day if asof_day is not None else (datetime.date.today() - D0).days,
@@ -3173,6 +3295,16 @@ def main():
     ctx['model_pub'] = {e['group']: e['slug'] for e in pub_entries}
     pages[os.path.join(SITE, 'model', 'index.html')] = build_model_hub(pub_entries, meta, status, ctx)
 
+    # 해설 글 시리즈 — 발행 게이트 통과분만 생성. 매니페스트(site/data/articles.json)는 홈·허브 '최신 글'의 정본
+    art_entries = load_article_entries(today_kst)
+    for e in art_entries:
+        pages[os.path.join(SITE, 'articles', e['slug'] + '.html')] = build_article(e, ctx)
+    art_manifest = [{'slug': e['slug'], 'url': '/articles/%s.html' % e['slug'], 'title': e['fm']['title'],
+                     'description': e['fm']['description'], 'publish': e['publish'], 'modified': e['modified'],
+                     'crumb': e['fm'].get('crumb') or ''}
+                    for e in sorted(art_entries, key=lambda x: (x['publish'], x['slug']), reverse=True)]
+    pages[os.path.join(SITE, 'data', 'articles.json')] = json.dumps(art_manifest, ensure_ascii=False, indent=1)
+
     for cd, r in regions.items():
         html, _ = build_region(cd, r, cars, regions, meta, status, hist, ctx)
         pages[os.path.join(SITE, 'region', cd + '.html')] = html
@@ -3193,23 +3325,32 @@ def main():
         pages[os.path.join(SITE, 'brief', 'latest.json')] = json.dumps(
             {'d': brief_days[0], 'desc': _brief_desc(brief_days[0])}, ensure_ascii=False)
 
-    # ── 홈 '접수 일정' 카드 — index.html의 <!--sched:start-->…<!--sched:end--> 사이만 갱신 ──
-    # 슬롯이 없으면 건너뛴다(손편집 마크업 보존·fail-safe). 카드는 derived 블록이라 루트 lastmod 무영향.
+    # ── 루트 손편집 페이지의 derived 슬롯 갱신 — <!--NAME:start-->…<!--NAME:end--> 사이만 다시 쓴다 ──
+    # 슬롯이 없으면 건너뛴다(손편집 마크업 보존·fail-safe). 블록은 derived라 루트 lastmod(R5·R7) 무영향.
+    #   index.html: sched(접수 일정 카드)·latest(최신 해설 4편) / articles.html: latest(새 글 전체)
+    def _fill_slots(rel, blocks):
+        fp = os.path.join(SITE, rel)
+        try:
+            with open(fp, encoding='utf-8') as f:
+                html = f.read()
+        except OSError:
+            print('경고: %s 없음 — 슬롯 갱신 건너뜀' % rel, file=sys.stderr)
+            return
+        new = html
+        for name, content in blocks.items():
+            m = re.search(r'<!--%s:start-->(.*?)<!--%s:end-->' % (name, name), new, re.S)
+            if not m:
+                print('경고: %s에 슬롯 %s 없음 — 건너뜀' % (rel, name), file=sys.stderr)
+                continue
+            new = new[:m.start(1)] + '\n' + content + '\n' + new[m.end(1):]
+        if new != html:
+            pages[fp] = new
     try:
-        idx_fp = os.path.join(SITE, 'index.html')
-        with open(idx_fp, encoding='utf-8') as f:
-            idx_html = f.read()
-        m = _SCHED_SLOT_RE.search(idx_html)
-        if m:
-            card = build_home_schedule(regions, rounds, datetime.date.fromisoformat(kst_today),
-                                       status.get('updated', ''))
-            new_idx = idx_html[:m.start(1)] + '\n' + card + '\n' + idx_html[m.end(1):]
-            if new_idx != idx_html:
-                pages[idx_fp] = new_idx
-        else:
-            print('경고: index.html에 접수 일정 슬롯(<!--sched:start-->)이 없어 홈 카드 생성을 건너뜀', file=sys.stderr)
+        sched = build_home_schedule(regions, rounds, datetime.date.fromisoformat(kst_today), status.get('updated', ''))
+        _fill_slots('index.html', {'sched': sched, 'latest': build_latest_block(art_manifest, 4, home=True)})
+        _fill_slots('articles.html', {'latest': build_latest_block(art_manifest, 12, home=False)})
     except Exception as ex:                       # 부가 기능 — 빌드 결과에 영향 주지 않음
-        print('경고: 홈 접수 일정 카드 생성 실패 — %s' % ex, file=sys.stderr)
+        print('경고: 루트 슬롯 갱신 실패 — %s' % ex, file=sys.stderr)
 
     # ── 색인 도달성 가드 ──────────────────────────────────
     # 대표 트림이라도 사이트 안에서 링크로 닿을 수 없으면(제원 미공개라 차종 랭킹에서 빠지는 등)
@@ -3270,13 +3411,13 @@ def main():
 
     sitemap, n_urls, lm_store = build_sitemap(
         regions, cars, today, pub_entries, brief_days, ctx.get('car_rep'),
-        pages=pages, store=prev_store, region_noindex=ctx['region_noindex'])
+        pages=pages, store=prev_store, region_noindex=ctx['region_noindex'], article_entries=art_entries)
 
     for path, html in pages.items():
         atomic_write(path, html)
     # 생성 대상에서 빠진 잔재 파일 정리(차종 삭제·발행 회수 등) — 이 5개 디렉터리는 생성기 소유.
     # 단 brief의 날짜 파일(YYYY-MM-DD.html)은 daily_brief.py 산출물이라 절대 삭제하지 않음(영구 보존).
-    for sub in ('region', 'car', 'sido', 'model', 'brief'):
+    for sub in ('region', 'car', 'sido', 'model', 'brief', 'articles'):
         droot = os.path.join(SITE, sub)
         if not os.path.isdir(droot):
             continue
@@ -3299,9 +3440,9 @@ def main():
 
     dt = (datetime.datetime.now() - t0).total_seconds()
     n_rx = len(ctx['region_noindex']) + (1 if '9999' in regions else 0)   # 롱테일 + 한국환경공단
-    print('prerender OK: region %d(noindex %d) · car %d · sido %d · model %d(허브 포함) · '
+    print('prerender OK: region %d(noindex %d) · car %d · sido %d · model %d(허브 포함) · 해설 글 %d편 · '
           'brief 허브+%d편 · sitemap %d URLs · lastmod 오늘자 %d/%d · %.1fs'
-          % (n_region, n_rx, n_car, n_sido, n_model, len(brief_days), n_urls,
+          % (n_region, n_rx, n_car, n_sido, n_model, len(art_entries), len(brief_days), n_urls,
              sum(1 for v in lm_store.values() if v['d'] == today), len(lm_store), dt))
 
 

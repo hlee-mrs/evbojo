@@ -70,6 +70,10 @@ R8_MAX_STALE_HOURS = 3
 # GSC Search Analytics는 약 3일 지연 → 7일 창의 종료일 = 오늘-3일 (gsc_report.py와 동일)
 GSC_LAG_DAYS = 3
 GSC_WINDOW_DAYS = 7
+# R9 최근 30일 안에 발행된 편집 글 수 — 4차 반려 문구('지속적인 콘텐츠 큐레이션', '꾸준히 운영')에 대응하는
+#    실측 지표. 글은 updater/content/articles/*.md 시차 발행으로 쌓이고, JSON-LD datePublished로 센다.
+R9_WINDOW_DAYS = 30
+R9_MIN_NEW_ARTICLES = 3
 
 # 색인 스냅샷의 버킷 키(index_watch._bucket) — '해설' 아티클은 article
 ARTICLE_BUCKET = "article"
@@ -84,6 +88,7 @@ LABELS = {
     "R6": ("검색 클릭 추세(7일 vs 직전 7일)", "≥ {:.0f}%".format(R6_CLICK_RATIO * 100)),
     "R7": ("sitemap lastmod 당일 비율", "< {:.0f}%".format(R7_MAX_TODAY_LASTMOD * 100)),
     "R8": ("라이브 status.json 신선도", "≤ {}시간".format(R8_MAX_STALE_HOURS)),
+    "R9": ("최근 {}일 신규 편집 글".format(R9_WINDOW_DAYS), "≥ {}편".format(R9_MIN_NEW_ARTICLES)),
 }
 
 
@@ -258,7 +263,8 @@ def crit_surface_stable(today, sitemap_path=SITEMAP):
     except Exception as ex:
         return _crit("R5", "측정 실패", False,
                      "sitemap 오류: {}: {}".format(type(ex).__name__, str(ex)[:80])), None
-    days = [d for p, d in entries if _is_editorial(p) and d]
+    # 새 글의 발행(lastmod == datePublished)은 '큐레이션'이지 '수정'이 아니다 — 안정 기간을 리셋하지 않는다.
+    days = [d for p, d in entries if _is_editorial(p) and d and d != _date_published(p)]
     if not days:
         return _crit("R5", "측정 실패", False, "편집 URL의 lastmod 없음"), None
     last = max(days)
@@ -267,6 +273,45 @@ def crit_surface_stable(today, sitemap_path=SITEMAP):
     eta = None if ok else (last + dt.timedelta(days=R5_MIN_STABLE_DAYS)).isoformat()
     return _crit("R5", "{}일 (최근 변경 {})".format(age, last.isoformat()), ok,
                  "편집 URL {}건 기준".format(len(days)), age), eta
+
+
+_PUB_RE = re.compile(r'"datePublished":\s*"(\d{4}-\d{2}-\d{2})"')
+SITE_DIR = os.path.dirname(SITEMAP)
+
+
+def _date_published(path):
+    """로컬 페이지의 JSON-LD datePublished(없으면 None). 경로 '/'는 index.html."""
+    fp = os.path.join(SITE_DIR, (path.lstrip('/') or 'index.html'))
+    try:
+        with open(fp, encoding='utf-8') as f:
+            m = _PUB_RE.search(f.read())
+    except OSError:
+        return None
+    return dt.date.fromisoformat(m.group(1)) if m else None
+
+
+def crit_fresh_articles(today):
+    """R9 — 루트·/articles/ 편집 페이지 중 datePublished가 최근 R9_WINDOW_DAYS일 안인 글 수."""
+    import glob
+    recent = []
+    for fp in sorted(glob.glob(os.path.join(SITE_DIR, '*.html')) + glob.glob(os.path.join(SITE_DIR, 'articles', '*.html'))):
+        try:
+            with open(fp, encoding='utf-8') as f:
+                html = f.read()
+        except OSError:
+            continue
+        if 'noindex' in html[:4000]:
+            continue
+        m = _PUB_RE.search(html)
+        if not m:
+            continue
+        d = dt.date.fromisoformat(m.group(1))
+        if 0 <= (today - d).days <= R9_WINDOW_DAYS:
+            recent.append((d, os.path.relpath(fp, SITE_DIR)))
+    recent.sort(reverse=True)
+    latest = ', '.join('%s(%s)' % (p, d.isoformat()[5:]) for d, p in recent[:3])
+    return _crit("R9", "{}편".format(len(recent)), len(recent) >= R9_MIN_NEW_ARTICLES,
+                 "최근: " + latest if latest else "최근 {}일 발행 글 없음".format(R9_WINDOW_DAYS), len(recent))
 
 
 def crit_click_trend(token, today):
@@ -347,6 +392,7 @@ def evaluate(snap, prev_snap=None, token=None, run_selfcheck=True, use_gsc=True)
     criteria.append(crit_click_trend(token, today) if use_gsc else _skipped("R6", "--no-gsc"))
     criteria.append(crit_lastmod_today(today))
     criteria.append(crit_live_fresh(now))
+    criteria.append(crit_fresh_articles(today))
 
     unmet = [c["id"] for c in criteria if c["ok"] is False]
     unmeasured = [c["id"] for c in criteria if c["ok"] is None]

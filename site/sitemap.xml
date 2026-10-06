@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>https://evbojo.co.kr/</loc><lastmod>2026-09-29</lastmod><changefreq>daily</changefreq></url>
+<url><loc>https://evbojo.co.kr/</loc><lastmod>2026-10-06</lastmod><changefreq>daily</changefreq></url>
 <url><loc>https://evbojo.co.kr/status.html</loc><lastmod>2026-08-30</lastmod><changefreq>hourly</changefreq></url>
 <url><loc>https://evbojo.co.kr/calc.html</loc><lastmod>2026-08-31</lastmod><changefreq>daily</changefreq></url>
 <url><loc>https://evbojo.co.kr/check.html</loc><lastmod>2026-08-31</lastmod><changefreq>daily</changefreq></url>
@@ -9,9 +9,9 @@
 <url><loc>https://evbojo.co.kr/refund.html</loc><lastmod>2026-08-30</lastmod><changefreq>daily</changefreq></url>
 <url><loc>https://evbojo.co.kr/faq.html</loc><lastmod>2026-08-31</lastmod><changefreq>daily</changefreq></url>
 <url><loc>https://evbojo.co.kr/compare.html</loc><lastmod>2026-08-31</lastmod><changefreq>daily</changefreq></url>
-<url><loc>https://evbojo.co.kr/about.html</loc><lastmod>2026-08-31</lastmod><changefreq>weekly</changefreq></url>
+<url><loc>https://evbojo.co.kr/about.html</loc><lastmod>2026-10-06</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://evbojo.co.kr/privacy.html</loc><lastmod>2026-10-02</lastmod><changefreq>weekly</changefreq></url>
-<url><loc>https://evbojo.co.kr/articles.html</loc><lastmod>2026-09-04</lastmod><changefreq>weekly</changefreq></url>
+<url><loc>https://evbojo.co.kr/articles.html</loc><lastmod>2026-10-06</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://evbojo.co.kr/price-tiers.html</loc><lastmod>2026-08-31</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://evbojo.co.kr/myths.html</loc><lastmod>2026-08-31</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://evbojo.co.kr/timeline-traps.html</loc><lastmod>2026-08-31</lastmod><changefreq>weekly</changefreq></url>
@@ -209,4 +209,6 @@
 <url><loc>https://evbojo.co.kr/model/ioniq6.html</loc><lastmod>2026-09-28</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://evbojo.co.kr/model/kona.html</loc><lastmod>2026-09-28</lastmod><changefreq>weekly</changefreq></url>
 <url><loc>https://evbojo.co.kr/model/ray.html</loc><lastmod>2026-09-28</lastmod><changefreq>weekly</changefreq></url>
+<url><loc>https://evbojo.co.kr/articles/quota-depletion-speed-45days.html</loc><lastmod>2026-10-06</lastmod><changefreq>weekly</changefreq></url>
+<url><loc>https://evbojo.co.kr/articles/supplementary-rounds-2026.html</loc><lastmod>2026-10-06</lastmod><changefreq>weekly</changefreq></url>
 </urlset>

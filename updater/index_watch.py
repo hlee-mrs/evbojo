@@ -53,6 +53,8 @@ def _bucket(path):
         return "sido"
     if path.startswith("/model/"):
         return "model"
+    if path.startswith("/articles/"):    # 해설 글 시리즈(발행 게이트)
+        return "article"
     if "/" not in path[1:]:          # 루트 단일 계층 정적 해설 페이지
         return "article"
     return None                       # /region/·/car/ 등 데이터 페이지는 제외
