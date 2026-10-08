@@ -1,5 +1,14 @@
 [
  {
+  "slug": "max-amount-vs-quota",
+  "url": "/articles/max-amount-vs-quota.html",
+  "title": "보조금 많이 주는 지역이 물량도 많을까 — 금액 상위 20곳과 공고 물량의 역관계",
+  "description": "승용 최대 보조금 상위 20개 지자체의 공고 물량 중앙값은 150대, 하위 20곳은 1,270대였습니다(2026년 10월 6일 수집). 금액이 큰 지역일수록 물량은 적고, 상위 20곳 중 10곳은 이미 잔여 0입니다. 금액 랭킹만 보고 움직이면 안 되는 이유를 숫자로 설명합니다.",
+  "publish": "2026-10-09",
+  "modified": "2026-10-09",
+  "crumb": "금액 vs 물량"
+ },
+ {
   "slug": "supplementary-rounds-2026",
   "url": "/articles/supplementary-rounds-2026.html",
   "title": "2026 전기차 보조금 추경 현황 — 160곳 중 90곳이 3차 공고까지, 지역별 회차 구조 읽는 법",

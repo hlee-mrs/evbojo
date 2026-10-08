@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');</script>
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7688026325140831" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 하위 경로(/region/ 등)에서도 상대 URL이 루트 기준으로 풀리도록 base 고정 — app.js의 data/*.json fetch·nav 링크가 그대로 동작 -->
+<base href="/">
+<title>보조금 많이 주는 지역이 물량도 많을까 — 금액 상위 20곳과 공고 물량의 역관계 | EV보조금</title>
+<meta name="description" content="승용 최대 보조금 상위 20개 지자체의 공고 물량 중앙값은 150대, 하위 20곳은 1,270대였습니다(2026년 10월 6일 수집). 금액이 큰 지역일수록 물량은 적고, 상위 20곳 중 10곳은 이미 잔여 0입니다. 금액 랭킹만 보고 움직이면 안 되는 이유를 숫자로 설명합니다.">
+<link rel="canonical" href="https://evbojo.co.kr/articles/max-amount-vs-quota.html">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<meta name="naver-site-verification" content="29413de3319d0b4b5a504cdbb92084043d6d663b" />
+<meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
+<meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":"https://evbojo.co.kr/"},{"@type":"ListItem","position":2,"name":"읽을거리","item":"https://evbojo.co.kr/articles.html"},{"@type":"ListItem","position":3,"name":"금액 vs 물량","item":"https://evbojo.co.kr/articles/max-amount-vs-quota.html"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"보조금 많이 주는 지역이 물량도 많을까 — 금액 상위 20곳과 공고 물량의 역관계","description":"승용 최대 보조금 상위 20개 지자체의 공고 물량 중앙값은 150대, 하위 20곳은 1,270대였습니다(2026년 10월 6일 수집). 금액이 큰 지역일수록 물량은 적고, 상위 20곳 중 10곳은 이미 잔여 0입니다. 금액 랭킹만 보고 움직이면 안 되는 이유를 숫자로 설명합니다.","datePublished":"2026-10-09","dateModified":"2026-10-09","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/articles/max-amount-vs-quota.html"}</script>
+</head>
+<body>
+<!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
+<header id="site-header" class="site-header"><div class="inner">
+  <a class="logo" href="/"><span class="bolt">⚡</span>EV보조금</a>
+  <nav class="gnb" aria-label="주 메뉴"><a href="/">홈</a><a href="status.html">전국 현황판</a><details class="nav-dd"><summary>도구</summary><div class="dd"><a href="calc.html">유지비 계산기</a><a href="check.html">자격 진단</a><a href="refund.html">환수 계산</a><a href="compare.html">차종 비교</a></div></details><details class="nav-dd"><summary>가이드</summary><div class="dd"><a href="guide.html">신청 절차</a><a href="law.html">제도·법령</a><a href="faq.html">FAQ</a></div></details><details class="nav-dd"><summary>읽을거리</summary><div class="dd"><a href="articles.html">읽을거리 전체</a><a href="brief/">일일 브리핑</a><a href="model/">모델별 시리즈</a></div></details></nav>
+</div></header>
+
+<main class="container">
+<nav class="small muted" aria-label="현재 위치" style="margin:14px 0 0"><a href="/">홈</a> › <a href="/articles.html">읽을거리</a> › <b>금액 vs 물량</b></nav>
+<div class="hero" style="text-align:left;padding-bottom:0">
+  <p class="muted small">전기차 보조금 해설 · 데이터 분석</p>
+  <h1>보조금 많이 주는 지역이 물량도 많을까 — 금액 상위 20곳과 공고 물량의 역관계</h1>
+  <p>1,647만원의 울릉군은 공고 130대. 741만원의 서울은 19,648대.</p>
+</div>
+
+<p class="stamp"><span>글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 게시 2026-10-09 · 데이터 기준 2026-10-06 · 수치는 무공해차 통합누리집(ev.or.kr) 공고 데이터를 이 사이트가 매시간 수집한 실측값</span></p>
+
+<section class="card"><p style="line-height:1.75;margin:10px 0">&quot;보조금 제일 많이 주는 데가 어디예요?&quot; 검색창에 가장 많이 들어오는 질문 중 하나입니다. 답은 <a href="region-ranking.html">지역 랭킹</a>에 있지만, 그 답만 보고 움직이면 두 번 실망합니다. 금액이 큰 지역은 대체로 물량이 작고, 거주요건 때문에 금액을 보고 지역을 고를 수도 없기 때문입니다. 2026년 10월 6일 수집분으로 160개 지자체의 승용 최대 보조금(국비+지방비)과 공고 물량·잔여를 나란히 놓고 봤습니다.</p></section>
+<section class="card"><h2>상위 20곳 vs 하위 20곳</h2>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>구분</th><th>공고 물량 중앙값</th><th>잔여 중앙값</th><th>잔여 0인 지역</th></tr></thead><tbody><tr><td>최대 보조금 상위 20곳</td><td class="num">150.5대</td><td class="num">0.5대</td><td class="num">10곳</td></tr><tr><td>최대 보조금 하위 20곳</td><td class="num">1,270.5대</td><td class="num">61대</td><td class="num">6곳</td></tr></tbody></table></div>
+<p style="line-height:1.75;margin:10px 0">금액 상위 20곳의 공고 물량 중앙값은 150대 남짓입니다. 하위 20곳은 1,270대로 여덟 배가 넘습니다. 상위 20곳 중 절반은 이미 잔여가 0입니다. 금액이 큰 곳은 &#39;적은 물량을 높은 단가로&#39; 푸는 구조이고, 금액이 작은 곳은 &#39;많은 물량을 낮은 단가로&#39; 푸는 구조라는 뜻입니다.</p>
+<p style="line-height:1.75;margin:10px 0">상위 5곳을 보면 더 또렷합니다. <a href="/region/4794.html">울릉군</a> 1,647만원(공고 130대·잔여 5대), <a href="/region/4689.html">완도군</a> 1,425만원(107대·31대), <a href="/region/4678.html">보성군</a> 1,425만원(20대·0대), <a href="/region/4680.html">장흥군</a> 1,330만원(153대·1대), <a href="/region/4681.html">강진군</a> 1,330만원(80대·0대). 다섯 곳 모두 군 단위이고, 공고 물량이 가장 큰 곳이 153대입니다.</p>
+<p style="line-height:1.75;margin:10px 0">반대로 공고 물량 상위 5곳은 <a href="/region/1100.html">서울특별시</a> 19,648대(잔여 4,091대·최대 741만원), <a href="/region/2800.html">인천광역시</a> 9,306대(1,997대·741만원), <a href="/region/2600.html">부산광역시</a> 8,629대(1,300대·741만원), <a href="/region/2700.html">대구광역시</a> 5,187대(898대·741만원), <a href="/region/4159.html">화성시</a> 4,528대(866대·760만원)입니다. 광역시는 최대 금액이 741만원으로 같고, 물량으로 승부합니다.</p></section>
+<div class="ad-slot" data-slot="article-1"><div class="ad-label">광고</div><div class="ad-box"></div></div>
+<section class="card"><h2>왜 이런 모양이 나오나</h2>
+<p style="line-height:1.75;margin:10px 0">지방비는 지자체 예산입니다. 예산 총액이 작은 군 지역이 전기차 보급을 늘리려면 <b>단가를 높여 소수에게 두텁게</b> 주는 방식이 유리하고, 인구와 예산이 큰 도시는 단가를 올리기보다 <b>물량을 늘려 많은 사람에게</b> 주는 방식이 됩니다. 이 설명은 숫자에서 읽히는 해석이며, 각 지자체의 예산 편성 사정은 공고문과 조례가 정본입니다.</p>
+<p style="line-height:1.75;margin:10px 0">전국 합계도 같은 그림입니다. 160개 지자체의 올해 공고 물량은 <b>148,524대</b>, 10월 6일 기준 잔여는 21,496대(14%)입니다. 공고 1,000대 이상인 지자체는 39곳, 100대 미만인 지자체는 22곳입니다. 전국 물량의 대부분은 금액이 평범한 대도시와 수도권 시·군에 있습니다.</p></section>
+<section class="card"><h2>금액 랭킹을 보고 할 수 있는 것과 없는 것</h2>
+<ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px;line-height:1.7"><li style="margin:4px 0"><b>할 수 없는 것:</b> 금액을 보고 신청 지역을 고르기. 보조금은 접수일 기준 주민등록 주소지에서만 받을 수 있습니다. 상세는 <a href="residency.html">거주요건 완전정리</a>에 있습니다. 물량 남은 지역으로 주소만 옮기는 위장전입은 부정수급입니다.</li><li style="margin:4px 0"><b>할 수 있는 것:</b> 내 지역 금액이 전국에서 어느 위치인지 이해하고, 금액이 작다면 물량이 상대적으로 넉넉한 구조인지 확인하기. 금액이 크다면 물량이 적어 회차 초반에 결정되는 구조임을 알고 준비하기.</li><li style="margin:4px 0"><b>같이 볼 것:</b> 내 유형 칸의 물량. 전체 물량이 커도 우선순위·택시 칸은 작을 수 있습니다. <a href="buyer-types.html">유형별 물량의 구조</a>에서 칸을 읽는 법을 정리했습니다.</li></ul></section>
+<section class="card"><h2>체크리스트</h2>
+<ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px;line-height:1.7"><li style="margin:4px 0">내 지역 페이지에서 승용 최대 금액과 올해 공고 물량을 같이 봅니다. 금액만 보지 않습니다.</li><li style="margin:4px 0">잔여가 0이면 접수가 열려 있는지, 다음 회차 일정이 등록됐는지 봅니다.</li><li style="margin:4px 0">금액이 큰 군 지역 거주자라면 회차가 열리는 날 바로 움직일 준비를 합니다. 물량이 작아 결정이 빠릅니다.</li><li style="margin:4px 0">금액이 작은 대도시 거주자라면 유형 칸과 회차 수를 봅니다. 물량이 커도 회차가 나뉘어 풀립니다.</li></ul>
+<p style="line-height:1.75;margin:10px 0">숫자는 2026년 10월 6일 20시 수집 기준입니다. 금액 순위와 격차의 배경은 <a href="region-ranking.html">지역 랭킹 TOP 20</a>이 매시간 갱신합니다.</p></section>
+
+<section class="card">
+  <h2 class="mt0">함께 보면 좋은 자료</h2>
+  <div class="chips"><a class="chip" href="region-ranking.html">지역 랭킹 TOP 20</a><a class="chip" href="residency.html">거주요건 완전정리</a><a class="chip" href="buyer-types.html">유형별 물량의 구조</a><a class="chip" href="status.html">전국 현황판</a><a class="chip" href="articles.html">📚 읽을거리 전체 보기</a></div>
+</section>
+
+<div class="ad-slot" data-slot="article-2"><div class="ad-label">광고</div><div class="ad-box"></div></div>
+
+</main>
+
+<footer id="site-footer" class="site-footer"><div class="inner">
+  <div class="links">
+    <a href="about.html">사이트 소개</a><a href="articles.html">읽을거리</a><a href="privacy.html">개인정보처리방침</a>
+    <a href="donate.html">💛 후원하기</a>
+    <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
+    <a href="report.html">오류 제보</a>
+  </div>
+  <div id="foot-stamp">단가 수집일 <b>2026-10-09</b> · 출처 무공해차 통합누리집(ev.or.kr) · 2026년 전기승용 기준</div>
+  <div class="disclaimer">
+    본 사이트는 <b>정부·공공기관과 무관한 개인 운영 정보 사이트</b>입니다. 게시된 보조금·제도 정보는 참고용이며 법적 효력이 없습니다.
+    실제 지원 금액·자격·잔여 물량은 반드시 <b>무공해차 통합누리집(ev.or.kr)</b>과 관할 지자체 공고문으로 확인하세요.
+    본 사이트는 광고(Google AdSense 등)를 게재하며, 광고 수익으로 운영됩니다.
+  </div>
+  <div class="mt8">© 2026 EV보조금 · 데이터 출처: 무공해차 통합누리집(ev.or.kr)</div>
+</div></footer>
+<script src="assets/js/app.js" defer></script>
+<script src="assets/js/detail.js" defer></script>
+</body>
+</html>
