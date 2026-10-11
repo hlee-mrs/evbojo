@@ -56,7 +56,7 @@ button.sum-tile:hover{border-color:var(--primary)}
 .s-next{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--primary-soft);color:var(--primary);font-weight:700;white-space:nowrap}
 #board{scroll-margin-top:64px}/* 요약 타일 탭 → 스크롤 시 스티키 헤더에 제목 안 가리게 */
 /* ── 시·도 지도 (순차 초록 램프 = '접수 가능 지역 비율' — dataviz 검증 통과 단계) ── */
-.kmap-wrap{position:relative;max-width:540px;margin:0 auto}
+.kmap-wrap{position:relative;max-width:540px;margin:0 auto}.kmap-wrap:empty{aspect-ratio:420/394.5}/* 지도 SVG(viewBox 420x394.5) 삽입 전 높이 예약 — CLS 0.135 원인(2026-10-11 실측) */
 .kmap-wrap svg{display:block;width:100%;height:auto}
 .kp{stroke:var(--surface);stroke-width:1.2;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .khit{fill:#000;fill-opacity:0;pointer-events:all;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}/* 소형 광역시 탭 확장(모바일에서 세종 등은 수 px라 직접 탭 불가) */
