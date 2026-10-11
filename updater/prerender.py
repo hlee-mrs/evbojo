@@ -23,6 +23,7 @@ site/data/*.json + updater/templates/*.tpl (+ updater/content/{sido,model}/*.md)
 import collections
 import csv
 import datetime
+import decimal
 import email.utils
 import hashlib
 import io
@@ -638,6 +639,73 @@ def cats_block(st, closed, hist, cd, asof_day):
             '      <p class="small muted cat-note">%s<button class="tip" type="button" data-tip="%s" aria-label="합계 차이 설명">?</button></p>\n'
             '      %s\n      <div class="cat-forecast" data-forecast>%s</div><!--derived:end-->'
             % (_CAT_HEAD_TIP, ''.join(tabs), note, _CAT_NOTE_TIP, alloc, ''.join(_fc_lines(st, closed, hist, cd, asof_day))))
+
+
+# ── 잔여 추이 스파크라인 — app.js sparkline()의 정적 쌍둥이(실측 기록, 예측 없음) ──
+#    JS가 history.json을 받은 뒤 같은 마크업으로 다시 그리므로 높이가 같다. 빈 슬롯이 채워질 때 .spark의
+#    margin-top 12px이 생기며 아래가 밀리던 잔여 시프트(2026-10-12 라이브 0.002) 제거 + 무JS 가시 차트(인라인 SVG).
+_SPARK_TIP = "ev.or.kr의 '남은 대수(전체)'를 이 사이트가 갱신될 때마다 기록한 실측값이에요. 예측이 아니라 지나간 기록이고, 점선은 추가공고로 물량이 늘어난 날이에요. 많은 지역에서 잔여는 신청이 아니라 출고 시점에 줄기 때문에 실제 접수 여유와 다를 수 있어요."
+
+
+def _js_fixed1(x):
+    """JS Number.prototype.toFixed(1)과 동일(동률은 큰 쪽으로) — SVG 좌표 문자열을 JS와 바이트 동일하게."""
+    return str(decimal.Decimal(x).quantize(decimal.Decimal('0.1'), rounding=decimal.ROUND_HALF_UP))
+
+
+def _md(d):
+    t = D0 + datetime.timedelta(days=d)
+    return '%d/%d' % (t.month, t.day)
+
+
+def spark_block(hist, cd, st, asof_day):
+    e = ((hist or {}).get('r') or {}).get(cd) if (hist or {}).get('v') == 1 else None
+    days = (hist or {}).get('days')
+    if not e or not isinstance(e.get('l'), list) or not isinstance(days, list):
+        return ''
+    as_of = asof_day if asof_day else (days[-1] if days else None)       # JS: isoToDay(updated) || 마지막 관측일
+    if as_of is None:
+        return ''
+    pts = [[d, v] for d, v in zip(days, e['l']) if v is not None and as_of - 27 <= d <= as_of]
+    if st and st.get('left') is not None:                                  # 라이브 값을 마지막 점으로
+        if not pts or as_of > pts[-1][0]:
+            pts.append([as_of, max(0, st['left'])])
+        else:
+            pts[-1][1] = max(0, st['left'])
+    if len(pts) < 3:
+        return ('<!--derived:start--><div class="spark"><p class="spark-note muted">📈 잔여 추이: 기록을 모으는 중이에요 (관측 %d일)</p></div><!--derived:end-->'
+                % len(pts))
+    W, H, PX, PT, PB = 280, 56, 4, 6, 6
+    d0, d1 = pts[0][0], pts[-1][0]
+    vs = [p[1] for p in pts]
+    v_max, v_min = max(vs), min(vs)
+    x = lambda d: _js_fixed1(PX if d1 == d0 else PX + (d - d0) / (d1 - d0) * (W - 2 * PX))
+    y = lambda v: _js_fixed1(H / 2 if v_max == v_min else PT + (v_max - v) / (v_max - v_min) * (H - PT - PB))
+    path = ' '.join(('L' if i else 'M') + x(p[0]) + ' ' + y(p[1]) for i, p in enumerate(pts))
+    resets = [v for v in ((e.get('L') or {}).get('ev') or []) if v[1] == 0 and d0 < v[0] <= d1]
+    marks = ''.join('<line x1="%s" y1="2" x2="%s" y2="%d" stroke="var(--warn)" stroke-dasharray="3 3" stroke-width="1" '
+                    'vector-effect="non-scaling-stroke"><title>%s 추가공고</title></line>' % (x(v[0]), x(v[0]), H - 2, _md(v[0]))
+                    for v in resets)
+    last = pts[-1]
+    p7 = next((p for p in reversed(pts) if p[0] <= as_of - 7), pts[0])
+    span = max(1, as_of - p7[0])
+    r7 = [v for v in resets if v[0] > p7[0]]
+    if r7:
+        v = r7[-1]
+        note = '%s 추가공고로 잔여 %s대 → %s대' % (_md(v[0]), fmt(v[2]), fmt(v[3]))
+    else:
+        dlt = last[1] - p7[1]
+        note = (('지난 %d일 동안 변화 없음' % span) if dlt == 0 else
+                ('지난 %d일 동안 %s대 감소' % (span, fmt(-dlt))) if dlt < 0 else
+                ('지난 %d일 동안 %s대 증가(환입·재집계)' % (span, fmt(dlt))))
+    return ('<!--derived:start--><div class="spark">\n'
+            '      <svg viewBox="0 0 %d %d" preserveAspectRatio="none" role="img" aria-label="최근 %d일 전체 잔여 추이">\n'
+            '        <path d="%s" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>%s\n'
+            '        <path d="M%s %s l0 0.01" stroke="var(--money)" stroke-width="7" stroke-linecap="round" vector-effect="non-scaling-stroke"/>\n'
+            '      </svg>\n'
+            '      <div class="spark-cap"><span>%s %s대</span><span>%s <b>%s대</b></span></div>\n'
+            '      <p class="spark-note">📈 전체 잔여 추이 · %s<button class="tip tip--wide" type="button" data-tip="%s" aria-label="추이 설명">?</button></p>\n'
+            '    </div><!--derived:end-->'
+            % (W, H, as_of - d0 + 1, path, marks, x(last[0]), y(last[1]), _md(d0), fmt(pts[0][1]), _md(last[0]), fmt(last[1]), note, _SPARK_TIP))
 
 
 # ── history 추이 (실측 산출 — 점추정 예측 금지, 과거 사실만 문장화) ──
@@ -1512,12 +1580,14 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     mapping['PROVENANCE'] = ''                      # 게이트 산정에서 보일러플레이트 제외
     mapping['NOTICE_FACTS'] = ''                    # 원문 발췌 카드도 게이트 산정에서 제외(공지 원문과 중복 집계 방지)
     mapping['CATS_BLOCK'] = ''                      # 유형별 잔여 UI(데이터 블록)도 게이트 산정 제외
+    mapping['SPARK_BLOCK'] = ''                     # 잔여 추이 차트(데이터 블록)도 게이트 산정 제외
     gate = len(strip_tags(render(ctx['tpl_region'], mapping)))
     mapping['AD1'] = ad_slot('region-1', gate, noindex)
     mapping['AD2'] = ad_slot('region-2', gate, noindex)
     mapping['PROVENANCE'] = provenance_block('region', updated, meta['updated'])
     mapping['NOTICE_FACTS'] = notice_facts_block(st, updated)
     mapping['CATS_BLOCK'] = cats_block(st, closed, hist, cd, ctx['asof_day'])
+    mapping['SPARK_BLOCK'] = spark_block(hist, cd, st, ctx['asof_day'])
     main = render(ctx['tpl_region'], mapping)
     page = render(ctx['tpl_page'], {
         'TITLE': esc('%s 전기차 보조금 2026 — 최대 %s만원·잔여 현황 | EV보조금' % (name, fmt(r.get('maxP')))),

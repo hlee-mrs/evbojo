@@ -414,7 +414,7 @@
       lines.push(P(`공단(ev.or.kr) 등록 접수상태가 <b>접수예정</b>이에요. 아직 이번 회차 접수가 시작되지 않아 소진 예측을 표시하지 않아요 — 접수 일정은 지자체 공지를 확인하세요.`));
       return done();
     }
-    if (!el.innerHTML) done();                                                                     // 정적(프리렌더) 고지가 없을 때만 먼저 표시 — 있으면 이력 판정 결과로 한 번에 교체(시프트 방지)
+    // 중간 페인트 없음 — 이력 판정까지 끝난 결과를 한 번에 그린다(정적 고지가 있으면 그대로 유지, 없으면 두 단계 시프트 대신 한 번). 모든 분기가 done()으로 끝난다.
     EVData.history().then(hist => {
       const updatedISO = ctx && ctx.updated, asOf = isoToDay(updatedISO);
       const e = hist && hist.v === 1 && ctx && hist.r[ctx.cd];

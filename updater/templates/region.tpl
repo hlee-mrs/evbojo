@@ -10,7 +10,7 @@
   </div>{{NEXT_ROUND}}
   {{PROG}}
   {{STATUS_LINES}}
-  <div data-live="spark" class="spark-slot"></div>
+  <div data-live="spark" class="spark-slot">{{SPARK_BLOCK}}</div>
   <div data-live="cats" class="cats-slot" data-cd="{{CD}}">{{CATS_BLOCK}}</div>
   <div class="grid2 mt8">
     {{TEL_BTN}}
