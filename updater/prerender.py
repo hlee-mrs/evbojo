@@ -412,6 +412,49 @@ def provenance_block(kind, updated, meta_updated):
             '</section>' % (_PROV_HOW.get(kind, _PROV_HOW['region']), esc(when), esc(meta_updated or '')))
 
 
+# 지자체 공지 원문에서 '이 지역에서만 참인' 요건을 라벨별로 발췌한다(해석·요약 없이 원문 그대로, I3).
+# 공지는 최신 안내가 앞에 오는 관행이라 첫 매치를 쓴다. 구분 기호(○ ㅇ ※ ▶ ★ - / 줄바꿈)에서 끊고 길이를 제한한다.
+_FACT_STOP = r'[^○ㅇ※▶★◎■□●\n]'
+_FACT_TAIL = r'\s*(?:[(（][^)）]{0,40}[)）])?\s*[:：]?\s*'            # 라벨 뒤 괄호 주석("(※ 예산소진 시 조기 마감)") 허용
+_FACT_RULES = [
+    ('접수 기간', re.compile(r'(?:접수\s*기간|신청\s*기간|신청\s*시기|사업\s*기간|보급\s*기간|접수일)' + _FACT_TAIL + r'(' + _FACT_STOP + r'{6,110})'), True),
+    ('공고 물량', re.compile(r'(?:보급\s*대수|지원\s*대수|공고\s*대수|사\s*업\s*량|보급\s*물량|보급\s*계획)' + _FACT_TAIL + r'((?:총\s*)?[\d,]{1,7}\s*대' + _FACT_STOP + r'{0,80})'), False),
+    ('신청 자격', re.compile(r'(?:신청\s*자격|신청\s*조건|신청\s*대상|지원\s*대상|지원\s*자격)' + _FACT_TAIL + r'(' + _FACT_STOP + r'{6,120})'), False),
+    ('선정 기준', re.compile(r'(?:선정\s*기준|선정\s*방식|선정\s*순서)' + _FACT_TAIL + r'(' + _FACT_STOP + r'{3,90})'), False),
+    ('지급·출고 기한', re.compile(r'((?:지급\s*신청|출고)' + _FACT_STOP + r'{0,30}?(?:\d{1,2}\s*일\s*이내|\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?' + _FACT_STOP + r'{0,16}까지)' + _FACT_STOP + r'{0,20})'), False),
+]
+_FACT_CUT = re.compile(r'\s[-–]\s|\s*[○ㅇ※▶★◎■□●⇒]|\s(?=(?:보급|지원|공고)\s*대수|신청\s*자격|신청\s*조건|신청\s*대상|선정\s*기준|지원\s*대상|보급\s*물량|접수\s*번호|신청\s*방법|문\s*의\s*처|문의처|사\s*업\s*량|보급\s*계획)')
+
+def notice_facts_block(st, updated):
+    """지역 페이지 '공고 원문에서 바로 읽는 요건' — 2개 이상 라벨이 잡힐 때만 카드 생성(얇은 카드 방지). derived."""
+    note = (st or {}).get('note') or ''
+    if not note.strip():
+        return ''
+    text = re.sub(r'\s+', ' ', note)
+    rows = []
+    for label, rx, need_digit in _FACT_RULES:
+        m = rx.search(text)
+        if not m:
+            continue
+        q = _FACT_CUT.split(m.group(1), 1)[0].strip(' :：-·,')
+        q = re.sub(r'\s*[(（]\s*[*※]\s*[^)）]*[)）]\s*$', '', q)       # 꼬리 괄호 주석 제거
+        if len(q) < 4 or (need_digit and not re.search(r'\d', q[:24])):
+            continue
+        if label == '접수 기간' and not re.search(r'[~∼～]|부터|까지|소진', q):     # 기간 표시가 없으면 공고일·안내문일 가능성 → 제외
+            continue
+        if len(q) > 110:
+            q = q[:108].rstrip() + '…'
+        rows.append('<dt>%s</dt><dd><q>%s</q></dd>' % (label, esc(q)))
+    if len(rows) < 2:
+        return ''
+    when = (updated or '').replace('T', ' ')[:16]
+    return ('<!--derived:start--><section class="card facts" aria-label="공고 원문 발췌 요건">'
+            '<h2 class="mt0">📄 공고 원문에서 바로 읽는 요건 <span class="sub">지자체 공지 발췌 · 수집 %s</span></h2>'
+            '<dl class="gloss">%s</dl>'
+            '<p class="small muted mt8">무공해차 통합누리집에 등록된 이 지역 공지에서 해당 항목만 글자 그대로 옮겼습니다. 해석·요약을 더하지 않았고, '
+            '전문과 첨부 공고문은 아래 \'지자체 공지\'와 ev.or.kr에서 확인하세요.</p></section><!--derived:end-->' % (esc(when), ''.join(rows)))
+
+
 def badge_of(st, closed, over=None):
     """공지 판정(closed)과 **공단 공식 신호**를 함께 반영한 상태 뱃지.
 
@@ -1318,10 +1361,12 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     }
     # 광고 게이트: app.js renderAds와 동일하게 정적 <main> 전체 텍스트 기준(1,200자)
     mapping['PROVENANCE'] = ''                      # 게이트 산정에서 보일러플레이트 제외
+    mapping['NOTICE_FACTS'] = ''                    # 원문 발췌 카드도 게이트 산정에서 제외(공지 원문과 중복 집계 방지)
     gate = len(strip_tags(render(ctx['tpl_region'], mapping)))
     mapping['AD1'] = ad_slot('region-1', gate, noindex)
     mapping['AD2'] = ad_slot('region-2', gate, noindex)
     mapping['PROVENANCE'] = provenance_block('region', updated, meta['updated'])
+    mapping['NOTICE_FACTS'] = notice_facts_block(st, updated)
     main = render(ctx['tpl_region'], mapping)
     page = render(ctx['tpl_page'], {
         'TITLE': esc('%s 전기차 보조금 2026 — 최대 %s만원·잔여 현황 | EV보조금' % (name, fmt(r.get('maxP')))),
