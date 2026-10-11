@@ -164,7 +164,7 @@ def check_status_badge(pages, ctx):
     for pg in pages:
         if pg.kind == 'region':
             cd = pg.key
-            m = re.search(r'data-live="badge" data-cd="%s"\s*>(.*?)</span></span>'
+            m = re.search(r'data-live="badge" data-cd="%s"[^>]*>(.*?)</span></span>'
                           % re.escape(cd), pg.body, re.S)
             seg = m.group(1) if m else ''
             if seg and RX_BADGE_OPEN.search(seg) and cd in bad:

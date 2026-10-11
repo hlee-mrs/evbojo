@@ -23,7 +23,7 @@
 <meta property="og:image:height" content="420">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://evbojo.co.kr/region/4481.html">
-<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/main.css?v=29c8c5e8">
 <link rel="alternate" type="application/rss+xml" title="EV보조금 해설·시리즈" href="/feed.xml">
 <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
@@ -51,13 +51,26 @@
 
 <section class="card">
   <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-    <span data-live="badge" data-cd="4481"><span class="badge badge-shut" style="font-size:14px;padding:6px 14px"><span class="dot"></span>공지상 마감 안내 · 유형별 확인 필요 · 공단 등록 상태: 접수중</span></span>
+    <span data-live="badge" data-cd="4481"><span class="badge badge-shut" style="font-size:14px;padding:6px 14px"><span class="dot"></span>공지상 마감 안내 · 유형별 확인 필요 · 일반 잔여는 아래 설명 참고</span></span>
     <span class="muted small">공고 270대 · 접수 296 · 출고 224</span>
   </div><!--derived:start--><p class="small next-round mt8">📅 <b>추경2차</b> 접수 중 (시작 8/4(화) 09:00 · 마감 11/27(금) 18:00) <span class="muted">— 공단 등록 일정 기준, 지자체 사정으로 바뀔 수 있어요</span></p><!--derived:end-->
   <div class="prog"><div class="stack"><i class="seg-r" style="width:65.5%"></i><i class="seg-w" style="width:21.1%"></i><i class="seg-l" style="width:13.5%"></i></div><div class="legend"><span><i style="background:var(--text3)"></i>출고 224</span><span><i style="background:var(--warn)"></i>접수대기 72</span><span><i style="background:var(--money)"></i>잔여 46</span><span>공고 270대</span></div></div>
   <p class="small muted mt8">선정 방식: 일반 출고등록순 · 우선 출고등록순</p><p class="small muted mt8">공단 등록 접수상태: <b>접수중</b> · 최종 신청마감 2026-09-21 16:00 <span class="muted">(공지 원문과 다르면 최근 변경이 반영 중일 수 있어요)</span></p>
   <div data-live="spark" class="spark-slot"></div>
-  <div data-live="cats" class="cats-slot" data-cd="4481"></div>
+  <div data-live="cats" class="cats-slot" data-cd="4481"><!--derived:start-->
+      <div class="cat-head">내 신청 유형 선택<button class="tip" type="button" data-tip="지자체는 물량을 신청 유형별로 나눠 배정해요. 내 유형의 잔여가 중요합니다 — 개인 구매자는 보통 '일반'(우대 대상이면 '우선순위')을 보세요." aria-label="신청 유형 설명">?</button></div>
+      <div class="cat-tabs"><div class="cat-tab on has" data-cat="general" role="button" tabindex="0" aria-pressed="true">
+          <span class="cat-nm">일반<button class="tip" type="button" data-tip="일반 개인 구매자에게 배정된 물량이에요. 대부분의 신청자가 여기에 해당해요." aria-label="일반 설명">?</button></span>
+          <b>46대 이하</b></div><div class="cat-tab  none" data-cat="priority" role="button" tabindex="0" aria-pressed="false">
+          <span class="cat-nm">우선순위<button class="tip" type="button" data-tip="다자녀·차상위·기초수급, 생애최초 청년 등 우대 대상에게 우선 배정된 물량이에요. 해당 여부는 자격 진단에서 확인하세요." aria-label="우선순위 설명">?</button></span>
+          <b>0대</b></div><div class="cat-tab  none" data-cat="corp" role="button" tabindex="0" aria-pressed="false">
+          <span class="cat-nm">법인·기관<button class="tip" type="button" data-tip="법인·공공기관·단체 명의 구매에 배정된 물량이에요. 개인 구매와는 별도예요." aria-label="법인·기관 설명">?</button></span>
+          <b>0대</b></div><div class="cat-tab  has" data-cat="taxi" role="button" tabindex="0" aria-pressed="false">
+          <span class="cat-nm">택시<button class="tip" type="button" data-tip="전기택시(영업용) 전용 물량이에요. 개인 승용 신청과 무관해요." aria-label="택시 설명">?</button></span>
+          <b>1대</b></div></div>
+      <p class="small muted cat-note">이 지역은 유형별 잔여가 전체 잔여(46대)보다 크게 집계돼 있어요 — 유형별 잔여는 공고 기준 계산값이라 전체 잔여를 상한으로 표시했어요. 실제 신청 가능 물량은 지자체 공고로 확인하세요<button class="tip" type="button" data-tip="유형별 잔여는 원본에서 유형마다 '공고−출고'로 따로 계산해요. 어떤 유형이 배정보다 많이 출고되면 그 초과분이 다른 유형과 상계되지 않아, 유형 숫자의 합이 전체 잔여보다 커질 수 있어요. 본공고·추경으로 회차가 나뉜 지역에서도 같은 차이가 납니다. 원본 수치는 그대로 두되, 화면에는 전체 잔여를 넘지 않도록 표시합니다." aria-label="합계 차이 설명">?</button></p>
+      <p class="small muted cat-alloc">올해 공고 물량: <b>전체 270대</b> (일반 230 · 우선순위 27 · 법인·기관 0 · 택시 13)<button class="tip" type="button" data-tip="지자체가 올해 공고한 보급 물량이에요(ev.or.kr 공고 기준). 추경·추가공고가 나면 늘어날 수 있고, 회차 구분 때문에 유형별 합계가 전체와 다를 수 있어요." aria-label="공고 물량 설명">?</button></p>
+      <div class="cat-forecast" data-forecast><p class="small muted cat-note" style="margin-top:2px">접수는 이미 공고 물량을 넘었어요(+26대). 지금 신청하면 취소·미배정분이 나와야 받을 수 있어요.</p><p class="small muted cat-note" style="margin-top:2px">이 지역은 신청 순서가 아니라 <b>출고 순서</b>로 보조금이 배정돼요.</p><p class="small muted cat-note" style="margin-top:2px">지자체 공지상 접수가 마감된 지역이에요. 남은 숫자는 아직 출고되지 않은 물량일 수 있어요 — 예측을 표시하지 않아요.</p></div><!--derived:end--></div>
   <div class="grid2 mt8">
     <a class="btn btn-ghost" href="tel:0413397538">📞 예산군 환경과 (041-339-7538)</a>
     <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">ev.or.kr에서 잔여 확인 ↗</a>
@@ -132,7 +145,7 @@
   </div>
   <div class="mt8">© 2026 EV보조금 · 데이터 출처: 무공해차 통합누리집(ev.or.kr)</div>
 </div></footer>
-<script src="assets/js/app.js" defer></script>
-<script src="assets/js/detail.js" defer></script>
+<script src="assets/js/app.js?v=c8b2468d" defer></script>
+<script src="assets/js/detail.js?v=de8a0d8a" defer></script>
 </body>
 </html>

@@ -8,7 +8,7 @@ kicker: 월간 데이터 리포트
 sub: 추경이 몰린 달입니다. 서울·인천·창원·부산·대구가 물량을 다시 열었고, 평택·수원·광주시는 0이 됐습니다.
 seo_title: 2026년 9월 전기차 보조금 월간 리포트 — 잔여·추경·소진 실측
 seo_desc: 9월 한 달 160개 지자체 승용 잔여를 매일 기록한 결과: 전국 잔여 14,713→24,619대(+9,906), 추가공고 63곳 71건, 9월 시작 회차 61건, 잔여 0 도달 27곳·재개 26곳. 지역별 증감 상위 정리.
-related: articles/quota-depletion-speed-45days.html|소진 속도 45일 실측;articles/supplementary-rounds-2026.html|추경 현황 160곳;status.html|전국 현황판;articles/sido-remaining-map-2026.html|시도별 잔여율 지도
+related: articles/quota-depletion-speed-45days.html|소진 속도 45일 실측;articles/supplementary-rounds-2026.html|추경 현황 160곳;status.html|전국 현황판;sold-out.html|소진·마감 지역 목록
 method_period: 2026-09-01~09-30(매시간 수집의 일별 값, 양 끝 관측일 모두 기록된 160개 지자체)
 method_sample: 승용 전체 잔여(공고−출고, 0 미만은 0)의 일별 값과 추가공고 감지 이벤트, 공단 등록 회차의 접수 시작·종료일
 method_exclude: 한국환경공단(9999) 제외, 잔여 증가 이벤트는 수집기가 리셋으로 판정한 건만(사소한 환입 제외)

@@ -28,6 +28,7 @@ import hashlib
 import io
 import html as _html
 import json
+import math
 import os
 import re
 import sys
@@ -455,44 +456,188 @@ def notice_facts_block(st, updated):
             '전문과 첨부 공고문은 아래 \'지자체 공지\'와 ev.or.kr에서 확인하세요.</p></section><!--derived:end-->' % (esc(when), ''.join(rows)))
 
 
-def badge_of(st, closed, over=None):
-    """공지 판정(closed)과 **공단 공식 신호**를 함께 반영한 상태 뱃지.
+# app.js CATS와 동일(순서·라벨·idx·설명) — 정적 유형 블록·뱃지 라벨이 JS 재렌더와 글자까지 같아야 한다
+CATS = [
+    {'key': 'general',  'label': '일반',      'idx': 3, 'tip': '일반 개인 구매자에게 배정된 물량이에요. 대부분의 신청자가 여기에 해당해요.'},
+    {'key': 'priority', 'label': '우선순위',  'idx': 0, 'tip': '다자녀·차상위·기초수급, 생애최초 청년 등 우대 대상에게 우선 배정된 물량이에요. 해당 여부는 자격 진단에서 확인하세요.'},
+    {'key': 'corp',     'label': '법인·기관', 'idx': 1, 'tip': '법인·공공기관·단체 명의 구매에 배정된 물량이에요. 개인 구매와는 별도예요.'},
+    {'key': 'taxi',     'label': '택시',      'idx': 2, 'tip': '전기택시(영업용) 전용 물량이에요. 개인 승용 신청과 무관해요.'},
+]
+CAT_DEFAULT = CATS[0]      # app.js myCategory.get() 기본값 'general' — 첫 방문자가 보는 뱃지·탭과 동일하게
 
-    공단 신호 = status의 `st`(공단 등록 접수상태) + `over`(rounds_over() 결과).
-    보수 원칙(I3): 공단이 '마감'·'접수예정'이거나 등록 회차 접수기간이 모두 지났으면
-    잔여가 남아 있어도 badge-open(초록)·badge-low(마감임박)를 주지 않는다.
-    반대 방향(공단 '접수중' ↔ 공지상 마감)은 종전대로 마감을 유지하고, 두 신호가
-    엇갈릴 때는 라벨에 공단 등록 상태를 병기해 이용자가 직접 판단할 수 있게 한다."""
-    if not st or st.get('left') is None:
-        return ('badge-closed', '물량 정보 없음')
-    if not st.get('n') and (st.get('left') or 0) <= 0:
+
+def _fmt_md(iso, with_time=False):
+    """'YYYY-MM-DD[ HH:MM]' → 'M/D[ HH:MM]' (app.js fmtMD와 동일)."""
+    m = re.match(r'^(\d{4})-(\d{2})-(\d{2})(?:\s(\d{1,2}:\d{2}))?', iso or '')
+    if not m:
+        return ''
+    return '%d/%d%s' % (int(m.group(2)), int(m.group(3)), (' ' + m.group(4)) if (with_time and m.group(4)) else '')
+
+
+def badge_of(st, closed, over=None, cat=None):
+    """상태 뱃지 — **app.js statusBadge(st, updated, catKey, over)의 쌍둥이**(stale 분기만 생략: 생성 시점 데이터).
+
+    규칙과 라벨 문자열을 양쪽 동일하게 유지한다. 정적 뱃지와 JS 재렌더 뱃지의 글자 수가 다르면
+    모바일에서 줄 수가 바뀌어 아래 콘텐츠 전체가 밀린다(2026-10-12 콜드 로드 CLS 실측) — 한쪽만 고치지 말 것.
+    공단 신호 = status `st`(등록 접수상태) + `over`(rounds_over: 등록 회차 접수기간이 모두 지남). 공지 마감 판정(closed)과
+    over는 site/data/closed.json으로 JS에 공유한다(app.js가 status에 병합 → 같은 판정). 보수 원칙(I3): 닫힌 신호가 있으면 잔여가 남아도 초록·임박 금지.
+    `cat`은 CATS 항목(유형별 뱃지) — 지역 페이지 상단 뱃지는 CAT_DEFAULT('일반')로 그린다."""
+    if not st:
+        return ('badge-closed', '현황 확인 필요')
+    if not st.get('n') and (st.get('left') is None or st['left'] <= 0):
         # 공고 0대 + 잔여 0 = 수집 결손(붕괴)이지 소진이 아님 — '소진' 단정 금지(I3)
         return ('badge-closed', '물량 정보 확인 중')
-    left = st['left']
-    ost = (st.get('st') or '').strip()          # 공단 등록 접수상태(접수중·마감·접수예정)
+    region_closed = st.get('left') is not None and st['left'] <= 0
+    ks = (st.get('st') or '').strip()               # 공단 등록 접수상태(접수중·마감·접수예정)
+    ks_shut, ks_soon = ks == '마감', ks == '접수예정'
+    ks_tag = ('공단 접수 마감' + ((' (%s)' % _fmt_md(st['dl'])) if st.get('dl') else '')) if ks_shut else ('공단 접수 예정' if ks_soon else '')
+    left, quota, pfx = st.get('left'), st.get('n'), ''
+    d = st.get('d') or {}
+    if cat and d.get('left'):
+        left = d['left'][cat['idx']] if cat['idx'] < len(d['left']) else None
+        quota = d['n'][cat['idx']] if (d.get('n') and cat['idx'] < len(d['n'])) else None
+        pfx = cat['label'] + ' '
+        # 유형 잔여 > 전체 잔여(원본 산식이 유형별 max(0, 공고−출고)라 상계가 안 됨) → 전체 기준 판정으로 강등, 숫자 미표기(I3)
+        if left is not None and st.get('left') is not None and left > st['left']:
+            cls, label = badge_of(st, closed, over)
+            return (cls, '%s · %s 잔여는 아래 설명 참고' % (label, cat['label']))
+    if left is None:
+        return ('badge-closed', pfx + '물량 정보 없음')
     if left <= 0:
-        return ('badge-closed', '잔여 소진(추가공고 확인)')
-    if closed and closed['closed']:
-        # 공단은 '접수중'인데 공지문은 마감 → 마감 유지(보수) + 공식 상태 병기
-        gap = ' · 공단 등록 상태: 접수중' if ost == '접수중' else ''
-        if closed['partial']:
-            return ('badge-shut', '공지상 마감 안내 · 유형별 확인 필요' + gap)
+        if cat and quota is not None and quota <= 0:
+            return ('badge-closed', pfx + '해당 물량 없음')       # 애초에 배정 물량이 없던 유형
+        return ('badge-closed', pfx + '잔여 소진(추가공고 확인)')
+    if cat and region_closed:                      # 지역 전체 소진인데 유형에만 이월 잔여 — 마감 맥락으로
+        return ('badge-shut' if ks_shut else 'badge-closed' if ks_soon else 'badge-low',
+                '%s전체 마감 · 유형 잔여 %s대(추가공고 확인)%s' % (pfx, fmt(left), (' · ' + ks_tag) if ks_tag else ''))
+    if closed and closed.get('closed'):            # 공지상 마감인데 잔여>0 — 미출고분일 수 있음, 초록 금지
+        tag = (' · ' + ks_tag) if ks_tag else ''
+        if cat:
+            if closed.get('partial'):
+                return ('badge-shut' if (ks_shut or ks_soon) else 'badge-low',
+                        '%s공지상 마감 안내 · 잔여 %s대(유형별 확인)%s' % (pfx, fmt(left), tag))
+            return ('badge-shut', '%s공지상 접수 마감 · 잔여 %s대는 미출고분일 수 있음%s' % (pfx, fmt(left), tag))
+        if closed.get('partial'):
+            return ('badge-shut', '공지상 마감 안내 · 유형별 확인 필요' + tag)
         cdte = closed.get('closedDate')
-        md = ' (%d/%d)' % (int(cdte[5:7]), int(cdte[8:10])) if cdte else ''
         return ('badge-shut', '공지상 접수 마감%s · 잔여 %s대는 미출고분일 수 있음%s'
-                % (md, fmt(left), gap))
-    # 공지문에 마감 문구가 없어도 공단 공식 신호가 닫혀 있으면 초록·임박 금지
-    if ost == '마감':
-        return ('badge-shut', '공단 등록 상태 마감 · 잔여 %s대 · 공고 일정 확인 필요' % fmt(left))
-    if ost == '접수예정':
-        return ('badge-shut', '공단 등록 상태 접수예정 · 공고 일정 확인 필요')
+                % ((' (%s)' % _fmt_md(cdte)) if cdte else '', fmt(left), tag))
+    if ks_shut:                                    # 공지문엔 완료형 마감이 없어도 공단 등록 상태가 닫힘
+        return ('badge-shut', '%s%s · 잔여 %s대는 미출고분일 수 있음 · 공고 일정 확인 필요' % (pfx, ks_tag, fmt(left)))
+    if ks_soon:
+        return ('badge-closed', '%s공단 접수 예정 · 잔여 %s대 · 공고 일정 확인 필요' % (pfx, fmt(left)))
     if over:
-        return ('badge-shut', '등록 회차 접수기간 종료 · 잔여 %s대 · 공고 일정 확인 필요' % fmt(left))
-    n = st.get('n')
-    ratio = left / n if n else 1
+        return ('badge-shut', '%s등록 회차 접수기간 종료 · 잔여 %s대 · 공고 일정 확인 필요' % (pfx, fmt(left)))
+    ratio = left / quota if quota else 1
     if left < 30 or ratio < 0.06:
-        return ('badge-low', '마감 임박 · 잔여 %s대' % fmt(left))
-    return ('badge-open', '접수 중 · 잔여 %s대' % fmt(left))
+        return ('badge-low', '%s마감 임박 · 잔여 %s대' % (pfx, fmt(left)))
+    return ('badge-open', '%s접수 중 · 잔여 %s대' % (pfx, fmt(left)))
+
+
+# ── 유형별 잔여 블록 — app.js categoryBar()+renderForecast()의 정적 쌍둥이 ──
+#    첫 화면에 JS 없이 그려 (1) 콜드 로드에서 슬롯이 예약 150px → 실제 203px로 늘며 아래가 밀리던 시프트를 없애고
+#    (2) LCP 후보(cat-note)를 첫 페인트로 당기며 (3) 크롤러·심사자에게도 유형별 잔여가 보이게 한다.
+#    detail.js는 같은 마크업으로 다시 그리므로(높이 동일) 시프트가 없다 — 마크업·문구를 바꾸면 app.js도 함께 바꿀 것.
+#    derived 마커로 감싸 lastmod 해시에서 제외(상태 문구가 매시 바뀜).
+_CAT_HEAD_TIP = "지자체는 물량을 신청 유형별로 나눠 배정해요. 내 유형의 잔여가 중요합니다 — 개인 구매자는 보통 '일반'(우대 대상이면 '우선순위')을 보세요."
+_CAT_NOTE_TIP = "유형별 잔여는 원본에서 유형마다 '공고−출고'로 따로 계산해요. 어떤 유형이 배정보다 많이 출고되면 그 초과분이 다른 유형과 상계되지 않아, 유형 숫자의 합이 전체 잔여보다 커질 수 있어요. 본공고·추경으로 회차가 나뉜 지역에서도 같은 차이가 납니다. 원본 수치는 그대로 두되, 화면에는 전체 잔여를 넘지 않도록 표시합니다."
+_CAT_ALLOC_TIP = "지자체가 올해 공고한 보급 물량이에요(ev.or.kr 공고 기준). 추경·추가공고가 나면 늘어날 수 있고, 회차 구분 때문에 유형별 합계가 전체와 다를 수 있어요."
+
+
+def _fc_lines(st, closed, hist, cd, asof_day):
+    """renderForecast()의 고지 문장(예측 없음) — 같은 순서·같은 조기 종료 규칙·같은 문구."""
+    P = lambda html: '<p class="small muted cat-note" style="margin-top:2px">%s</p>' % html
+    lines = []
+    a, n, left = st.get('a'), st.get('n'), st.get('left')
+    if a is not None and n is not None and a > n and (left or 0) > 0:
+        lines.append(P('접수는 이미 공고 물량을 넘었어요(+%s대). 지금 신청하면 취소·미배정분이 나와야 받을 수 있어요.' % fmt(a - n)))
+    if '출고' in (st.get('m') or '') and (left or 0) > 0:
+        lines.append(P('이 지역은 신청 순서가 아니라 <b>출고 순서</b>로 보조금이 배정돼요.'))
+    if left is None or left <= 0:                  # ① 마감: 뱃지가 담당
+        return lines
+    if closed and closed.get('closed'):            # ② 공지상 마감(잔여>0이어도)
+        lines.append(P('지자체 공지상 접수가 마감된 지역이에요. 남은 숫자는 아직 출고되지 않은 물량일 수 있어요 — 예측을 표시하지 않아요.'))
+        return lines
+    ks = (st.get('st') or '').strip()
+    if ks == '마감':
+        dl_txt = _fmt_md(st.get('dl'), True)
+        lines.append(P('공단(ev.or.kr) 등록 접수상태가 <b>마감</b>이에요%s. 남은 숫자는 아직 출고되지 않은 물량일 수 있어요 — 소진 예측을 표시하지 않아요. 다음 공고 일정은 지자체 공지를 확인하세요.'
+                       % ((' (최종 신청마감 %s)' % dl_txt) if dl_txt else '')))
+        return lines
+    if ks == '접수예정':
+        lines.append(P('공단(ev.or.kr) 등록 접수상태가 <b>접수예정</b>이에요. 아직 이번 회차 접수가 시작되지 않아 소진 예측을 표시하지 않아요 — 접수 일정은 지자체 공지를 확인하세요.'))
+        return lines
+    e = ((hist or {}).get('r') or {}).get(cd) if (hist or {}).get('v') == 1 else None
+    L = (e or {}).get('L') or {}
+    if not e or not L.get('rd') or asof_day is None:
+        return lines
+    hol = set(hist.get('holidays') or [])
+    pts = [[d, v] for d, v in zip(hist.get('days') or [], e.get('l') or []) if v is not None]
+    client_reset = False
+    if pts:
+        prev = pts[-1][1]
+        thr = max(10, math.ceil(0.05 * (e.get('n') or prev or 1)))
+        if left - prev >= thr:
+            client_reset = True
+        elif left > prev:
+            if asof_day > pts[-1][0]:
+                pts.append([asof_day, prev])
+        elif asof_day > pts[-1][0]:
+            pts.append([asof_day, left])
+        else:
+            pts[-1][1] = min(prev, left)
+    pts = [p for p in pts if p[0] >= L['rd']['t']]
+    if not pts:
+        return lines
+    had_reset = any(v[1] == 0 and asof_day - v[0] <= 7 for v in (L.get('ev') or []))
+    if client_reset or had_reset:                  # ③ 추가공고 리셋 7일 내
+        t = D0 + datetime.timedelta(days=L['rd']['t'])
+        lines.append(P('%d/%d <b>추가공고로 물량이 늘었어요.</b> 새 공고 기준으로 다시 기록하는 중이에요 — 신청 계획이 있다면 지자체 공지를 바로 확인하세요.' % (t.month, t.day)))
+        return lines
+    s0 = next((p for p in pts if p[0] >= asof_day - 28), pts[0])
+    nw = pts[-1]
+    B = _biz_days(s0[0], asof_day, hol)
+    N = max(0, s0[1] - nw[1])
+    idle = _biz_days(L['lc'], asof_day, hol) if L.get('lc') is not None else B
+    if idle >= 5 and N == 0:                       # ④ 정체 ≠ 여유
+        lines.append(P("최근 %d영업일간 잔여가 줄지 않았어요. 접수가 일시 중지됐거나 집계가 멈췄을 수 있어요 — '여유 있다'는 뜻은 아니에요. 지자체 공지를 확인하세요." % idle))
+    return lines
+
+
+def cats_block(st, closed, hist, cd, asof_day):
+    """유형별 잔여 탭 + 고지(정적). st.d.left가 없으면 ''(JS도 빈 블록)."""
+    d = (st or {}).get('d') or {}
+    if not st or not d.get('left'):
+        return ''
+    tot = st.get('left')
+    cells = []
+    for c in CATS:
+        raw = d['left'][c['idx']] if c['idx'] < len(d['left']) else None
+        over = raw is not None and tot is not None and raw > tot
+        cells.append((c, over, tot if over else raw))
+    capped = any(o for _, o, _ in cells)
+    tabs = []
+    for c, over, n in cells:
+        state = '' if n is None else ('has' if n > 0 else 'none')
+        on = c['key'] == CAT_DEFAULT['key']
+        tabs.append('<div class="cat-tab %s %s" data-cat="%s" role="button" tabindex="0" aria-pressed="%s">\n'
+                    '          <span class="cat-nm">%s<button class="tip" type="button" data-tip="%s" aria-label="%s 설명">?</button></span>\n'
+                    '          <b>%s</b></div>'
+                    % ('on' if on else '', state, c['key'], 'true' if on else 'false', c['label'], esc(c['tip']), c['label'],
+                       '-' if n is None else (fmt(n) + '대' + (' 이하' if (over and n > 0) else ''))))
+    note = (('이 지역은 유형별 잔여가 전체 잔여(%s대)보다 크게 집계돼 있어요 — 유형별 잔여는 공고 기준 계산값이라 전체 잔여를 상한으로 표시했어요. 실제 신청 가능 물량은 지자체 공고로 확인하세요' % fmt(tot))
+            if capped else "숫자는 각 유형의 남은 물량이에요. 항목 합계는 '전체'와 다를 수 있어요")
+    alloc = ''
+    if st.get('n') is not None:
+        dn = d.get('n')
+        per = (' (%s)' % ' · '.join('%s %s' % (c['label'], fmt(dn[c['idx']]) if c['idx'] < len(dn) else '-') for c in CATS)) if dn else ''
+        alloc = ('<p class="small muted cat-alloc">올해 공고 물량: <b>전체 %s대</b>%s<button class="tip" type="button" data-tip="%s" aria-label="공고 물량 설명">?</button></p>'
+                 % (fmt(st['n']), per, _CAT_ALLOC_TIP))
+    return ('<!--derived:start-->\n      <div class="cat-head">내 신청 유형 선택<button class="tip" type="button" data-tip="%s" aria-label="신청 유형 설명">?</button></div>\n'
+            '      <div class="cat-tabs">%s</div>\n'
+            '      <p class="small muted cat-note">%s<button class="tip" type="button" data-tip="%s" aria-label="합계 차이 설명">?</button></p>\n'
+            '      %s\n      <div class="cat-forecast" data-forecast>%s</div><!--derived:end-->'
+            % (_CAT_HEAD_TIP, ''.join(tabs), note, _CAT_NOTE_TIP, alloc, ''.join(_fc_lines(st, closed, hist, cd, asof_day))))
 
 
 # ── history 추이 (실측 산출 — 점추정 예측 금지, 과거 사실만 문장화) ──
@@ -1145,7 +1290,11 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     # 페이지·형제 칩 링크는 그대로 유지(탐색용)하고 색인 표면에서만 뺀다. 광고 슬롯은 ad_slot이 제거.
     noindex = (cd == '9999') or (cd in ctx.get('region_noindex', ()))
     closed = ctx['closed_map'][cd]
-    cls, label = badge_of(st, closed, (ctx.get('rounds_over') or {}).get(cd))
+    over = (ctx.get('rounds_over') or {}).get(cd)
+    cls0, label0 = badge_of(st, closed, over)              # 표·칩·설명문 공용(유형 무관 — detail.js 표 재렌더와 동일)
+    # 상단 뱃지는 detail.js paint()가 첫 방문자에게 그리는 결과(기본 유형 '일반')와 글자까지 같아야 한다 —
+    # 라벨 길이가 다르면 모바일에서 줄 수가 바뀌어 아래 콘텐츠 전체가 밀린다(2026-10-12 콜드 로드 CLS 실측).
+    cls, label = badge_of(st, closed, over, CAT_DEFAULT)
     # 데이터 모순 가드: 전체 잔여 0인데 유형 잔여가 남음 → 단정 문장 생략 대상
     d = st.get('d') or {}
     contradiction = (st.get('left') is not None and st['left'] <= 0
@@ -1357,21 +1506,23 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
         'MODEL_COUNT': str(len(all_rows)),
         'SIDO_LABEL': esc(SIDO_FULL.get(sido, sido or '지역')),
         'SIBLINGS': sibs_html,
-        'RELATED': related_for_region(cd, cls, rank, rows, ctx),
+        'RELATED': related_for_region(cd, cls0, rank, rows, ctx),
     }
     # 광고 게이트: app.js renderAds와 동일하게 정적 <main> 전체 텍스트 기준(1,200자)
     mapping['PROVENANCE'] = ''                      # 게이트 산정에서 보일러플레이트 제외
     mapping['NOTICE_FACTS'] = ''                    # 원문 발췌 카드도 게이트 산정에서 제외(공지 원문과 중복 집계 방지)
+    mapping['CATS_BLOCK'] = ''                      # 유형별 잔여 UI(데이터 블록)도 게이트 산정 제외
     gate = len(strip_tags(render(ctx['tpl_region'], mapping)))
     mapping['AD1'] = ad_slot('region-1', gate, noindex)
     mapping['AD2'] = ad_slot('region-2', gate, noindex)
     mapping['PROVENANCE'] = provenance_block('region', updated, meta['updated'])
     mapping['NOTICE_FACTS'] = notice_facts_block(st, updated)
+    mapping['CATS_BLOCK'] = cats_block(st, closed, hist, cd, ctx['asof_day'])
     main = render(ctx['tpl_region'], mapping)
     page = render(ctx['tpl_page'], {
         'TITLE': esc('%s 전기차 보조금 2026 — 최대 %s만원·잔여 현황 | EV보조금' % (name, fmt(r.get('maxP')))),
         'DESC': esc('%s 2026년 전기차 보조금: 승용 최대 %s만원(국비+지방비), 잔여 %s대 · %s. 차종별 단가표%s, 담당부서 연락처까지. %s 기준.'
-                    % (name, fmt(r.get('maxP')), fmt(st.get('left')), label.split(' · ')[0],
+                    % (name, fmt(r.get('maxP')), fmt(st.get('left')), label0.split(' · ')[0],
                        ', 지자체 공지 원문' if note else '', asof)),
         'ROBOTS': '\n<meta name="robots" content="noindex">' if noindex else '',
         'CANONICAL': canonical,
@@ -3009,7 +3160,7 @@ def build_ics(regions, rounds, updated, today, before=30, after=90):
                 ev.append('\n'.join(_ics_fold(l) for l in lines))
     head = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//EV보조금//접수 일정//KO', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
             'X-WR-CALNAME:EV보조금 접수 일정(전국)', 'X-WR-CALDESC:공단 등록 회차의 접수 시작·마감 — 지난 %d일~앞으로 %d일' % (before, after), 'X-WR-TIMEZONE:Asia/Seoul']
-    return '\n'.join(_ics_fold(l) for l in head) + '\n' + '\n'.join(ev) + ('\n' if ev else '') + 'END:VCALENDAR\r\n'
+    return '\n'.join(_ics_fold(l) for l in head) + '\n' + '\n'.join(ev) + ('\n' if ev else '') + 'END:VCALENDAR\n'
 
 
 def build_csv(header, rows):
@@ -3650,6 +3801,31 @@ def build_sitemap(regions, cars, today, model_entries=(), brief_days=(), car_rep
             len(urls), new_store)
 
 
+# ── 에셋 캐시 버전(P16-lite) — 자체 CSS/JS 링크에 내용 해시(?v=)를 붙인다 ──
+#    GitHub Pages·Cloudflare가 max-age=600으로 캐시하므로 배포 직후 최대 10분간 새 HTML + 옛 CSS/JS가 섞여
+#    예약 높이·광고 스위치·슬롯 재사용이 어긋났다(2026-10-11 실측). 링크는 <head>·</main> 밖이라
+#    lastmod 해시(content_hash·head_hash)에 영향이 없다. 손편집 전용 루트 페이지(about·faq 등)는 대상 아님.
+_ASSET_RE = re.compile(r'(?P<attr>href|src)="(?P<path>(?:\.\./)*assets/(?:css|js)/[A-Za-z0-9_./-]+?\.(?:css|js))(?:\?v=[0-9a-f]{8})?"')
+_ASSET_VER = {}
+
+
+def _asset_ver(rel):
+    if rel not in _ASSET_VER:
+        try:
+            with open(os.path.join(SITE, rel), 'rb') as f:
+                _ASSET_VER[rel] = hashlib.md5(f.read()).hexdigest()[:8]
+        except OSError:
+            _ASSET_VER[rel] = None            # 없는 파일은 손대지 않음(selfcheck 링크 검사가 잡는다)
+    return _ASSET_VER[rel]
+
+
+def version_assets(html):
+    def rep(m):
+        v = _asset_ver(re.sub(r'^(?:\.\./)+', '', m.group('path')))
+        return m.group(0) if not v else '%s="%s?v=%s"' % (m.group('attr'), m.group('path'), v)
+    return _ASSET_RE.sub(rep, html)
+
+
 def atomic_write(path, content):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + '.tmp~'
@@ -3756,6 +3932,28 @@ def main():
         r = regions[cd]; stt = status['data'].get(cd) or {}
         cls, label = badge_of(stt, ctx['closed_map'].get(cd) or detect_closed(stt.get('note')), (ctx.get('rounds_over') or {}).get(cd))
         csv_rows.append([cd, r['name'], r.get('sido'), r.get('maxP'), stt.get('n'), stt.get('a'), stt.get('r'), stt.get('left'), stt.get('st'), label, status.get('updated', '')])
+    # 서버 판정 정본(JS 공유) — 공지 마감 감지(closed_map)·등록 회차 종료(rounds_over). app.js가 status.json에 병합해
+    # statusBadge/closedInfo/renderForecast가 prerender와 같은 판정을 쓴다 — 정규식 이중 구현의 미세 차이(2026-10-12 실측
+    # 3/160 지역)로 정적 뱃지와 JS 재렌더가 어긋나던 모순·시프트 제거. 닫힌/종료 지역만 수록(없으면 열린 지역).
+    verdict = {}
+    for cd in regions:
+        c = ctx['closed_map'].get(cd) or {}
+        o = (ctx.get('rounds_over') or {}).get(cd)
+        if c.get('closed') or o:
+            v = {}
+            if c.get('closed'):
+                v['c'] = 1
+                if c.get('partial'):
+                    v['p'] = 1
+                if c.get('closedDate'):
+                    v['d'] = c['closedDate']
+                if c.get('nextRound'):
+                    v['n'] = c['nextRound']
+            if o:
+                v['o'] = 1
+            verdict[cd] = v
+    pages[os.path.join(SITE, 'data', 'closed.json')] = json.dumps(
+        {'v': 1, 'updated': status.get('updated', ''), 'r': verdict}, ensure_ascii=False, separators=(',', ':'))
     pages[os.path.join(SITE, 'data', 'regions.csv')] = build_csv(
         ['region_code', 'region', 'sido', 'max_subsidy_manwon', 'quota', 'applied', 'delivered', 'remaining', 'official_status', 'site_badge', 'remaining_asof'], csv_rows)
     pages[os.path.join(SITE, 'data', 'cars.csv')] = build_csv(
@@ -3802,6 +4000,7 @@ def main():
                 print('경고: %s에 슬롯 %s 없음 — 건너뜀' % (rel, name), file=sys.stderr)
                 continue
             new = new[:m.start(1)] + '\n' + content + '\n' + new[m.end(1):]
+        new = version_assets(new)              # 에셋 버전(?v=)이 바뀐 것도 쓰기 사유
         if new != html:
             pages[fp] = new
     try:
@@ -3878,7 +4077,7 @@ def main():
         pages=pages, store=prev_store, region_noindex=ctx['region_noindex'], article_entries=art_entries)
 
     for path, html in pages.items():
-        atomic_write(path, html)
+        atomic_write(path, version_assets(html) if (path.endswith('.html') and isinstance(html, str)) else html)
     # 생성 대상에서 빠진 잔재 파일 정리(차종 삭제·발행 회수 등) — 이 5개 디렉터리는 생성기 소유.
     # 단 brief의 날짜 파일(YYYY-MM-DD.html)은 daily_brief.py 산출물이라 절대 삭제하지 않음(영구 보존).
     for sub in ('region', 'car', 'sido', 'model', 'brief', 'articles'):

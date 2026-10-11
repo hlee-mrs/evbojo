@@ -86,14 +86,24 @@
     }
     return cache[name];
   }
+  /* 서버(prerender) 판정 병합 — 공지 마감 감지(closed)·등록 회차 종료(over)는 prerender가 정본(site/data/closed.json).
+     같은 규칙을 JS 정규식으로 다시 돌리면 미세 차이(2026-10-12 실측 3/160 지역)로 정적 뱃지와 재렌더가 어긋나
+     모순·시프트가 난다. 병합되면 st.srv = {closed, partial, closedDate, nextRound, over}; closed.json이 없으면 JS 감지 폴백. */
+  const withVerdict = p => Promise.all([p, load('closed').catch(() => null)]).then(([s, c]) => {
+    if (s && s.data && c && c.v === 1 && c.r) Object.keys(s.data).forEach(cd => {
+      const v = c.r[cd] || {}, st = s.data[cd];
+      if (st) st.srv = { closed: !!v.c, partial: !!v.p, closedDate: v.d || null, nextRound: v.n || null, over: !!v.o };
+    });
+    return s;
+  });
   window.EVData = {
     cars: () => load('cars'),
     regions: () => load('regions'),
     meta: () => load('meta'),
-    status: () => load('status').catch(() => null),
+    status: () => withVerdict(load('status')).catch(() => null),
     history: () => load('history').catch(() => null),   // 소진 예측용 잔여 이력(없으면 무소음 강등)
     rounds: () => load('rounds').catch(() => null),     // 공고 차수·접수 일정(등록값 — 예측 아님)
-    all: () => Promise.all([load('cars'), load('regions'), load('meta'), load('status').catch(() => null)]),
+    all: () => Promise.all([load('cars'), load('regions'), load('meta'), withVerdict(load('status')).catch(() => null)]),
   };
 
   /* ── 포맷터 ── */
@@ -249,6 +259,7 @@
   /* closedInfo(st): note 문자열 기준 캐시. 마감 감지 시 결과 객체, 아니면 null(기존 잔여 기준 동작 유지) — 계약 API */
   const ciCache = new Map();
   window.closedInfo = function (st) {
+    if (st && st.srv) return st.srv.closed ? { closed: true, partial: st.srv.partial, closedDate: st.srv.closedDate, nextRound: st.srv.nextRound, evidence: 'server' } : null;
     const note = st && st.note;
     if (!note) return null;
     if (!ciCache.has(note)) { const r = detectClosed(note); ciCache.set(note, r.closed ? r : null); }
@@ -270,8 +281,9 @@
      반대 방향(공단 '접수중' + 공지 원문 완료형 마감)은 closedInfo 판정을 그대로 유지한다.
      라벨에는 공단 상태를 병기해 사용자가 두 신호를 모두 보고 대조할 수 있게 한다.
      prerender.py badge_of()가 이 로직의 쌍둥이 — 규칙(초록 금지·마감 계열·병기)을 양쪽 동일하게 유지. */
-  window.statusBadge = function (st, statusUpdated, catKey) {
+  window.statusBadge = function (st, statusUpdated, catKey, over) {
     if (!st) return { cls: 'badge-closed', label: '현황 확인 필요', stale: true };
+    if (over == null) over = !!(st.srv && st.srv.over);     // 서버 판정(closed.json) — 명시 인자가 없을 때
     // 공고 0대 + 잔여 0 = 수집 결손(붕괴)이지 소진이 아님 — prerender badge_of와 같은 규칙(I3)
     if (!st.n && (st.left == null || st.left <= 0)) return { cls: 'badge-closed', label: '물량 정보 확인 중', stale: false };
     const ageDays = statusUpdated ? (Date.now() - new Date(statusUpdated).getTime()) / 864e5 : 99;
@@ -291,7 +303,7 @@
       // (전체 잔여는 상계 후 값 = 실제 상한). 유형 숫자를 '남은 물량'으로 내보내면
       // 전체보다 큰 값이 노출돼 오해를 부르므로, 전체 기준 판정으로 강등하고 숫자는 표기하지 않는다(I3).
       if (left != null && st.left != null && left > st.left) {
-        const b = window.statusBadge(st, statusUpdated);
+        const b = window.statusBadge(st, statusUpdated, null, over);
         return { cls: b.cls, label: `${b.label} · ${c.label} 잔여는 아래 설명 참고`, stale: b.stale };
       }
     }
@@ -320,6 +332,8 @@
     // 공지 원문엔 완료형 마감 선언이 없지만 공단 등록 상태가 마감/접수예정 — 초록·임박 금지(위 주석의 보수 규칙)
     if (ksShut) return { cls: 'badge-shut', label: `${pfx}${ksTag} · 잔여 ${fmt(left)}대는 미출고분일 수 있음 · 공고 일정 확인 필요`, stale: false };
     if (ksSoon) return { cls: 'badge-closed', label: `${pfx}공단 접수 예정 · 잔여 ${fmt(left)}대 · 공고 일정 확인 필요`, stale: false };
+    // 공단 등록 회차의 접수기간이 모두 지난 지역(prerender rounds_over → closed.json의 o) — 열린 공지·등록상태라도 초록·임박 금지(I3)
+    if (over) return { cls: 'badge-shut', label: `${pfx}등록 회차 접수기간 종료 · 잔여 ${fmt(left)}대 · 공고 일정 확인 필요`, stale: false };
     const ratio = quota ? left / quota : 1;
     if (left < 30 || ratio < 0.06) return { cls: 'badge-low', label: `${pfx}마감 임박 · 잔여 ${fmt(left)}대`, stale: false };
     return { cls: 'badge-open', label: `${pfx}접수 중 · 잔여 ${fmt(left)}대`, stale: false };
@@ -400,7 +414,7 @@
       lines.push(P(`공단(ev.or.kr) 등록 접수상태가 <b>접수예정</b>이에요. 아직 이번 회차 접수가 시작되지 않아 소진 예측을 표시하지 않아요 — 접수 일정은 지자체 공지를 확인하세요.`));
       return done();
     }
-    done();                                                                     // 이력 로드 전 상시 고지 먼저 표시
+    if (!el.innerHTML) done();                                                                     // 정적(프리렌더) 고지가 없을 때만 먼저 표시 — 있으면 이력 판정 결과로 한 번에 교체(시프트 방지)
     EVData.history().then(hist => {
       const updatedISO = ctx && ctx.updated, asOf = isoToDay(updatedISO);
       const e = hist && hist.v === 1 && ctx && hist.r[ctx.cd];
@@ -423,7 +437,7 @@
       //    (관측 첫날의 rd.t는 '기록 시작'이지 공고가 아님 → rd.t만 보면 전 지역에 거짓 안내가 나감)
       const hadReset = (e.L.ev || []).some(v => v[1] === 0 && asOf - v[0] <= 7);
       if (clientReset || hadReset) {
-        lines.push(P(`${md(e.L.rd.t)} <b>추가공고로 물량이 늘었어요.</b> 재공고 직후에는 며칠 안에 마감되는 경우가 많아요 — 신청 계획이 있다면 지자체 공지를 바로 확인하세요. (새 공고 기준으로 다시 기록하는 중)`));
+        lines.push(P(`${md(e.L.rd.t)} <b>추가공고로 물량이 늘었어요.</b> 새 공고 기준으로 다시 기록하는 중이에요 — 신청 계획이 있다면 지자체 공지를 바로 확인하세요.`));
         return done();
       }
       const rate = W => { const s = pts.find(p => p[0] >= asOf - W) || pts[0]; const nw = pts[pts.length - 1];
@@ -520,6 +534,7 @@
       return { c, over, n: over ? tot : raw };
     });
     const capped = cells.some(x => x.over);
+    const keepFc = (mount.querySelector('[data-forecast]') || {}).innerHTML || '';   // 프리렌더 고지 유지 — 중간에 비우면 높이가 줄었다 늘어 시프트
     mount.innerHTML = `
       <div class="cat-head">내 신청 유형 선택<button class="tip" type="button" data-tip="지자체는 물량을 신청 유형별로 나눠 배정해요. 내 유형의 잔여가 중요합니다 — 개인 구매자는 보통 '일반'(우대 대상이면 '우선순위')을 보세요." aria-label="신청 유형 설명">?</button></div>
       <div class="cat-tabs">${cells.map(({ c, over, n }) => {
@@ -533,7 +548,7 @@
         ? `이 지역은 유형별 잔여가 전체 잔여(${fmt(tot)}대)보다 크게 집계돼 있어요 — 유형별 잔여는 공고 기준 계산값이라 전체 잔여를 상한으로 표시했어요. 실제 신청 가능 물량은 지자체 공고로 확인하세요`
         : `숫자는 각 유형의 남은 물량이에요. 항목 합계는 '전체'와 다를 수 있어요`}<button class="tip" type="button" data-tip="유형별 잔여는 원본에서 유형마다 '공고−출고'로 따로 계산해요. 어떤 유형이 배정보다 많이 출고되면 그 초과분이 다른 유형과 상계되지 않아, 유형 숫자의 합이 전체 잔여보다 커질 수 있어요. 본공고·추경으로 회차가 나뉜 지역에서도 같은 차이가 납니다. 원본 수치는 그대로 두되, 화면에는 전체 잔여를 넘지 않도록 표시합니다." aria-label="합계 차이 설명">?</button></p>
       ${st.n != null ? `<p class="small muted cat-alloc">올해 공고 물량: <b>전체 ${fmt(st.n)}대</b>${st.d && st.d.n ? ` (${CATS.map(c => `${c.label} ${fmt(st.d.n[c.idx])}`).join(' · ')})` : ''}<button class="tip" type="button" data-tip="지자체가 올해 공고한 보급 물량이에요(ev.or.kr 공고 기준). 추경·추가공고가 나면 늘어날 수 있고, 회차 구분 때문에 유형별 합계가 전체와 다를 수 있어요." aria-label="공고 물량 설명">?</button></p>` : ''}
-      <div class="cat-forecast" data-forecast></div>`;
+      <div class="cat-forecast" data-forecast>${keepFc}</div>`;
     renderForecast(mount.querySelector('[data-forecast]'), st, ctx);
     function selectTab(tab) {
       myCategory.set(tab.dataset.cat);
