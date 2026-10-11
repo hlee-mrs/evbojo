@@ -3,8 +3,7 @@
 <head>
 <meta charset="utf-8">
 <!-- Google Analytics (GA4) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');</script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');addEventListener('load',function(){setTimeout(function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB';document.head.appendChild(s)},1500)})</script><!-- GA4 지연 로드: 페이지 로드 1.5초 뒤 주입 — 느린 모바일에서 첫 화면 렌더와 경합하지 않게. 이벤트는 dataLayer에 큐잉돼 유실 없음 -->
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <!-- 하위 경로(/region/없는페이지.html 등)에서 뜨는 404에서도 상대 URL이 루트 기준으로 풀리도록 base 고정 —
      app.js가 재렌더하는 헤더/푸터 내비(상대경로)와 data/*.json fetch가 그대로 동작한다(page.tpl과 동일 방식). -->
