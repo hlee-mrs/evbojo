@@ -40,4 +40,6 @@
   <div class="chips">{{RELATED}}</div>
 </section>
 
+{{PROVENANCE}}
+
 {{AD2}}

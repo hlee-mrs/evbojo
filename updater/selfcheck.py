@@ -627,6 +627,41 @@ def check_collapse(pages, ctx):
 RX_SCHED_SLOT = re.compile(r'<!--sched:start-->(.*?)<!--sched:end-->', re.S)
 
 
+def check_provenance_feed(pages, ctx):
+    """생성 페이지(region/car/sido/model/articles)마다 '이 페이지는 어떻게 만들어졌나' 블록이 있고,
+    홈·현황판·소진 글의 정적 슬롯이 채워져 있으며, RSS 2종이 XML로 파싱되는지."""
+    import xml.etree.ElementTree as ET
+    out = []
+    site = ctx['site']
+    for p in pages:
+        gen = (p.kind in ('region', 'car', 'sido', 'model') and p.rel != 'model/index.html') or p.rel.startswith('articles/')
+        if gen and 'class="card provenance"' not in p.main:
+            out.append('%s — 투명성(제작 방식·검수) 블록 없음' % p.rel)
+    for rel, names in (('index.html', ('strip', 'rank', 'cars')), ('status.html', ('summary', 'board')), ('sold-out.html', ('sostats',))):
+        pg = ctx['by_rel'].get(rel)
+        if pg is None:
+            continue
+        html = getattr(pg, 'html', None) or pg.main
+        for nm in names:
+            m = re.search(r'<!--%s:start-->(.*?)<!--%s:end-->' % (nm, nm), html, re.S)
+            if not m:
+                out.append('%s — 슬롯 %s 없음' % (rel, nm))
+            elif m.group(1).count('<!--derived:start-->') != 1 or m.group(1).count('<!--derived:end-->') != 1:
+                out.append('%s — 슬롯 %s derived 마커 1쌍 아님(비어 있거나 중복)' % (rel, nm))
+    for rel in ('feed.xml', 'brief/feed.xml'):
+        fp = os.path.join(site, rel)
+        if not os.path.isfile(fp):
+            out.append('%s — 없음' % rel)
+            continue
+        try:
+            root = ET.parse(fp).getroot()
+            if not root.findall('./channel/item'):
+                out.append('%s — item 0건' % rel)
+        except ET.ParseError as ex:
+            out.append('%s — XML 파싱 실패: %s' % (rel, ex))
+    return out
+
+
 def check_home_schedule(pages, ctx):
     """index.html의 접수 일정 슬롯이 prerender 산출로 채워져 있고 구조가 온전한지.
 
@@ -678,6 +713,7 @@ CHECKS = (
     ('12 지역→해설 내부 링크(함께 읽으면 좋은 해설)', check_region_related),
     ('13 수집 붕괴 징후(공고 0대·접수중/소진 단정)', check_collapse),
     ('14 홈 접수 일정 카드(슬롯·derived 마커·링크)', check_home_schedule),
+    ('15 투명성 블록·정적 슬롯·RSS', check_provenance_feed),
 )
 
 

@@ -55,7 +55,8 @@
 <section class="card">
   <h2 class="mt0">함께 읽으면 좋은 글</h2>
   <div class="chips">{{RELATED}}</div>
-  <p class="stamp mt8">데이터 수집·검증: EV보조금 운영자 <a href="/about.html#operator" style="color:inherit;text-decoration:underline">HyeongHun Lee</a> · <a href="/about.html#method" style="color:inherit;text-decoration:underline">수집·검증 방법</a> · 출처 무공해차 통합누리집(ev.or.kr)</p>
 </section>
+
+{{PROVENANCE}}
 
 {{AD2}}

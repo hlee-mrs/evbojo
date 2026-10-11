@@ -5,6 +5,8 @@
 
 <p class="stamp">글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 게시 {{PUBLISHED}} · 데이터 기준 {{ASOF}}</p>
 
+{{NOW_BLOCK}}
+
 <section class="card">
   {{PROSE}}
 </section>
@@ -31,5 +33,7 @@
     <a class="chip" href="articles.html">📚 읽을거리</a>
   </div>
 </section>
+
+{{PROVENANCE}}
 
 {{AD2}}

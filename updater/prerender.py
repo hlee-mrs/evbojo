@@ -21,8 +21,11 @@ site/data/*.json + updater/templates/*.tpl (+ updater/content/{sido,model}/*.md)
   → 크롤 스케줄러가 "매일 전 URL 변경"으로 오인하지 않게 한다.
 """
 import collections
+import csv
 import datetime
+import email.utils
 import hashlib
+import io
 import html as _html
 import json
 import os
@@ -84,6 +87,7 @@ CORE_PAGES = [
     ('/extra-support.html', 'weekly'), ('/winter-range.html', 'weekly'), ('/changes-2026-2027.html', 'weekly'),
     ('/sold-out.html', 'weekly'), ('/region-ranking.html', 'weekly'),
     ('/winter-range-ranking.html', 'weekly'), ('/yearend-guide.html', 'weekly'),
+    ('/data.html', 'weekly'), ('/changelog.html', 'weekly'), ('/glossary.html', 'weekly'),
 ]
 
 
@@ -360,6 +364,48 @@ def rounds_over(rounds, cd, today):
 
 
 # ── 상태 뱃지 (app.js statusBadge의 정적 축약 — stale 분기는 생성 시점 데이터라 불필요) ──
+_POLISH = [
+    (re.compile(r'(덧붙이면|참고로|끝으로) 다만 '), '다만 '),
+    (re.compile(r'기준점과 견주면 ([^.]{0,80}?)과 견주면 '), r'\1과 견주면 '),
+    (re.compile(r'((?:와|과) 견주면 )([^.]{0,60}?)(?:와|과) 견주면 '), r'\1\2 대비 '),
+]
+
+
+def polish_prose(html):
+    """생성 산문 후처리 — 접속어 중복('덧붙이면 다만', '…견주면 …견주면')과 구현 설명투를 의미 변화 없이 정리.
+    문장 풀 자체도 고쳤지만, 풀 조합이 늘어나도 같은 흔적이 다시 새지 않도록 안전망으로 둔다."""
+    for rx, rpl in _POLISH:
+        html = rx.sub(rpl, html)
+    return html.replace('표시값은 전체 잔여를 넘지 않도록 잡았습니다', '화면에는 전체 잔여를 상한으로 표시합니다')
+
+
+_PROV_HOW = {
+    'region': '수치(단가·공고·접수·출고·잔여·회차 일정)는 수집한 실측값 그대로이고, 문장은 그 수치를 미리 정한 규칙에 따라 조합한 <b>자동 생성문</b>입니다(생성형 AI 미사용). 지역 간 비교·순위는 같은 수집분 안에서 계산합니다. 운영자가 규칙과 표기를 검수하고 오류 제보를 처리합니다.',
+    'car': '트림별 국비·제원은 공단 공고 데이터이고, 지역별 합계는 각 지자체 지방비 표를 같은 수집분에서 더한 값입니다. 문장은 수치를 규칙에 따라 조합한 <b>자동 생성문</b>입니다(생성형 AI 미사용). 운영자가 규칙과 표기를 검수합니다.',
+    'sido': '표와 상태 요약은 매시간 자동 갱신되는 실측값이고, 본문 해설은 운영자가 <b>게시 시점 데이터</b>로 쓴 글입니다(게시일 표기). 게시 뒤 달라진 상태는 요약 블록에서 자동으로 집계합니다.',
+    'model': '표·분포는 매시간 자동 갱신되는 실측값이고, 해설 본문은 운영자가 <b>게시 시점 데이터</b>로 쓴 글입니다(게시일 표기).',
+    'article': '수치는 이 사이트가 수집·보관한 데이터(접수 현황·잔여 이력·회차 일정)에서 분석 스크립트로 추출했습니다. 원고는 AI 도구의 보조를 받아 작성한 뒤 운영자가 수치를 원본 데이터와 대조·검수해 게시하며, 게시 후 수치는 다시 계산하지 않고 데이터 기준일을 명시합니다.',
+}
+
+
+def provenance_block(kind, updated, meta_updated):
+    """'이 페이지는 어떻게 만들어졌나' — 출처·수집·생성 방식·검수·검증 규칙·정정 창구를 모든 생성 페이지에 공개한다.
+    (구글 people-first 'Who/How/Why' 공개 권고 + 애드센스 '검토·선별 없는 자동 생성' 금지 조항 대응.) 기준 시각만 derived."""
+    when = (updated or '').replace('T', ' ')[:16]
+    return ('<section class="card provenance" aria-label="이 페이지의 데이터와 검수">'
+            '<h2 class="mt0">🔎 이 페이지는 어떻게 만들어졌나</h2>'
+            '<ul class="prov">'
+            '<li><b>출처</b> 무공해차 통합누리집(ev.or.kr) 보조금관리시스템 공개 데이터 · 지자체 공고문 원문</li>'
+            '<li><b>수집</b> 접수 현황은 매시간, 전체 단가표는 매일 04시 자동 수집 · 요청 간격 1.2초 이상과 연락처를 밝힌 UA로 공공 사이트 부하를 줄입니다</li>'
+            '<li><b>생성·검수</b> %s</li>'
+            '<li><b>검증 규칙</b> 행 수·값이 이상하면 교체하지 않고 직전 데이터를 유지 · 40%% 이상 급변은 보류 후 사람이 확인 · 한 지역이 갑자기 0으로 떨어지면 소진이 아니라 결손으로 보고 직전 값을 유지</li>'
+            '<li><b>기준 시각</b> <span data-derived>잔여현황 %s · 단가 수집일 %s</span></li>'
+            '<li><b>정정</b> 틀린 곳을 보셨다면 <a href="report.html">오류 제보</a>로 알려 주세요. 확인 후 고치고 <a href="changelog.html">변경·정정 이력</a>에 남깁니다 · 운영자 <a href="about.html#operator">HyeongHun Lee</a></li>'
+            '</ul>'
+            '<p class="small muted mt8">정부·공공기관과 무관한 개인 운영 사이트입니다. 실제 신청 전에는 ev.or.kr 원문과 지자체 공고문을 확인하세요 · 수집·검증 방법 전체는 <a href="data.html">데이터·방법론</a>에 정리돼 있습니다.</p>'
+            '</section>' % (_PROV_HOW.get(kind, _PROV_HOW['region']), esc(when), esc(meta_updated or '')))
+
+
 def badge_of(st, closed, over=None):
     """공지 판정(closed)과 **공단 공식 신호**를 함께 반영한 상태 뱃지.
 
@@ -1233,7 +1279,7 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
         # meta.updated는 '단가가 언제부터 유효한가'가 아니라 update.py가 단가표를 수집한 날짜다
         # (update_full이 회차마다 today로 갱신) → '기준일'이 아니라 '수집일'로 표기한다.
         'STAMP': '잔여현황 기준 %s · 단가 수집일 %s · 출처 ev.or.kr' % (esc(updated.replace('T', ' ')), esc(meta['updated'])),
-        'PROSE': prose_html,
+        'PROSE': polish_prose(prose_html),
         'NOTE_SECTION': note_sec,
         'AD1': '', 'AD2': '',
         'TABLE_SUB': '보조금 상위 %d개 / 전체 %d개 모델' % (min(25, len(rows)), len(all_rows)),
@@ -1244,9 +1290,11 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
         'RELATED': related_for_region(cd, cls, rank, rows, ctx),
     }
     # 광고 게이트: app.js renderAds와 동일하게 정적 <main> 전체 텍스트 기준(1,200자)
+    mapping['PROVENANCE'] = ''                      # 게이트 산정에서 보일러플레이트 제외
     gate = len(strip_tags(render(ctx['tpl_region'], mapping)))
     mapping['AD1'] = ad_slot('region-1', gate, noindex)
     mapping['AD2'] = ad_slot('region-2', gate, noindex)
+    mapping['PROVENANCE'] = provenance_block('region', updated, meta['updated'])
     main = render(ctx['tpl_region'], mapping)
     page = render(ctx['tpl_page'], {
         'TITLE': esc('%s 전기차 보조금 2026 — 최대 %s만원·잔여 현황 | EV보조금' % (name, fmt(r.get('maxP')))),
@@ -1539,7 +1587,7 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
                  '출고 일정이 몰리면 다시 움직일 수 있는 수치입니다.']))
         pB.append(CC('trendcaveat',
             ['', '참고로 ', '덧붙이면 '],
-            ['다만 잔여는 신청 시점이 아니라 차량 출고 시점에 줄어드는 지역이 많아 ',
+            ['잔여는 신청 시점이 아니라 차량 출고 시점에 줄어드는 지역이 많아 ',
              '잔여가 출고돼야 줄어드는 집계라는 점 때문에 ',
              '이 수치는 출고 기준으로 움직이므로 '],
             ['실제 접수는 수치보다 먼저 마감될 수 있습니다.',
@@ -1829,7 +1877,7 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
                  '이 유형별 수치는 유형 단위로 산출된 공고 기준 계산값이어서 ',
                  '유형별 잔여 값은 전체 집계와 계산 방식이 달라 '],
                 ['전체 잔여(%s대)와 다를 수 있습니다 — 이 페이지에서는 전체 잔여를 상한으로 표시했습니다.' % fmt(left),
-                 '전체 잔여(%s대)를 넘어설 수 있어, 표시값은 전체 잔여를 넘지 않도록 잡았습니다.' % fmt(left),
+                 '전체 잔여(%s대)를 넘어설 수 있어, 화면에는 전체 잔여를 상한으로 표시합니다.' % fmt(left),
                  '전체 잔여(%s대)와 어긋날 수 있습니다. 실제 신청 가능 물량은 전체 잔여 범위로 보세요.' % fmt(left),
                  '전체 잔여(%s대)보다 크게 잡힐 수 있어, 여기서는 전체 잔여를 넘지 않게 표시했습니다.' % fmt(left)]))
         else:
@@ -2122,7 +2170,7 @@ def build_car(car, cars, regions, meta, status, ctx):
         'SUB': '2026년 국비 %s만원 · 지역별 합계 %s만~%s만원' % (fmt(car['nat']),
                                                        fmt(rows[-1][3]) if rows else '-', fmt(rows[0][3]) if rows else '-'),
         'DISC_BANNER': disc_banner,
-        'PROSE': prose_html,
+        'PROSE': polish_prose(prose_html),
         'AD1': '', 'AD2': '',
         'SPECS': specs,
         'WINTER': winter,
@@ -2135,9 +2183,11 @@ def build_car(car, cars, regions, meta, status, ctx):
         'RELATED': ''.join(related),
     }
     # 광고 게이트: app.js renderAds와 동일하게 정적 <main> 전체 텍스트 기준(1,200자)
+    mapping['PROVENANCE'] = ''
     gate = len(strip_tags(render(ctx['tpl_car'], mapping)))
     mapping['AD1'] = ad_slot('car-1', gate, noindex)
     mapping['AD2'] = ad_slot('car-2', gate, noindex)
+    mapping['PROVENANCE'] = provenance_block('car', status.get('updated', ''), meta['updated'])
     main = render(ctx['tpl_car'], mapping)
     page = render(ctx['tpl_page'], {
         'TITLE': esc('%s 보조금 2026 — 국비 %s만원·지역별 합계 | EV보조금' % (name, fmt(car['nat']))),
@@ -2363,7 +2413,7 @@ def car_prose(car, cars, rows, eff, cr, meta, status, ctx):
         nshare = round(car['nat'] / nm * 100)
         if car['nat'] >= nm:
             p2.append(CC('natshare',
-                ['', '기준점과 견주면 ', '위치를 짚으면 '],
+                ['', '기준점을 두고 보면 ', '위치를 짚으면 '],
                 ['이는 올해 국비 상한(%s만원)을 꽉 채운 금액이라 ' % fmt(nm),
                  '국비 상한 %s만원을 그대로 받는 트림이라 ' % fmt(nm),
                  '올해 국비 최고액(%s만원)에 해당해 ' % fmt(nm)],
@@ -2372,7 +2422,7 @@ def car_prose(car, cars, rows, eff, cr, meta, status, ctx):
                  '차이는 지방비에서만 납니다.']))
         else:
             p2.append(CC('natshare',
-                ['', '기준점과 견주면 ', '위치를 짚으면 '],
+                ['', '기준점을 두고 보면 ', '위치를 짚으면 '],
                 ['이는 올해 국비 상한(%s만원)의 약 %d%% 수준이라 ' % (fmt(nm), nshare),
                  '국비 상한 %s만원 대비 약 %d%%에 해당해 ' % (fmt(nm), nshare),
                  '올해 국비 최고액(%s만원)과 견주면 약 %d%%라 ' % (fmt(nm), nshare)],
@@ -2659,6 +2709,195 @@ def sido_auto_prose(sido, sibs, status, meta, asof):
     return '\n'.join('<p style="line-height:1.75;margin:10px 0">%s</p>' % esc(p) for p in paras)
 
 
+def _badge_cls(cd, status, ctx):
+    stt = status['data'].get(cd) or {}
+    cls, label = badge_of(stt, ctx['closed_map'].get(cd) or detect_closed(stt.get('note')),
+                          (ctx.get('rounds_over') or {}).get(cd))
+    return cls, label, stt
+
+
+def sido_now_block(full, sibs, status, ctx, published, updated):
+    """시도 심층글 상단 '지금은' 요약 — 글은 게시 시점 서술이고 표는 매시간 바뀌므로 둘 사이를 잇는 자동 집계(derived)."""
+    cnt = collections.Counter()
+    for cd, _ in sibs:
+        cls, _, _ = _badge_cls(cd, status, ctx)
+        cnt[cls] += 1
+    n = len(sibs)
+    when = (updated or '').replace('T', ' ')[:16]
+    parts = ['접수 중 %s' % knu(cnt['badge-open'], '곳'), '마감 임박 %s' % knu(cnt['badge-low'], '곳'),
+             '공지상 마감 %s' % knu(cnt['badge-shut'], '곳'), '잔여 소진 %s' % knu(cnt['badge-closed'], '곳')]
+    return ('<!--derived:start--><section class="card" aria-label="현재 상태 요약">'
+            '<h2 class="mt0">📍 지금 %s <span class="sub">%s 수집 기준 · 매시간 갱신</span></h2>'
+            '<p style="font-size:14.5px;color:var(--text2);margin:0">%d개 시·군·구 가운데 %s입니다. '
+            '아래 해설은 <b>%s 게시 시점</b>의 흐름을 적은 글이고, 표와 이 요약은 최신 수집값입니다 — 두 시점이 다르면 표가 현재입니다.</p>'
+            '</section><!--derived:end-->' % (esc(full + josa(full, '은', '는')), esc(when), n, ' · '.join(parts), esc(published)))
+
+
+_HOME_POPULAR = ['더뉴EV6 롱레인지 2WD 19인치', '더 뉴 아이오닉5 2WD 롱레인지 19인치', 'EV3 롱레인지 2WD 17인치',
+                 '캐스퍼 일렉트릭 항속형 15인치', 'Model Y Premium Long Range', '코나 일렉트릭 2WD 롱레인지 17인치',
+                 '레이 EV 2WD 14인치 4인승 승용', '토레스 EVX 18인치(2026)']   # index.html POPULAR와 동일 순서
+
+
+def build_home_strip(regions, status, ctx):
+    cnt = collections.Counter()
+    for cd in regions:
+        if cd == '9999':
+            continue
+        cls, _, _ = _badge_cls(cd, status, ctx)
+        cnt['open' if cls == 'badge-open' else 'low' if cls == 'badge-low' else 'closed'] += 1
+    return ('<!--derived:start--><span class="st-tile t-open"><b>%s</b><span>접수 중</span></span>'
+            '<span class="st-tile t-low"><b>%s</b><span>마감 임박</span></span>'
+            '<span class="st-tile t-closed"><b>%s</b><span>마감·소진</span></span><!--derived:end-->'
+            % (fmt(cnt['open']), fmt(cnt['low']), fmt(cnt['closed'])))
+
+
+def build_home_rank(regions):
+    ranked = sorted(((cd, r) for cd, r in regions.items() if cd != '9999'), key=lambda kv: -(kv[1].get('maxP') or 0))[:10]
+    top = (ranked[0][1].get('maxP') or 1) if ranked else 1
+    rows = ''.join('<a class="hbar%s" href="/region/%s.html" style="color:inherit"><span class="nm">%d. %s</span>'
+                   '<span class="bar"><i style="width:%d%%"></i></span><span class="val">%s만원</span></a>'
+                   % (' top' if i == 0 else '', cd, i + 1,
+                      esc(r['name'].replace('특별자치도', '').replace('특별자치시', '')),
+                      round((r.get('maxP') or 0) / top * 100), fmt(r.get('maxP')))
+                   for i, (cd, r) in enumerate(ranked))
+    return '<!--derived:start-->' + rows + '<!--derived:end-->'
+
+
+def build_home_cars(cars):
+    by_name = {c['name']: c for c in cars if not c.get('disc')}
+    rows = []
+    for nm in _HOME_POPULAR:
+        c = by_name.get(nm)
+        if not c:
+            continue
+        desc = '%s · %s%s' % (MAKER_SHORT.get(c['maker'], c['maker']), ('%skm' % c['range']) if c.get('range') else '제원 미공개',
+                              (' · %skWh' % c['batt']) if c.get('batt') else '')
+        rows.append('<a class="row" href="/car/%d.html"><div class="grow"><div class="tit">%s</div><div class="desc">%s</div></div>'
+                    '<div class="amt">%s만원<small>국비만 · 지역 선택 시 합산</small></div></a>'
+                    % (c['id'], esc(c.get('disp') or c['name']), esc(desc), fmt(c['nat'])))
+    return '<!--derived:start-->' + ''.join(rows) + '<!--derived:end-->'
+
+
+def build_status_blocks(regions, status, ctx):
+    """현황판의 요약 타일·지역 목록을 정적 HTML로(무JS 수집기·네이버·리더 모드용). 접속 시 JS가 같은 규칙으로 다시 그린다."""
+    rows = []
+    cnt = collections.Counter()
+    for cd, r in regions.items():
+        if cd == '9999':
+            continue
+        cls, label, stt = _badge_cls(cd, status, ctx)
+        cnt[cls] += 1
+        left, n = stt.get('left'), stt.get('n')
+        gen = (stt.get('d') or {}).get('left', [None] * 4)[3] if stt.get('d') else None
+        pct = max(0, min(100, round((n - left) / n * 100))) if (n and left is not None) else None
+        desc = ('<span class="mini"><i style="width:%d%%"></i></span> 소진 %d%%' % (pct, pct)) if pct is not None else '소진율 -'
+        if n is not None:
+            desc += ' · 공고 %s대' % fmt(n)
+        html = ('<a class="row" href="/region/%s.html"><div class="grow"><div class="tit">%s <span class="badge %s"><span class="dot"></span>%s</span></div>'
+                '<div class="desc">%s</div></div><div class="amt"><span class="cat">일반</span> %s<small>전체 %s</small></div></a>'
+                % (cd, esc(r['name']), cls, esc(label), desc, ('%s대' % fmt(gen)) if gen is not None else '-',
+                   ('%s대' % fmt(left)) if left is not None else '-'))
+        rows.append(((-1 if left is None else -left), r['name'], html))
+    rows.sort(key=lambda x: (x[0] == -1 and 1 or 0, x[0], x[1]))   # 잔여 많은 순(잔여 미상은 맨 뒤)·이름순
+    tiles = ''.join('<button type="button" class="sum-tile %s" data-stat="%s" aria-label="%s 지역만 보기"><b>%s곳</b><span class="lb">%s</span></button>'
+                    % (cls, k, lb, fmt(cnt['badge-' + k]), lb)
+                    for k, lb, cls in (('open', '접수 중', 'sum-open'), ('low', '마감 임박', 'sum-low'),
+                                       ('shut', '공지상 마감', 'sum-shut'), ('closed', '잔여 소진', 'sum-closed')))
+    return ('<!--derived:start-->' + tiles + '<!--derived:end-->',
+            '<!--derived:start-->' + ''.join(h for _, _, h in rows) + '<!--derived:end-->')
+
+
+def build_soldout_stats(regions, status, ctx):
+    """sold-out.html '지금 전국은' 문단 — 게시 시점 수치가 굳지 않도록 매시간 집계(derived)."""
+    zero = shut = total = 0
+    for cd in regions:
+        if cd == '9999':
+            continue
+        total += 1
+        stt = status['data'].get(cd) or {}
+        if stt.get('left') is not None and stt['left'] <= 0:
+            zero += 1
+        ci = ctx['closed_map'].get(cd) or detect_closed(stt.get('note'))
+        if ci and ci.get('closed'):
+            shut += 1
+    when = (status.get('updated') or '').replace('T', ' ')[:16]
+    return ('<!--derived:start--><p style="font-size:14.5px;color:var(--text2);margin:0 0 8px">이 사이트가 매시간 수집하는 ev.or.kr 접수현황 기준으로, '
+            '전국 %d개 지자체 중 승용 <b>잔여가 0인 지역이 %s곳</b>, 지자체 공지에서 <b>접수 마감·종료 안내가 확인되는 지역이 %s곳</b>입니다 '
+            '(일부 차종·유형만 마감인 지역 포함, %s 수집 기준). 드문 일이 아니라는 뜻이에요 — 이 글이 그 다음 수를 다룹니다.</p>'
+            '<p class="small muted" style="margin:0">최신 수치와 지역별 목록은 <a href="status.html">전국 현황판</a>에서 확인하세요.</p><!--derived:end-->'
+            % (total, fmt(zero), fmt(shut), esc(when)))
+
+
+_KST = datetime.timezone(datetime.timedelta(hours=9))
+
+
+def _rfc822(day):
+    d = datetime.datetime.strptime(day, '%Y-%m-%d').replace(hour=9, tzinfo=_KST)
+    return email.utils.format_datetime(d)
+
+
+def build_feed(title, link, desc, items):
+    """RSS 2.0 — items: (title, url, description, 'YYYY-MM-DD'). 네이버 서치어드바이저 RSS 제출·구독기용."""
+    items = sorted(items, key=lambda x: x[3], reverse=True)[:40]
+    body = ''.join('<item><title>%s</title><link>%s</link><guid isPermaLink="true">%s</guid><description>%s</description><pubDate>%s</pubDate></item>\n'
+                   % (esc(t), esc(u), esc(u), esc(d), _rfc822(day)) for t, u, d, day in items)
+    last = _rfc822(items[0][3]) if items else _rfc822('2026-07-15')
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>'
+            '<title>%s</title><link>%s</link><description>%s</description><language>ko</language><lastBuildDate>%s</lastBuildDate>'
+            '<atom:link href="%s" rel="self" type="application/rss+xml"/>\n%s</channel></rss>\n'
+            % (esc(title), esc(link), esc(desc), last, esc(link.rstrip('/') + ('/feed.xml' if link.endswith('/') else '')), body))
+
+
+def build_csv(header, rows):
+    buf = io.StringIO()
+    w = csv.writer(buf, lineterminator='\n')
+    w.writerow(header)
+    for r in rows:
+        w.writerow(['' if v is None else v for v in r])
+    return '\ufeff' + buf.getvalue()           # BOM: 엑셀에서 한글 깨짐 방지
+
+
+def build_data_page(regions, cars, status, meta, hist, art_manifest, ctx):
+    """/data.html — 데이터·방법론·다운로드(사람이 읽는 데이터 설명 + Dataset 구조화 데이터). 수치는 derived."""
+    updated = status.get('updated', '')
+    cur = [c for c in cars if not c.get('disc')]
+    days = (hist or {}).get('days') or []
+    d0 = (hist or {}).get('d0')
+    hist_start = (datetime.date.fromisoformat(d0) + datetime.timedelta(days=days[0])).isoformat() if (d0 and days) else '-'
+    n_regions = sum(1 for cd in regions if cd != '9999')
+    mapping = {
+        'N_REGIONS': str(n_regions), 'N_TRIMS': str(len(cur)), 'N_TRIMS_ALL': str(len(cars)),
+        'N_ARTICLES': str(len(art_manifest)), 'STATUS_UPDATED': esc(updated.replace('T', ' ')[:16]),
+        'META_UPDATED': esc(meta.get('updated', '')), 'HIST_START': esc(hist_start), 'HIST_DAYS': str(len(days)),
+    }
+    main = render(load_tpl('data.tpl'), mapping)
+    canonical = BASE + '/data.html'
+    ld = [{'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
+              {'@type': 'ListItem', 'position': 1, 'name': '홈', 'item': BASE + '/'},
+              {'@type': 'ListItem', 'position': 2, 'name': '데이터·방법론', 'item': canonical}]},
+          {'@context': 'https://schema.org', '@type': 'Dataset', '@id': BASE + '/#dataset',
+           'name': '2026년 전국 지자체 전기차 구매보조금 현황',
+           'description': '전국 160개 지자체 × 전기승용 현행 트림의 국비·지방비 단가와 공고·접수·출고·잔여 대수, 공고 회차 일정, 일별 잔여 이력. 무공해차 통합누리집(ev.or.kr) 공개 데이터를 매시간 수집해 검증·정리한 2차 데이터.',
+           'url': canonical, 'inLanguage': 'ko', 'isBasedOn': 'https://ev.or.kr/', 'temporalCoverage': '2026',
+           'spatialCoverage': {'@type': 'Place', 'name': '대한민국'},
+           'creator': {'@type': 'Organization', 'name': 'EV보조금', 'url': BASE + '/'},
+           'keywords': ['전기차 보조금', '지자체 보조금', '전기승용 국비 지방비', '접수 잔여현황'],
+           'distribution': [
+               {'@type': 'DataDownload', 'name': '지역별 요약(CSV)', 'encodingFormat': 'text/csv', 'contentUrl': BASE + '/data/regions.csv'},
+               {'@type': 'DataDownload', 'name': '차종(트림)별 국비·제원(CSV)', 'encodingFormat': 'text/csv', 'contentUrl': BASE + '/data/cars.csv'},
+               {'@type': 'DataDownload', 'name': '지역·차종 단가 행렬(JSON)', 'encodingFormat': 'application/json', 'contentUrl': BASE + '/data/regions.json'},
+               {'@type': 'DataDownload', 'name': '차종 목록(JSON)', 'encodingFormat': 'application/json', 'contentUrl': BASE + '/data/cars.json'},
+               {'@type': 'DataDownload', 'name': '접수 현황(JSON)', 'encodingFormat': 'application/json', 'contentUrl': BASE + '/data/status.json'},
+               {'@type': 'DataDownload', 'name': '공고 회차 일정(JSON)', 'encodingFormat': 'application/json', 'contentUrl': BASE + '/data/rounds.json'},
+               {'@type': 'DataDownload', 'name': '일별 잔여 이력(JSON)', 'encodingFormat': 'application/json', 'contentUrl': BASE + '/data/history.json'}]}]
+    return render(ctx['tpl_page'], {
+        'TITLE': esc('데이터·방법론 — 전기차 보조금 데이터는 어떻게 수집·검증·공개되나 | EV보조금'),
+        'DESC': esc('EV보조금이 매시간 수집하는 지자체 전기차 보조금 데이터의 출처·필드·수집 주기·검증 규칙·마감 판정 기준·알려진 한계·정정 절차와 CSV/JSON 다운로드. 출처를 밝히면 자유롭게 인용할 수 있습니다.'),
+        'ROBOTS': '', 'CANONICAL': canonical, 'JSONLD': jsonld_script(ld),
+        'BREADCRUMB': '<a href="/">홈</a> › <b>데이터·방법론</b>', 'MAIN': main, 'META_UPDATED': esc(meta.get('updated', '')),
+    })
+
+
 def build_sido(sido, regions, meta, status, ctx):
     slug = SIDO_SLUG[sido]
     full = SIDO_FULL[sido]
@@ -2711,14 +2950,17 @@ def build_sido(sido, regions, meta, status, ctx):
         'SUB': ('2026년 전기승용 기준 · 접수 흐름·마감 패턴과 현재 잔여 현황' if single
                 else '2026년 전기승용 기준 · %d개 시·군·구 최대 보조금·잔여 현황' % len(sibs)),
         'PUBLISHED': esc(published), 'ASOF': esc(asof),
-        'PROSE': prose,
+        'PROSE': polish_prose(prose),
         'AD1': '', 'AD2': '',
         'TABLE_SUB': '%d개 지역 · 최대 보조금 순' % len(sibs),
         'TABLE_ROWS': ''.join(trs),
     }
+    mapping['PROVENANCE'] = ''; mapping['NOW_BLOCK'] = ''
     gate = len(strip_tags(render(ctx['tpl_sido'], mapping)))   # app.js와 동일: <main> 전체 텍스트 기준
     mapping['AD1'] = ad_slot('sido-1', gate, False)
     mapping['AD2'] = ad_slot('sido-2', gate, False)
+    mapping['PROVENANCE'] = provenance_block('sido', updated, meta['updated'])
+    mapping['NOW_BLOCK'] = sido_now_block(full, sibs, status, ctx, published, updated)
     main = render(ctx['tpl_sido'], mapping)
     page = render(ctx['tpl_page'], {
         'TITLE': esc('%s | EV보조금' % head_txt),
@@ -2822,6 +3064,7 @@ def build_article(entry, ctx):
         'ASOF': esc(fm.get('asof') or entry['publish']),
         'PROSE': '\n'.join(cards), 'RELATED': ''.join(related), 'AD2': ad2,
     }
+    mapping['PROVENANCE'] = provenance_block('article', '', '')
     main = render(ctx['tpl_article'], mapping)
     ld = [{'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
               {'@type': 'ListItem', 'position': 1, 'name': '홈', 'item': BASE + '/'},
@@ -2959,9 +3202,11 @@ def build_model(entry, cars, regions, meta, status, ctx):
         'DIST': dist,
         'RELATED': ''.join(related),
     }
+    mapping['PROVENANCE'] = ''
     gate = len(strip_tags(render(ctx['tpl_model'], mapping)))   # app.js와 동일: <main> 전체 텍스트 기준
     mapping['AD1'] = ad_slot('model-1', gate, False)
     mapping['AD2'] = ad_slot('model-2', gate, False)
+    mapping['PROVENANCE'] = provenance_block('model', status.get('updated', ''), meta['updated'])
     main = render(ctx['tpl_model'], mapping)
     return render(ctx['tpl_page'], {
         'TITLE': esc('%s | EV보조금' % title),
@@ -3305,6 +3550,30 @@ def main():
                     for e in sorted(art_entries, key=lambda x: (x['publish'], x['slug']), reverse=True)]
     pages[os.path.join(SITE, 'data', 'articles.json')] = json.dumps(art_manifest, ensure_ascii=False, indent=1)
 
+    # 구독·외부 이용 표면 — RSS 2종(해설·시리즈 / 일일 브리핑), CSV 2종, 데이터·방법론 페이지
+    feed_items = [(a['title'], BASE + a['url'], a['description'], a['publish']) for a in art_manifest]
+    for e in pub_entries:
+        fm_ = e.get('fm') or {}
+        if fm_.get('title') and e.get('publish'):
+            feed_items.append((fm_['title'], '%s/model/%s.html' % (BASE, e['slug']), fm_.get('description', ''), e['publish']))
+    pages[os.path.join(SITE, 'feed.xml')] = build_feed('EV보조금 해설·시리즈', BASE + '/', '실측 데이터로 쓰는 전기차 보조금 해설과 모델별 심층 시리즈', feed_items)
+    pages[os.path.join(SITE, 'brief', 'feed.xml')] = build_feed(
+        'EV보조금 일일 브리핑', BASE + '/brief/', '전국 전기차 보조금 잔여 변동을 매일 아침 실측 데이터로 정리',
+        [('%s 전기차 보조금 브리핑' % d, '%s/brief/%s.html' % (BASE, d), _brief_desc(d), d) for d in list_brief_days(today_kst)[:30]])
+    csv_rows = []
+    for cd in sorted(regions):
+        if cd == '9999':
+            continue
+        r = regions[cd]; stt = status['data'].get(cd) or {}
+        cls, label = badge_of(stt, ctx['closed_map'].get(cd) or detect_closed(stt.get('note')), (ctx.get('rounds_over') or {}).get(cd))
+        csv_rows.append([cd, r['name'], r.get('sido'), r.get('maxP'), stt.get('n'), stt.get('a'), stt.get('r'), stt.get('left'), stt.get('st'), label, status.get('updated', '')])
+    pages[os.path.join(SITE, 'data', 'regions.csv')] = build_csv(
+        ['region_code', 'region', 'sido', 'max_subsidy_manwon', 'quota', 'applied', 'delivered', 'remaining', 'official_status', 'site_badge', 'remaining_asof'], csv_rows)
+    pages[os.path.join(SITE, 'data', 'cars.csv')] = build_csv(
+        ['car_id', 'maker', 'trim', 'national_subsidy_manwon', 'range_km', 'range_cold_km', 'battery_kwh', 'discontinued', 'price_asof'],
+        [[c['id'], c['maker'], c['name'], c['nat'], c.get('range'), c.get('rangeCold'), c.get('batt'), 1 if c.get('disc') else 0, meta.get('updated', '')] for c in cars])
+    pages[os.path.join(SITE, 'data.html')] = build_data_page(regions, cars, status, meta, hist, art_manifest, ctx)
+
     for cd, r in regions.items():
         html, _ = build_region(cd, r, cars, regions, meta, status, hist, ctx)
         pages[os.path.join(SITE, 'region', cd + '.html')] = html
@@ -3347,8 +3616,13 @@ def main():
             pages[fp] = new
     try:
         sched = build_home_schedule(regions, rounds, datetime.date.fromisoformat(kst_today), status.get('updated', ''))
-        _fill_slots('index.html', {'sched': sched, 'latest': build_latest_block(art_manifest, 4, home=True)})
+        _fill_slots('index.html', {'sched': sched, 'latest': build_latest_block(art_manifest, 4, home=True),
+                                   'strip': build_home_strip(regions, status, ctx), 'rank': build_home_rank(regions),
+                                   'cars': build_home_cars(cars)})
         _fill_slots('articles.html', {'latest': build_latest_block(art_manifest, 12, home=False)})
+        s_tiles, s_board = build_status_blocks(regions, status, ctx)
+        _fill_slots('status.html', {'summary': s_tiles, 'board': s_board})
+        _fill_slots('sold-out.html', {'sostats': build_soldout_stats(regions, status, ctx)})
     except Exception as ex:                       # 부가 기능 — 빌드 결과에 영향 주지 않음
         print('경고: 루트 슬롯 갱신 실패 — %s' % ex, file=sys.stderr)
 
