@@ -9,168 +9,168 @@ X-WR-CALDESC:공단 등록 회차의 접수 시작·마감 — 지난 30일
 X-WR-TIMEZONE:Asia/Seoul
 BEGIN:VEVENT
 UID:1100-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260917T010000Z
 DURATION:PT1H
 SUMMARY:[서울특별시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 서울특
  별시 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/1100.html
 URL:https://evbojo.co.kr/region/1100.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:1100-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[서울특별시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 서울특
  별시 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/1100.html
 URL:https://evbojo.co.kr/region/1100.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:2600-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260930T090000Z
 DURATION:PT1H
 SUMMARY:[부산광역시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 부산광
  역시 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/2600.html
 URL:https://evbojo.co.kr/region/2600.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:2600-3-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261014T010000Z
 DURATION:PT1H
 SUMMARY:[부산광역시] 추경3차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 부산광
  역시 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/2600.html
 URL:https://evbojo.co.kr/region/2600.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:2600-3-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[부산광역시] 추경3차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 부산광
  역시 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/2600.html
 URL:https://evbojo.co.kr/region/2600.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:2700-3-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261001T000000Z
 DURATION:PT1H
 SUMMARY:[대구광역시] 추경3차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 대구광
  역시 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/2700.html
 URL:https://evbojo.co.kr/region/2700.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:2700-3-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261008T080000Z
 DURATION:PT1H
 SUMMARY:[대구광역시] 추경3차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 대구광
  역시 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/2700.html
 URL:https://evbojo.co.kr/region/2700.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:2800-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260922T010000Z
 DURATION:PT1H
 SUMMARY:[인천광역시] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 인천광
  역시 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/2800.html
 URL:https://evbojo.co.kr/region/2800.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:2800-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[인천광역시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 인천광
  역시 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/2800.html
 URL:https://evbojo.co.kr/region/2800.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:2900-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[광주광역시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 광주광
  역시 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/2900.html
 URL:https://evbojo.co.kr/region/2900.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:3100-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260918T020000Z
 DURATION:PT1H
 SUMMARY:[울산광역시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 울산광
  역시 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/3100.html
 URL:https://evbojo.co.kr/region/3100.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:3100-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260918T020200Z
 DURATION:PT1H
 SUMMARY:[울산광역시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 울산광
  역시 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-
- 12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
+ 12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 
  전 공고문을 확인하세요. https://evbojo.co.kr/region/3100.html
 URL:https://evbojo.co.kr/region/3100.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4111-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[수원시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 수원시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4111.html
 URL:https://evbojo.co.kr/region/4111.html
@@ -178,12 +178,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4113-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[성남시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 성남시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4113.html
 URL:https://evbojo.co.kr/region/4113.html
@@ -191,38 +191,38 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4115-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260914T010000Z
 DURATION:PT1H
 SUMMARY:[의정부시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 의정부
  시 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 
- 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 
+ 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 
  공고문을 확인하세요. https://evbojo.co.kr/region/4115.html
 URL:https://evbojo.co.kr/region/4115.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4115-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[의정부시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 의정부
  시 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 
- 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 
+ 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 
  공고문을 확인하세요. https://evbojo.co.kr/region/4115.html
 URL:https://evbojo.co.kr/region/4115.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4117-0-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260922T050000Z
 DURATION:PT1H
 SUMMARY:[안양시] 본공고 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 안양시 
- 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4117.html
 URL:https://evbojo.co.kr/region/4117.html
@@ -230,12 +230,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4117-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[안양시] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 안양시 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4117.html
 URL:https://evbojo.co.kr/region/4117.html
@@ -243,12 +243,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4119-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261127T090000Z
 DURATION:PT1H
 SUMMARY:[부천시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 부천시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4119.html
 URL:https://evbojo.co.kr/region/4119.html
@@ -256,12 +256,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4121-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260930T050000Z
 DURATION:PT1H
 SUMMARY:[광명시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 광명시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4121.html
 URL:https://evbojo.co.kr/region/4121.html
@@ -269,12 +269,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4121-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[광명시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 광명시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4121.html
 URL:https://evbojo.co.kr/region/4121.html
@@ -282,12 +282,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4122-0-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261006T003000Z
 DURATION:PT1H
 SUMMARY:[평택시] 본공고 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 평택시 
- 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4122.html
 URL:https://evbojo.co.kr/region/4122.html
@@ -295,12 +295,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4122-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261231T080000Z
 DURATION:PT1H
 SUMMARY:[평택시] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 평택시 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4122.html
 URL:https://evbojo.co.kr/region/4122.html
@@ -308,38 +308,38 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4125-0-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260914T000000Z
 DURATION:PT1H
 SUMMARY:[동두천시] 본공고 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 동두천
  시 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 0
- 1:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 
+ 2:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 
  공고문을 확인하세요. https://evbojo.co.kr/region/4125.html
 URL:https://evbojo.co.kr/region/4125.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4125-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261207T090000Z
 DURATION:PT1H
 SUMMARY:[동두천시] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 동두천
  시 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 0
- 1:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 
+ 2:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 
  공고문을 확인하세요. https://evbojo.co.kr/region/4125.html
 URL:https://evbojo.co.kr/region/4125.html
 CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4127-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260923T050000Z
 DURATION:PT1H
 SUMMARY:[안산시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 안산시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4127.html
 URL:https://evbojo.co.kr/region/4127.html
@@ -347,12 +347,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4127-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[안산시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 안산시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4127.html
 URL:https://evbojo.co.kr/region/4127.html
@@ -360,12 +360,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4128-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T050000Z
 DURATION:PT1H
 SUMMARY:[고양시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 고양시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4128.html
 URL:https://evbojo.co.kr/region/4128.html
@@ -373,12 +373,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4128-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[고양시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 고양시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4128.html
 URL:https://evbojo.co.kr/region/4128.html
@@ -386,12 +386,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4129-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260918T000000Z
 DURATION:PT1H
 SUMMARY:[과천시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 과천시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4129.html
 URL:https://evbojo.co.kr/region/4129.html
@@ -399,12 +399,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4129-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[과천시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 과천시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4129.html
 URL:https://evbojo.co.kr/region/4129.html
@@ -412,12 +412,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4131-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[구리시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 구리시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4131.html
 URL:https://evbojo.co.kr/region/4131.html
@@ -425,12 +425,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4137-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260918T010000Z
 DURATION:PT1H
 SUMMARY:[오산시] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 오산시 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4137.html
 URL:https://evbojo.co.kr/region/4137.html
@@ -438,12 +438,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4137-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[오산시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 오산시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4137.html
 URL:https://evbojo.co.kr/region/4137.html
@@ -451,12 +451,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4139-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[시흥시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 시흥시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4139.html
 URL:https://evbojo.co.kr/region/4139.html
@@ -464,12 +464,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4141-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260917T010000Z
 DURATION:PT1H
 SUMMARY:[군포시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 군포시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4141.html
 URL:https://evbojo.co.kr/region/4141.html
@@ -477,12 +477,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4141-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260917T023400Z
 DURATION:PT1H
 SUMMARY:[군포시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 군포시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4141.html
 URL:https://evbojo.co.kr/region/4141.html
@@ -490,12 +490,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4143-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261016T010000Z
 DURATION:PT1H
 SUMMARY:[의왕시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 의왕시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4143.html
 URL:https://evbojo.co.kr/region/4143.html
@@ -503,12 +503,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4143-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[의왕시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 의왕시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4143.html
 URL:https://evbojo.co.kr/region/4143.html
@@ -516,12 +516,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4145-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[하남시] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 하남시 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4145.html
 URL:https://evbojo.co.kr/region/4145.html
@@ -529,12 +529,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4148-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261015T010000Z
 DURATION:PT1H
 SUMMARY:[파주시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 파주시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4148.html
 URL:https://evbojo.co.kr/region/4148.html
@@ -542,12 +542,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4148-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[파주시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 파주시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4148.html
 URL:https://evbojo.co.kr/region/4148.html
@@ -555,12 +555,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4150-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[이천시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 이천시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4150.html
 URL:https://evbojo.co.kr/region/4150.html
@@ -568,12 +568,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4155-3-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T010000Z
 DURATION:PT1H
 SUMMARY:[안성시] 추경3차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 안성시 
- 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4155.html
 URL:https://evbojo.co.kr/region/4155.html
@@ -581,12 +581,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4155-3-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T010200Z
 DURATION:PT1H
 SUMMARY:[안성시] 추경3차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 안성시 
- 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4155.html
 URL:https://evbojo.co.kr/region/4155.html
@@ -594,12 +594,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4157-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260921T003000Z
 DURATION:PT1H
 SUMMARY:[김포시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 김포시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4157.html
 URL:https://evbojo.co.kr/region/4157.html
@@ -607,12 +607,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4157-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260928T010000Z
 DURATION:PT1H
 SUMMARY:[김포시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 김포시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4157.html
 URL:https://evbojo.co.kr/region/4157.html
@@ -620,12 +620,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4159-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260930T010000Z
 DURATION:PT1H
 SUMMARY:[화성시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 화성시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4159.html
 URL:https://evbojo.co.kr/region/4159.html
@@ -633,12 +633,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4159-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[화성시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 화성시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4159.html
 URL:https://evbojo.co.kr/region/4159.html
@@ -646,12 +646,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4161-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261001T010700Z
 DURATION:PT1H
 SUMMARY:[광주시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 광주시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4161.html
 URL:https://evbojo.co.kr/region/4161.html
@@ -659,12 +659,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4163-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[양주시] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 양주시 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4163.html
 URL:https://evbojo.co.kr/region/4163.html
@@ -672,12 +672,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4165-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261218T090000Z
 DURATION:PT1H
 SUMMARY:[포천시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 포천시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4165.html
 URL:https://evbojo.co.kr/region/4165.html
@@ -685,12 +685,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4167-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261001T060000Z
 DURATION:PT1H
 SUMMARY:[여주시] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 여주시 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4167.html
 URL:https://evbojo.co.kr/region/4167.html
@@ -698,12 +698,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4167-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[여주시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 여주시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4167.html
 URL:https://evbojo.co.kr/region/4167.html
@@ -711,12 +711,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4180-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[연천군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 연천군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4180.html
 URL:https://evbojo.co.kr/region/4180.html
@@ -724,12 +724,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4182-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261231T090000Z
 DURATION:PT1H
 SUMMARY:[가평군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 가평군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4182.html
 URL:https://evbojo.co.kr/region/4182.html
@@ -737,12 +737,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4211-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260918T010000Z
 DURATION:PT1H
 SUMMARY:[춘천시] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 춘천시 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4211.html
 URL:https://evbojo.co.kr/region/4211.html
@@ -750,12 +750,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4211-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[춘천시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 춘천시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4211.html
 URL:https://evbojo.co.kr/region/4211.html
@@ -763,12 +763,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4213-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260922T000000Z
 DURATION:PT1H
 SUMMARY:[원주시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 원주시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4213.html
 URL:https://evbojo.co.kr/region/4213.html
@@ -776,12 +776,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4213-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[원주시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 원주시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4213.html
 URL:https://evbojo.co.kr/region/4213.html
@@ -789,12 +789,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4215-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[강릉시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 강릉시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4215.html
 URL:https://evbojo.co.kr/region/4215.html
@@ -802,12 +802,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4217-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[동해시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 동해시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4217.html
 URL:https://evbojo.co.kr/region/4217.html
@@ -815,12 +815,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4223-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261209T090000Z
 DURATION:PT1H
 SUMMARY:[삼척시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 삼척시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4223.html
 URL:https://evbojo.co.kr/region/4223.html
@@ -828,12 +828,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4272-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[홍천군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 홍천군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4272.html
 URL:https://evbojo.co.kr/region/4272.html
@@ -841,12 +841,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4273-0-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260928T010000Z
 DURATION:PT1H
 SUMMARY:[횡성군] 본공고 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 횡성군 
- 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4273.html
 URL:https://evbojo.co.kr/region/4273.html
@@ -854,12 +854,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4273-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[횡성군] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 횡성군 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4273.html
 URL:https://evbojo.co.kr/region/4273.html
@@ -867,12 +867,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4275-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260921T040000Z
 DURATION:PT1H
 SUMMARY:[영월군] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영월군 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4275.html
 URL:https://evbojo.co.kr/region/4275.html
@@ -880,12 +880,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4275-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[영월군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영월군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4275.html
 URL:https://evbojo.co.kr/region/4275.html
@@ -893,12 +893,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4276-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260930T000000Z
 DURATION:PT1H
 SUMMARY:[평창군] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 평창군 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4276.html
 URL:https://evbojo.co.kr/region/4276.html
@@ -906,12 +906,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4276-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261209T090000Z
 DURATION:PT1H
 SUMMARY:[평창군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 평창군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4276.html
 URL:https://evbojo.co.kr/region/4276.html
@@ -919,12 +919,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4277-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[정선군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 정선군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4277.html
 URL:https://evbojo.co.kr/region/4277.html
@@ -932,12 +932,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4279-3-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261007T010000Z
 DURATION:PT1H
 SUMMARY:[화천군] 추경3차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 화천군 
- 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4279.html
 URL:https://evbojo.co.kr/region/4279.html
@@ -945,12 +945,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4279-3-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261120T083000Z
 DURATION:PT1H
 SUMMARY:[화천군] 추경3차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 화천군 
- 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4279.html
 URL:https://evbojo.co.kr/region/4279.html
@@ -958,12 +958,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4280-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260930T090000Z
 DURATION:PT1H
 SUMMARY:[양구군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 양구군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4280.html
 URL:https://evbojo.co.kr/region/4280.html
@@ -971,12 +971,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4282-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260921T000000Z
 DURATION:PT1H
 SUMMARY:[고성군] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 고성군 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4282.html
 URL:https://evbojo.co.kr/region/4282.html
@@ -984,12 +984,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4282-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[고성군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 고성군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4282.html
 URL:https://evbojo.co.kr/region/4282.html
@@ -997,12 +997,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4283-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[양양군] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 양양군 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4283.html
 URL:https://evbojo.co.kr/region/4283.html
@@ -1010,12 +1010,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4311-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260915T020000Z
 DURATION:PT1H
 SUMMARY:[청주시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 청주시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4311.html
 URL:https://evbojo.co.kr/region/4311.html
@@ -1023,12 +1023,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4311-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[청주시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 청주시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4311.html
 URL:https://evbojo.co.kr/region/4311.html
@@ -1036,12 +1036,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4313-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260930T050000Z
 DURATION:PT1H
 SUMMARY:[충주시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 충주시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4313.html
 URL:https://evbojo.co.kr/region/4313.html
@@ -1049,12 +1049,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4313-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261218T090000Z
 DURATION:PT1H
 SUMMARY:[충주시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 충주시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4313.html
 URL:https://evbojo.co.kr/region/4313.html
@@ -1062,12 +1062,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4315-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260914T000000Z
 DURATION:PT1H
 SUMMARY:[제천시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 제천시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4315.html
 URL:https://evbojo.co.kr/region/4315.html
@@ -1075,12 +1075,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4315-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261231T090000Z
 DURATION:PT1H
 SUMMARY:[제천시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 제천시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4315.html
 URL:https://evbojo.co.kr/region/4315.html
@@ -1088,12 +1088,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4372-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261006T010000Z
 DURATION:PT1H
 SUMMARY:[보은군] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 보은군 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4372.html
 URL:https://evbojo.co.kr/region/4372.html
@@ -1101,12 +1101,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4372-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261006T010100Z
 DURATION:PT1H
 SUMMARY:[보은군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 보은군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4372.html
 URL:https://evbojo.co.kr/region/4372.html
@@ -1114,12 +1114,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4374-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[영동군] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영동군 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4374.html
 URL:https://evbojo.co.kr/region/4374.html
@@ -1127,12 +1127,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:43745-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261030T090000Z
 DURATION:PT1H
 SUMMARY:[증평군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 증평군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/43745.html
 URL:https://evbojo.co.kr/region/43745.html
@@ -1140,12 +1140,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4375-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261001T010000Z
 DURATION:PT1H
 SUMMARY:[진천군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 진천군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4375.html
 URL:https://evbojo.co.kr/region/4375.html
@@ -1153,12 +1153,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4375-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261231T030000Z
 DURATION:PT1H
 SUMMARY:[진천군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 진천군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4375.html
 URL:https://evbojo.co.kr/region/4375.html
@@ -1166,12 +1166,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4380-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260930T090000Z
 DURATION:PT1H
 SUMMARY:[단양군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 단양군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4380.html
 URL:https://evbojo.co.kr/region/4380.html
@@ -1179,12 +1179,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4415-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260918T010000Z
 DURATION:PT1H
 SUMMARY:[공주시] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 공주시 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4415.html
 URL:https://evbojo.co.kr/region/4415.html
@@ -1192,12 +1192,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4415-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261224T090000Z
 DURATION:PT1H
 SUMMARY:[공주시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 공주시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4415.html
 URL:https://evbojo.co.kr/region/4415.html
@@ -1205,12 +1205,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4418-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[보령시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 보령시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4418.html
 URL:https://evbojo.co.kr/region/4418.html
@@ -1218,12 +1218,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4420-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261127T090000Z
 DURATION:PT1H
 SUMMARY:[아산시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 아산시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4420.html
 URL:https://evbojo.co.kr/region/4420.html
@@ -1231,12 +1231,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4421-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261008T000000Z
 DURATION:PT1H
 SUMMARY:[서산시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 서산시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4421.html
 URL:https://evbojo.co.kr/region/4421.html
@@ -1244,12 +1244,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4421-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261127T090000Z
 DURATION:PT1H
 SUMMARY:[서산시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 서산시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4421.html
 URL:https://evbojo.co.kr/region/4421.html
@@ -1257,12 +1257,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4423-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260915T000000Z
 DURATION:PT1H
 SUMMARY:[논산시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 논산시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4423.html
 URL:https://evbojo.co.kr/region/4423.html
@@ -1270,12 +1270,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4423-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261008T090000Z
 DURATION:PT1H
 SUMMARY:[논산시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 논산시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4423.html
 URL:https://evbojo.co.kr/region/4423.html
@@ -1283,12 +1283,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4425-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261008T050000Z
 DURATION:PT1H
 SUMMARY:[계룡시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 계룡시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4425.html
 URL:https://evbojo.co.kr/region/4425.html
@@ -1296,12 +1296,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4425-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[계룡시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 계룡시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4425.html
 URL:https://evbojo.co.kr/region/4425.html
@@ -1309,12 +1309,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4427-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T090000Z
 DURATION:PT1H
 SUMMARY:[당진시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 당진시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4427.html
 URL:https://evbojo.co.kr/region/4427.html
@@ -1322,12 +1322,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4471-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[금산군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 금산군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4471.html
 URL:https://evbojo.co.kr/region/4471.html
@@ -1335,12 +1335,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4476-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261030T090000Z
 DURATION:PT1H
 SUMMARY:[부여군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 부여군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4476.html
 URL:https://evbojo.co.kr/region/4476.html
@@ -1348,12 +1348,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4477-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261007T010000Z
 DURATION:PT1H
 SUMMARY:[서천군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 서천군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4477.html
 URL:https://evbojo.co.kr/region/4477.html
@@ -1361,12 +1361,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4477-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261007T090000Z
 DURATION:PT1H
 SUMMARY:[서천군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 서천군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4477.html
 URL:https://evbojo.co.kr/region/4477.html
@@ -1374,12 +1374,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4479-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261127T090000Z
 DURATION:PT1H
 SUMMARY:[청양군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 청양군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4479.html
 URL:https://evbojo.co.kr/region/4479.html
@@ -1387,12 +1387,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4480-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261012T010000Z
 DURATION:PT1H
 SUMMARY:[홍성군] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 홍성군 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4480.html
 URL:https://evbojo.co.kr/region/4480.html
@@ -1400,12 +1400,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4480-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261012T090000Z
 DURATION:PT1H
 SUMMARY:[홍성군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 홍성군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4480.html
 URL:https://evbojo.co.kr/region/4480.html
@@ -1413,12 +1413,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4481-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261127T090000Z
 DURATION:PT1H
 SUMMARY:[예산군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 예산군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4481.html
 URL:https://evbojo.co.kr/region/4481.html
@@ -1426,12 +1426,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:44825-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261012T000000Z
 DURATION:PT1H
 SUMMARY:[태안군] 추경3차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 태안군 
- 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/44825.html
 URL:https://evbojo.co.kr/region/44825.html
@@ -1439,12 +1439,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:44825-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[태안군] 추경3차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 태안군 
- 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/44825.html
 URL:https://evbojo.co.kr/region/44825.html
@@ -1452,12 +1452,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4511-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[전주시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 전주시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4511.html
 URL:https://evbojo.co.kr/region/4511.html
@@ -1465,12 +1465,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4513-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261016T090000Z
 DURATION:PT1H
 SUMMARY:[군산시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 군산시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4513.html
 URL:https://evbojo.co.kr/region/4513.html
@@ -1478,12 +1478,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4514-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261001T000000Z
 DURATION:PT1H
 SUMMARY:[익산시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 익산시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4514.html
 URL:https://evbojo.co.kr/region/4514.html
@@ -1491,12 +1491,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4514-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261002T090000Z
 DURATION:PT1H
 SUMMARY:[익산시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 익산시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4514.html
 URL:https://evbojo.co.kr/region/4514.html
@@ -1504,12 +1504,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4519-3-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T000000Z
 DURATION:PT1H
 SUMMARY:[남원시] 추경3차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 남원시 
- 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4519.html
 URL:https://evbojo.co.kr/region/4519.html
@@ -1517,12 +1517,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4519-3-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261002T090000Z
 DURATION:PT1H
 SUMMARY:[남원시] 추경3차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 남원시 
- 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4519.html
 URL:https://evbojo.co.kr/region/4519.html
@@ -1530,12 +1530,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4521-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[김제시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 김제시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4521.html
 URL:https://evbojo.co.kr/region/4521.html
@@ -1543,12 +1543,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4571-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261012T000000Z
 DURATION:PT1H
 SUMMARY:[완주군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 완주군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4571.html
 URL:https://evbojo.co.kr/region/4571.html
@@ -1556,12 +1556,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4571-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261014T090000Z
 DURATION:PT1H
 SUMMARY:[완주군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 완주군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4571.html
 URL:https://evbojo.co.kr/region/4571.html
@@ -1569,12 +1569,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4573-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261030T090000Z
 DURATION:PT1H
 SUMMARY:[무주군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 무주군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4573.html
 URL:https://evbojo.co.kr/region/4573.html
@@ -1582,12 +1582,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4574-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[장수군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 장수군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4574.html
 URL:https://evbojo.co.kr/region/4574.html
@@ -1595,12 +1595,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4575-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[임실군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 임실군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4575.html
 URL:https://evbojo.co.kr/region/4575.html
@@ -1608,12 +1608,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4577-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261231T090000Z
 DURATION:PT1H
 SUMMARY:[순창군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 순창군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4577.html
 URL:https://evbojo.co.kr/region/4577.html
@@ -1621,12 +1621,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4579-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[고창군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 고창군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4579.html
 URL:https://evbojo.co.kr/region/4579.html
@@ -1634,12 +1634,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4580-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260916T090000Z
 DURATION:PT1H
 SUMMARY:[부안군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 부안군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4580.html
 URL:https://evbojo.co.kr/region/4580.html
@@ -1647,12 +1647,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4580-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261007T000000Z
 DURATION:PT1H
 SUMMARY:[부안군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 부안군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4580.html
 URL:https://evbojo.co.kr/region/4580.html
@@ -1660,12 +1660,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4580-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261014T090000Z
 DURATION:PT1H
 SUMMARY:[부안군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 부안군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4580.html
 URL:https://evbojo.co.kr/region/4580.html
@@ -1673,12 +1673,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4611-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261014T000000Z
 DURATION:PT1H
 SUMMARY:[목포시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 목포시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4611.html
 URL:https://evbojo.co.kr/region/4611.html
@@ -1686,12 +1686,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4611-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261127T090000Z
 DURATION:PT1H
 SUMMARY:[목포시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 목포시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4611.html
 URL:https://evbojo.co.kr/region/4611.html
@@ -1699,12 +1699,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4617-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261019T000000Z
 DURATION:PT1H
 SUMMARY:[나주시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 나주시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4617.html
 URL:https://evbojo.co.kr/region/4617.html
@@ -1712,12 +1712,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4617-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[나주시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 나주시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4617.html
 URL:https://evbojo.co.kr/region/4617.html
@@ -1725,12 +1725,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4672-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T000000Z
 DURATION:PT1H
 SUMMARY:[곡성군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 곡성군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4672.html
 URL:https://evbojo.co.kr/region/4672.html
@@ -1738,12 +1738,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4672-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T030000Z
 DURATION:PT1H
 SUMMARY:[곡성군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 곡성군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4672.html
 URL:https://evbojo.co.kr/region/4672.html
@@ -1751,12 +1751,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4677-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261201T090000Z
 DURATION:PT1H
 SUMMARY:[고흥군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 고흥군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4677.html
 URL:https://evbojo.co.kr/region/4677.html
@@ -1764,12 +1764,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4679-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260917T010000Z
 DURATION:PT1H
 SUMMARY:[화순군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 화순군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4679.html
 URL:https://evbojo.co.kr/region/4679.html
@@ -1777,12 +1777,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4679-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260917T030000Z
 DURATION:PT1H
 SUMMARY:[화순군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 화순군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4679.html
 URL:https://evbojo.co.kr/region/4679.html
@@ -1790,12 +1790,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4682-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260918T000000Z
 DURATION:PT1H
 SUMMARY:[해남군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 해남군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4682.html
 URL:https://evbojo.co.kr/region/4682.html
@@ -1803,12 +1803,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4682-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260918T000300Z
 DURATION:PT1H
 SUMMARY:[해남군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 해남군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4682.html
 URL:https://evbojo.co.kr/region/4682.html
@@ -1816,12 +1816,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4683-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260914T010000Z
 DURATION:PT1H
 SUMMARY:[영암군] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영암군 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4683.html
 URL:https://evbojo.co.kr/region/4683.html
@@ -1829,12 +1829,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4683-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[영암군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영암군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4683.html
 URL:https://evbojo.co.kr/region/4683.html
@@ -1842,12 +1842,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4684-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T010000Z
 DURATION:PT1H
 SUMMARY:[무안군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 무안군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4684.html
 URL:https://evbojo.co.kr/region/4684.html
@@ -1855,12 +1855,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4684-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261001T090000Z
 DURATION:PT1H
 SUMMARY:[무안군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 무안군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4684.html
 URL:https://evbojo.co.kr/region/4684.html
@@ -1868,12 +1868,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4686-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261030T090000Z
 DURATION:PT1H
 SUMMARY:[함평군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 함평군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4686.html
 URL:https://evbojo.co.kr/region/4686.html
@@ -1881,12 +1881,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4687-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[영광군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영광군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4687.html
 URL:https://evbojo.co.kr/region/4687.html
@@ -1894,12 +1894,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4688-3-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T020000Z
 DURATION:PT1H
 SUMMARY:[장성군] 추경3차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 장성군 
- 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4688.html
 URL:https://evbojo.co.kr/region/4688.html
@@ -1907,12 +1907,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4688-3-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261002T060000Z
 DURATION:PT1H
 SUMMARY:[장성군] 추경3차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 장성군 
- 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4688.html
 URL:https://evbojo.co.kr/region/4688.html
@@ -1920,12 +1920,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4689-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260921T000000Z
 DURATION:PT1H
 SUMMARY:[완도군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 완도군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4689.html
 URL:https://evbojo.co.kr/region/4689.html
@@ -1933,12 +1933,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4689-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[완도군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 완도군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4689.html
 URL:https://evbojo.co.kr/region/4689.html
@@ -1946,12 +1946,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4690-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261112T145900Z
 DURATION:PT1H
 SUMMARY:[진도군] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 진도군 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4690.html
 URL:https://evbojo.co.kr/region/4690.html
@@ -1959,12 +1959,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4711-3-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T090000Z
 DURATION:PT1H
 SUMMARY:[포항시] 추경3차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 포항시 
- 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4711.html
 URL:https://evbojo.co.kr/region/4711.html
@@ -1972,12 +1972,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4713-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[경주시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 경주시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4713.html
 URL:https://evbojo.co.kr/region/4713.html
@@ -1985,12 +1985,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4715-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261225T090000Z
 DURATION:PT1H
 SUMMARY:[김천시] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 김천시 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4715.html
 URL:https://evbojo.co.kr/region/4715.html
@@ -1998,12 +1998,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4719-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261001T010000Z
 DURATION:PT1H
 SUMMARY:[구미시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 구미시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4719.html
 URL:https://evbojo.co.kr/region/4719.html
@@ -2011,12 +2011,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4719-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261001T090000Z
 DURATION:PT1H
 SUMMARY:[구미시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 구미시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4719.html
 URL:https://evbojo.co.kr/region/4719.html
@@ -2024,12 +2024,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4721-0-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261012T000000Z
 DURATION:PT1H
 SUMMARY:[영주시] 본공고 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영주시 
- 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4721.html
 URL:https://evbojo.co.kr/region/4721.html
@@ -2037,12 +2037,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4721-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261014T090000Z
 DURATION:PT1H
 SUMMARY:[영주시] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영주시 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4721.html
 URL:https://evbojo.co.kr/region/4721.html
@@ -2050,12 +2050,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4723-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260915T010000Z
 DURATION:PT1H
 SUMMARY:[영천시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영천시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4723.html
 URL:https://evbojo.co.kr/region/4723.html
@@ -2063,12 +2063,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4723-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261210T090000Z
 DURATION:PT1H
 SUMMARY:[영천시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영천시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4723.html
 URL:https://evbojo.co.kr/region/4723.html
@@ -2076,12 +2076,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4728-0-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261001T010000Z
 DURATION:PT1H
 SUMMARY:[문경시] 본공고 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 문경시 
- 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4728.html
 URL:https://evbojo.co.kr/region/4728.html
@@ -2089,12 +2089,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4728-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261001T010000Z
 DURATION:PT1H
 SUMMARY:[문경시] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 문경시 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4728.html
 URL:https://evbojo.co.kr/region/4728.html
@@ -2102,12 +2102,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4777-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261204T090000Z
 DURATION:PT1H
 SUMMARY:[영덕군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 영덕군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4777.html
 URL:https://evbojo.co.kr/region/4777.html
@@ -2115,12 +2115,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4782-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261207T090000Z
 DURATION:PT1H
 SUMMARY:[청도군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 청도군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4782.html
 URL:https://evbojo.co.kr/region/4782.html
@@ -2128,12 +2128,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4783-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[고령군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 고령군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4783.html
 URL:https://evbojo.co.kr/region/4783.html
@@ -2141,12 +2141,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4784-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[성주군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 성주군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4784.html
 URL:https://evbojo.co.kr/region/4784.html
@@ -2154,12 +2154,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4785-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[칠곡군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 칠곡군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4785.html
 URL:https://evbojo.co.kr/region/4785.html
@@ -2167,12 +2167,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4790-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260921T000000Z
 DURATION:PT1H
 SUMMARY:[예천군] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 예천군 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4790.html
 URL:https://evbojo.co.kr/region/4790.html
@@ -2180,12 +2180,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4792-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261231T090000Z
 DURATION:PT1H
 SUMMARY:[봉화군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 봉화군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4792.html
 URL:https://evbojo.co.kr/region/4792.html
@@ -2193,12 +2193,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4793-0-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[울진군] 본공고 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 울진군 
- 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:10
+ 본공고 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:10
  . 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고
  문을 확인하세요. https://evbojo.co.kr/region/4793.html
 URL:https://evbojo.co.kr/region/4793.html
@@ -2206,12 +2206,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4794-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261030T010200Z
 DURATION:PT1H
 SUMMARY:[울릉군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 울릉군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4794.html
 URL:https://evbojo.co.kr/region/4794.html
@@ -2219,12 +2219,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4812-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261231T090000Z
 DURATION:PT1H
 SUMMARY:[창원시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 창원시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4812.html
 URL:https://evbojo.co.kr/region/4812.html
@@ -2232,12 +2232,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4817-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260921T000000Z
 DURATION:PT1H
 SUMMARY:[진주시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 진주시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4817.html
 URL:https://evbojo.co.kr/region/4817.html
@@ -2245,12 +2245,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4817-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260921T001000Z
 DURATION:PT1H
 SUMMARY:[진주시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 진주시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4817.html
 URL:https://evbojo.co.kr/region/4817.html
@@ -2258,12 +2258,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4822-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260918T090000Z
 DURATION:PT1H
 SUMMARY:[통영시] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 통영시 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4822.html
 URL:https://evbojo.co.kr/region/4822.html
@@ -2271,12 +2271,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4822-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260930T060000Z
 DURATION:PT1H
 SUMMARY:[통영시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 통영시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4822.html
 URL:https://evbojo.co.kr/region/4822.html
@@ -2284,12 +2284,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4822-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261224T090000Z
 DURATION:PT1H
 SUMMARY:[통영시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 통영시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4822.html
 URL:https://evbojo.co.kr/region/4822.html
@@ -2297,12 +2297,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4825-3-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261218T090000Z
 DURATION:PT1H
 SUMMARY:[김해시] 추경3차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 김해시 
- 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경3차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4825.html
 URL:https://evbojo.co.kr/region/4825.html
@@ -2310,12 +2310,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4827-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T000000Z
 DURATION:PT1H
 SUMMARY:[밀양시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 밀양시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4827.html
 URL:https://evbojo.co.kr/region/4827.html
@@ -2323,12 +2323,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4827-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261231T090000Z
 DURATION:PT1H
 SUMMARY:[밀양시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 밀양시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4827.html
 URL:https://evbojo.co.kr/region/4827.html
@@ -2336,12 +2336,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4831-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[거제시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 거제시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4831.html
 URL:https://evbojo.co.kr/region/4831.html
@@ -2349,12 +2349,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4833-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260917T010000Z
 DURATION:PT1H
 SUMMARY:[양산시] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 양산시 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4833.html
 URL:https://evbojo.co.kr/region/4833.html
@@ -2362,12 +2362,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4833-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[양산시] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 양산시 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4833.html
 URL:https://evbojo.co.kr/region/4833.html
@@ -2375,12 +2375,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4872-1-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260921T010000Z
 DURATION:PT1H
 SUMMARY:[의령군] 추경1차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 의령군 
- 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4872.html
 URL:https://evbojo.co.kr/region/4872.html
@@ -2388,12 +2388,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4872-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261030T090000Z
 DURATION:PT1H
 SUMMARY:[의령군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 의령군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4872.html
 URL:https://evbojo.co.kr/region/4872.html
@@ -2401,12 +2401,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4874-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260930T000000Z
 DURATION:PT1H
 SUMMARY:[창녕군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 창녕군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4874.html
 URL:https://evbojo.co.kr/region/4874.html
@@ -2414,12 +2414,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4882-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T020000Z
 DURATION:PT1H
 SUMMARY:[고성군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 고성군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4882.html
 URL:https://evbojo.co.kr/region/4882.html
@@ -2427,12 +2427,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4882-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[고성군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 고성군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4882.html
 URL:https://evbojo.co.kr/region/4882.html
@@ -2440,12 +2440,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4884-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261218T090000Z
 DURATION:PT1H
 SUMMARY:[남해군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 남해군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4884.html
 URL:https://evbojo.co.kr/region/4884.html
@@ -2453,12 +2453,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4885-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[하동군] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 하동군 
- 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경1차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4885.html
 URL:https://evbojo.co.kr/region/4885.html
@@ -2466,12 +2466,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4886-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260929T010000Z
 DURATION:PT1H
 SUMMARY:[산청군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 산청군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4886.html
 URL:https://evbojo.co.kr/region/4886.html
@@ -2479,12 +2479,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4886-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261130T090000Z
 DURATION:PT1H
 SUMMARY:[산청군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 산청군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4886.html
 URL:https://evbojo.co.kr/region/4886.html
@@ -2492,12 +2492,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4887-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261211T090000Z
 DURATION:PT1H
 SUMMARY:[함양군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 함양군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4887.html
 URL:https://evbojo.co.kr/region/4887.html
@@ -2505,12 +2505,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4889-2-s@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261012T020000Z
 DURATION:PT1H
 SUMMARY:[합천군] 추경2차 접수 시작
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 합천군 
- 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 시작 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4889.html
 URL:https://evbojo.co.kr/region/4889.html
@@ -2518,12 +2518,12 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:4889-2-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20261012T090000Z
 DURATION:PT1H
 SUMMARY:[합천군] 추경2차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 합천군 
- 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 01:1
+ 추경2차 회차의 접수 마감 시각입니다. 수집 2026-10-12 02:1
  0. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공
  고문을 확인하세요. https://evbojo.co.kr/region/4889.html
 URL:https://evbojo.co.kr/region/4889.html
@@ -2531,13 +2531,13 @@ CATEGORIES:전기차 보조금
 END:VEVENT
 BEGIN:VEVENT
 UID:5000-1-e@evbojo.co.kr
-DTSTAMP:20261011T161000Z
+DTSTAMP:20261011T171000Z
 DTSTART:20260930T090000Z
 DURATION:PT1H
 SUMMARY:[제주특별자치도] 추경1차 접수 마감
 DESCRIPTION:무공해차 통합누리집(ev.or.kr)에 등록된 제주특
  별자치도 추경1차 회차의 접수 마감 시각입니다. 수집 20
- 26-10-12 01:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신
+ 26-10-12 02:10. 일정은 지자체 공고로 바뀔 수 있어요 — 신
  청 전 공고문을 확인하세요. https://evbojo.co.kr/region/5000.htm
  l
 URL:https://evbojo.co.kr/region/5000.html
