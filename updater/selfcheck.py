@@ -627,7 +627,7 @@ def check_collapse(pages, ctx):
 RX_SCHED_SLOT = re.compile(r'<!--sched:start-->(.*?)<!--sched:end-->', re.S)
 
 
-def check_structure(pages, ctx):
+def check_structure_metrics(pages, ctx):
     """구조 지표 — 실패가 아니라 추세 기록용 경고.
     (a) 지역 색인 페이지 산문 중복률: 숫자를 가린 <p> 문장 중 지역 절반 이상에 공통인 문장 비율(목표 ≤20%).
     (b) 색인 페이지 간 본문 링크 그래프에서 인바운드 ≤2인 색인 페이지 수(nav·푸터 제외, 목표 감소 추세).
@@ -788,7 +788,7 @@ CHECKS = (
     ('14 홈 접수 일정 카드(슬롯·derived 마커·링크)', check_home_schedule),
     ('15 투명성 블록·정적 슬롯·RSS', check_provenance_feed),
     ('16 OG·광고 로더·메타 길이(경고)', check_og_loader_meta),
-    ('17 구조 지표(산문 중복률·색인 인바운드·캘린더) (경고)', check_structure),
+    ('17 구조 지표(산문 중복률·색인 인바운드·캘린더) (경고)', check_structure_metrics),
 )
 
 
