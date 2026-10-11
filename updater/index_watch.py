@@ -45,9 +45,13 @@ BUCKET_ORDER = ["core", "sido", "model", "article"]
 
 
 # ── 감시 대상 목록 ────────────────────────────────────────────
+# 데이터·방법론 안내, 용어집, 변경 이력, 이용안내 — 해설 글이 아니라 사이트 기본 페이지(2026-10-11 추가). article 버킷에 섞이면 R2(해설 색인률)가 왜곡된다.
+UTILITY_PAGES = {"/data.html", "/changelog.html", "/glossary.html", "/terms.html"}
+
+
 def _bucket(path):
     """사이트맵 경로 → 감시 버킷. 편집 콘텐츠가 아니면 None(=조회 안 함)."""
-    if path in CORE_PAGES:
+    if path in CORE_PAGES or path in UTILITY_PAGES:
         return "core"
     if path.startswith("/sido/"):
         return "sido"

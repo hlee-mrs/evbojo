@@ -250,10 +250,20 @@ def crit_selfcheck():
         return _crit("R4", "검사 실패", False,
                      "검사기 오류: {}: {}".format(type(ex).__name__, str(ex)[:80]))
     fails = [ln[len("[FAIL] "):] for ln in lines if ln.startswith("[FAIL]")]
-    note = "; ".join(fails[:3])
-    if len(fails) > 3:
-        note += "; 외 {}종".format(len(fails) - 3)
-    return _crit("R4", "{}건".format(total), total <= R4_MAX_SELFCHECK, note, total)
+    # 경고 등급 검사(제목에 "(경고)" — 17 구조 지표처럼 추세 기록용)는 위반으로 세지 않는다.
+    # 2026-10-12: 경고 2건이 R4를 영구 ❌로 만들어 10/27 재신청 검토가 거짓 WAIT가 될 뻔함.
+    hard = [f for f in fails if "(경고)" not in f.split(" — ")[0]]
+    warn_n = len(fails) - len(hard)
+    hard_total = 0
+    for f in hard:
+        m = re.search(r"— (\d+)건", f)
+        hard_total += int(m.group(1)) if m else 1
+    note = "; ".join(hard[:3])
+    if len(hard) > 3:
+        note += "; 외 {}종".format(len(hard) - 3)
+    if warn_n:
+        note = (note + "; " if note else "") + "경고 {}종 제외".format(warn_n)
+    return _crit("R4", "{}건".format(hard_total), hard_total <= R4_MAX_SELFCHECK, note, hard_total)
 
 
 def crit_surface_stable(today, sitemap_path=SITEMAP):
