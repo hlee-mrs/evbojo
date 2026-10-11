@@ -3910,6 +3910,20 @@ def version_assets(html):
     return _ASSET_RE.sub(rep, html)
 
 
+# ── 슬롯 루트 페이지의 코어 CSS 인라인 — 생성 페이지(page.tpl)와 같은 효과를 손편집 루트 4쪽(index·status·sold-out·articles)에도.
+#    외부 링크를 <!--css:start-->…<!--css:end--> 블록으로 바꾸고, 이후 회차에는 블록 안만 현재 CSS로 다시 쓴다(CSS 변경 시 자동 갱신).
+#    <head> 안이라 lastmod(content_hash·head_hash)·R5 무영향. 손편집 시 이 블록은 건드리지 않는다.
+_CSS_LINK_RE = re.compile(r'<link rel="stylesheet" href="(?:\.\./)*assets/css/main\.css(?:\?v=[0-9a-f]{8})?">')
+_CSS_BLOCK_RE = re.compile(r'<!--css:start-->.*?<!--css:end-->', re.S)
+
+
+def inline_root_css(html):
+    block = '<!--css:start--><style>%s</style><!--css:end-->' % inline_css()
+    if _CSS_BLOCK_RE.search(html):
+        return _CSS_BLOCK_RE.sub(lambda m: block, html, count=1)
+    return _CSS_LINK_RE.sub(lambda m: block, html, count=1)
+
+
 def atomic_write(path, content):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + '.tmp~'
@@ -4084,7 +4098,7 @@ def main():
                 print('경고: %s에 슬롯 %s 없음 — 건너뜀' % (rel, name), file=sys.stderr)
                 continue
             new = new[:m.start(1)] + '\n' + content + '\n' + new[m.end(1):]
-        new = version_assets(new)              # 에셋 버전(?v=)이 바뀐 것도 쓰기 사유
+        new = inline_root_css(version_assets(new))   # 에셋 버전(?v=)·인라인 CSS가 바뀐 것도 쓰기 사유
         if new != html:
             pages[fp] = new
     try:
