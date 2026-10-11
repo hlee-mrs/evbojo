@@ -1128,7 +1128,7 @@ def build_home_schedule(regions, rounds, today, updated, horizon=7):
             + group_html('접수 마감', '🔴', ends, '등록된 마감 일정이 없어요'))
     return ('<!--derived:start--><section class="card" id="sched-card" aria-label="접수 일정">'
             '<h2 class="mt0">📅 접수 일정 <span class="sub">시작·마감 예정 지역 — 공단 등록 회차 기준</span></h2>'
-            '%s<p class="small muted mt8">접수 중인 지역의 잔여·마감 상태는 <a href="/status.html">전국 현황판</a>에서 보세요.</p>'
+            '%s<p class="small muted mt8">접수 중인 지역의 잔여·마감 상태는 <a href="/status.html">전국 현황판</a>에서 보세요. · <a href="/calendar/evbojo.ics">📆 접수 일정 캘린더 구독(.ics)</a></p>'
             '<p class="stamp">출처: 무공해차 통합누리집(ev.or.kr) 보조금관리시스템 등록 일정 · 수집 %s · '
             '일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고문을 확인하세요.</p></section><!--derived:end-->'
             % (body, esc((updated or '').replace('T', ' '))))
@@ -2948,6 +2948,70 @@ def build_feed(title, link, desc, items):
             % (esc(title), esc(link), esc(desc), last, esc(link.rstrip('/') + ('/feed.xml' if link.endswith('/') else '')), body))
 
 
+def _ics_fold(line):
+    """RFC 5545 줄 접기 — 75옥텟 이하, 멀티바이트 문자를 자르지 않음. 줄끝은 LF(저장소 정규화 호환, 클라이언트 수용)."""
+    out, cur, limit = [], '', 75
+    for ch in line:
+        if len((cur + ch).encode('utf-8')) > limit:
+            out.append(cur); cur = ' ' + ch; limit = 75
+        else:
+            cur += ch
+    out.append(cur)
+    return '\n'.join(out)
+
+
+def _ics_text(t):
+    return t.replace('\\', '\\\\').replace(';', '\\;').replace(',', '\\,').replace('\n', '\\n')
+
+
+def _ics_dt(val):
+    """'YYYY-MM-DD HH:MM'(KST) → UTC 'YYYYMMDDTHHMMSSZ'. 시각이 없으면 ('DATE', 'YYYYMMDD')."""
+    val = (val or '').strip()
+    m = re.match(r'(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?', val)
+    if not m:
+        return None
+    if not m.group(4):
+        return ('DATE', '%s%s%s' % (m.group(1), m.group(2), m.group(3)))
+    d = datetime.datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)), int(m.group(4)), int(m.group(5)), tzinfo=_KST)
+    return ('UTC', d.astimezone(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ'))
+
+
+def build_ics(regions, rounds, updated, today, before=30, after=90):
+    """전국 접수 일정 캘린더(.ics) — 공단 등록 회차의 접수 시작·마감만(예측 없음). DTSTAMP는 수집 시각으로 고정(멱등, I7)."""
+    rr = (rounds or {}).get('rounds') or {}
+    lo, hi = today - datetime.timedelta(days=before), today + datetime.timedelta(days=after)
+    stamp = _ics_dt(updated)
+    stamp = stamp[1] if stamp and stamp[0] == 'UTC' else today.strftime('%Y%m%dT000000Z')
+    ev = []
+    for cd in sorted(rr):
+        r = regions.get(cd)
+        if not r or cd == '9999':
+            continue
+        for i, x in enumerate(rr[cd] or []):
+            for key, label in (('s', '접수 시작'), ('e', '접수 마감')):
+                dtv = _ics_dt(x.get(key))
+                if not dtv:
+                    continue
+                day = datetime.date(int(x[key][:4]), int(x[key][5:7]), int(x[key][8:10]))
+                if not (lo <= day <= hi):
+                    continue
+                uid = '%s-%d-%s@evbojo.co.kr' % (cd, i, key)
+                summary = '[%s] %s %s' % (r['name'], x.get('k') or x.get('nm') or '회차', label)
+                desc = ('무공해차 통합누리집(ev.or.kr)에 등록된 %s %s 회차의 %s 시각입니다. 수집 %s. 일정은 지자체 공고로 바뀔 수 있어요 — 신청 전 공고문을 확인하세요. %s/region/%s.html'
+                        % (r['name'], x.get('k') or '', label, (updated or '')[:16].replace('T', ' '), BASE, cd))
+                lines = ['BEGIN:VEVENT', 'UID:' + uid, 'DTSTAMP:' + stamp]
+                if dtv[0] == 'DATE':
+                    lines.append('DTSTART;VALUE=DATE:' + dtv[1])
+                else:
+                    lines.append('DTSTART:' + dtv[1]); lines.append('DURATION:PT1H')
+                lines += ['SUMMARY:' + _ics_text(summary), 'DESCRIPTION:' + _ics_text(desc),
+                          'URL:%s/region/%s.html' % (BASE, cd), 'CATEGORIES:전기차 보조금', 'END:VEVENT']
+                ev.append('\n'.join(_ics_fold(l) for l in lines))
+    head = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//EV보조금//접수 일정//KO', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+            'X-WR-CALNAME:EV보조금 접수 일정(전국)', 'X-WR-CALDESC:공단 등록 회차의 접수 시작·마감 — 지난 %d일~앞으로 %d일' % (before, after), 'X-WR-TIMEZONE:Asia/Seoul']
+    return '\n'.join(_ics_fold(l) for l in head) + '\n' + '\n'.join(ev) + ('\n' if ev else '') + 'END:VCALENDAR\r\n'
+
+
 def build_csv(header, rows):
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator='\n')
@@ -3368,6 +3432,15 @@ def build_model_hub(entries, meta, status, ctx):
         '    <a class="chip" href="winter-range-ranking.html">❄️ 겨울 주행거리 랭킹</a>\n'
         '    <a class="chip" href="articles.html">📚 읽을거리 전체</a>\n'
         '  </div>\n</section>\n')
+    # 대표 트림 전체 — 지역 표(상위 25행)에 못 드는 대표 트림도 색인 페이지에서 최소 1개 인바운드를 갖도록(2026-10-11 구조 지표 54편 대응)
+    reps = ctx.get('rep_cars') or []
+    if reps:
+        chips = ''.join('<a class="chip" href="/car/%d.html">%s <span class="muted">%s만원</span></a>'
+                        % (c['id'], esc(c.get('disp') or c['name']), fmt(c['nat'])) for c in reps)
+        rep_sec = ('<section class="card">\n  <h2 class="mt0">차종별 보조금 페이지 전체 <span class="sub">모델그룹 대표 트림 %d종 · 국비 순</span></h2>\n'
+                   '  <p class="small muted">모델 그룹마다 국비가 가장 높은 현행 트림이 대표입니다. 같은 모델의 다른 트림은 대표 페이지 안의 형제 목록에서 볼 수 있어요.</p>\n'
+                   '  <div class="chips">%s</div>\n</section>\n' % (len(reps), chips))
+        main_body = main_body.replace('<section class="card">\n  <h2 class="mt0">다음 단계</h2>', rep_sec + '<section class="card">\n  <h2 class="mt0">다음 단계</h2>', 1)
     gate = len(strip_tags(main_body % (esc(asof), intro, '', len(entries), listing)))
     ad1 = ad_slot('model-hub-1', gate, False)
     main = main_body % (esc(asof), intro, ad1, len(entries), listing)
@@ -3640,6 +3713,7 @@ def main():
     # 트림 → 그룹 대표 트림 id. 색인 페이지(지역 표·홈)의 차종 링크를 대표 페이지(+행 앵커)로 모아 noindex 트림으로 흐르던
     # 내부 링크(비대표 101편 × 123 페이지)를 대표 33편에 집중시킨다(2026-10-11 기술 감사 F3).
     ctx['rep_of'] = {c['id']: rep_by_group[model_group(c)]['id'] for c in cars if model_group(c) in rep_by_group}
+    ctx['rep_cars'] = sorted((c for c in cars if c['id'] in ctx['car_rep']), key=lambda c: (-(c['nat'] or 0), c['id']))   # 허브의 대표 트림 전체 목록용
 
     pages = {}   # 전부 메모리에서 완성 → 성공 시에만 원자 쓰기(부분 파일 금지)
 
@@ -3688,6 +3762,7 @@ def main():
         ['car_id', 'maker', 'trim', 'national_subsidy_manwon', 'range_km', 'range_cold_km', 'battery_kwh', 'discontinued', 'price_asof'],
         [[c['id'], c['maker'], c['name'], c['nat'], c.get('range'), c.get('rangeCold'), c.get('batt'), 1 if c.get('disc') else 0, meta.get('updated', '')] for c in cars])
     pages[os.path.join(SITE, 'data.html')] = build_data_page(regions, cars, status, meta, hist, art_manifest, ctx)
+    pages[os.path.join(SITE, 'calendar', 'evbojo.ics')] = build_ics(regions, rounds, status.get('updated', ''), datetime.date.fromisoformat(kst_today))
 
     for cd, r in regions.items():
         html, _ = build_region(cd, r, cars, regions, meta, status, hist, ctx)

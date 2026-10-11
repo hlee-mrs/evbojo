@@ -627,6 +627,53 @@ def check_collapse(pages, ctx):
 RX_SCHED_SLOT = re.compile(r'<!--sched:start-->(.*?)<!--sched:end-->', re.S)
 
 
+def check_structure(pages, ctx):
+    """구조 지표 — 실패가 아니라 추세 기록용 경고.
+    (a) 지역 색인 페이지 산문 중복률: 숫자를 가린 <p> 문장 중 지역 절반 이상에 공통인 문장 비율(목표 ≤20%).
+    (b) 색인 페이지 간 본문 링크 그래프에서 인바운드 ≤2인 색인 페이지 수(nav·푸터 제외, 목표 감소 추세).
+    (c) calendar/evbojo.ics 존재·VEVENT ≥1."""
+    out = []
+    idx = [p for p in pages if not p.noindex and p.rel not in ('404.html', '429.html', 'google26c5d436316c40f8.html')]
+    regs = [p for p in idx if p.kind == 'region']
+    if regs:
+        counts = {}
+        for p in regs:
+            sents = set()
+            for ptxt in re.findall(r'<p[^>]*>(.*?)</p>', p.main, re.S):
+                t = re.sub(r'<[^>]+>', '', ptxt)
+                t = re.sub(r'\d[\d,.]*', '#', t).strip()
+                for sn in re.split(r'(?<=[.!?])\s+', t):
+                    if len(sn) >= 12:
+                        sents.add(sn)
+            for sn in sents:
+                counts[sn] = counts.get(sn, 0) + 1
+        if counts:
+            common = sum(1 for c in counts.values() if c >= len(regs) / 2)
+            ratio = common / len(counts) * 100
+            out.append('(경고) 지역 색인 %d편 산문 중복률 %.1f%% (공통 문장 %d / 고유 문장 %d, 목표 ≤20%%)' % (len(regs), ratio, common, len(counts)))
+    rels = {p.rel for p in idx}
+    inbound = {r: 0 for r in rels}
+    for p in idx:
+        seen = set()
+        for href in re.findall(r'href="([^"#?]+)', p.main):
+            h = href[1:] if href.startswith('/') else href
+            if h.endswith('/'):
+                h += 'index.html'
+            if h in rels and h != p.rel and h not in seen:
+                seen.add(h); inbound[h] += 1
+    low = sorted((v, r) for r, v in inbound.items() if v <= 2 and (r.startswith('region/') or r.startswith('car/') or r.startswith('articles/') or r.startswith('sido/') or r.startswith('model/')))
+    if low:
+        out.append('(경고) 본문 인바운드 ≤2인 색인 페이지 %d편 — 예: %s' % (len(low), ', '.join('%s(%d)' % (r, v) for v, r in low[:5])))
+    ics = os.path.join(ctx['site'], 'calendar', 'evbojo.ics')
+    if not os.path.isfile(ics):
+        out.append('calendar/evbojo.ics 없음')
+    else:
+        txt = open(ics, encoding='utf-8').read()
+        if txt.count('BEGIN:VEVENT') == 0 or txt.count('BEGIN:VEVENT') != txt.count('END:VEVENT') or not txt.rstrip().endswith('END:VCALENDAR'):
+            out.append('calendar/evbojo.ics 구조 이상(VEVENT %d/%d)' % (txt.count('BEGIN:VEVENT'), txt.count('END:VEVENT')))
+    return out
+
+
 def check_og_loader_meta(pages, ctx):
     """색인 페이지: og:image·canonical 필수. noindex 페이지: AdSense 로더 금지. 제목>60자·설명>160자는 경고 집계(네이버 가이드 참고)."""
     out = []
@@ -741,6 +788,7 @@ CHECKS = (
     ('14 홈 접수 일정 카드(슬롯·derived 마커·링크)', check_home_schedule),
     ('15 투명성 블록·정적 슬롯·RSS', check_provenance_feed),
     ('16 OG·광고 로더·메타 길이(경고)', check_og_loader_meta),
+    ('17 구조 지표(산문 중복률·색인 인바운드·캘린더) (경고)', check_structure),
 )
 
 

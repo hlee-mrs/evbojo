@@ -18,6 +18,7 @@
       <tr><td><a href="data/status.json">status.json</a></td><td>지역별 공고·접수·출고·잔여, 유형별 분해, 공단 접수상태, 지자체 공지 원문, 신청마감</td><td>매시간</td></tr>
       <tr><td><a href="data/rounds.json">rounds.json</a></td><td>지역별 공고 회차(본공고·추경)의 게시일·접수기간·신청마감과 최근 90일 공단 변경 이력</td><td>매시간</td></tr>
       <tr><td><a href="data/history.json">history.json</a></td><td>지역별 일별 승용 잔여 이력(<span data-derived>{{HIST_START}}</span>부터 <span data-derived>{{HIST_DAYS}}</span>일치)과 추가공고 감지 이벤트</td><td>매일</td></tr>
+      <tr><td><a href="calendar/evbojo.ics">evbojo.ics</a></td><td>전국 접수 일정 캘린더(공단 등록 회차의 접수 시작·마감, 지난 30일~앞으로 90일) — 캘린더 앱에서 구독하면 일정이 자동 갱신됩니다</td><td>매시간</td></tr>
       <tr><td><a href="data/articles.json">articles.json</a></td><td>데이터 해설 시리즈 목록(<span data-derived>{{N_ARTICLES}}</span>편) · <a href="feed.xml">RSS</a></td><td>발행 시</td></tr>
     </tbody>
   </table></div>
