@@ -12,12 +12,14 @@
 <base href="/">
 <title>{{TITLE}}</title>
 <meta name="description" content="{{DESC}}">{{ROBOTS}}
+{{OG}}
 <link rel="canonical" href="{{CANONICAL}}">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="alternate" type="application/rss+xml" title="EV보조금 해설·시리즈" href="/feed.xml">
 <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="icon" href="https://evbojo.co.kr/favicon.png" type="image/png" sizes="64x64">
+<link rel="apple-touch-icon" href="https://evbojo.co.kr/assets/apple-touch-icon.png">
 <meta name="naver-site-verification" content="29413de3319d0b4b5a504cdbb92084043d6d663b" />
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />

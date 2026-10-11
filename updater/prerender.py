@@ -46,6 +46,12 @@ REGION_NOINDEX = os.path.join(DATA, 'region_noindex.json')   # 롱테일 지역 
 BASE = 'https://evbojo.co.kr'
 KST = datetime.timezone(datetime.timedelta(hours=9))   # 발행 게이트는 서버 로컬이 아니라 KST 기준
 AD_MIN = 1200          # 광고 게이팅: 정적 산문+공지 합계 최소 자수
+# 승인 전에는 슬롯 마크업 자체를 내보내지 않는다(빈 '광고' 박스가 심사·CLS·이용자 인상에 모두 손해 — 2026-10-11 기술 감사).
+# 승인 후: ADS_LIVE=True + app.js SITE.ads.live=true + main.css .ad-slot 기본 display를 block으로(docs/3 절차).
+ADS_LIVE = False
+ADSENSE_LOADER = ('<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7688026325140831" '
+                  'crossorigin="anonymous"></script>\n')
+OG_IMAGE = 'https://evbojo.co.kr/assets/og-default.jpg'
 D0 = datetime.date(2026, 1, 1)   # history.json d0
 
 # ── 시도 슬러그 (스펙 고정 17) ──
@@ -498,15 +504,30 @@ def render(tpl, mapping):
     """단일 패스 치환 — 템플릿(원본)의 키 집합을 mapping과 사전 대조하고,
     치환된 값 영역은 다시 스캔하지 않는다(데이터 유래 '{{…}}'가 빌드를 오염·중단시키지 않음)."""
     need = set(re.findall(r'\{\{([A-Z][A-Z0-9_]*)\}\}', tpl))
+    if 'OG' in need and 'OG' not in mapping:
+        # 페이지 템플릿 공통 Open Graph — 네이버·카카오·구글이 썸네일·제목에 사용. 값은 TITLE/DESC/CANONICAL에서 유도.
+        mapping = dict(mapping)
+        mapping['OG'] = og_block(mapping.get('TITLE', ''), mapping.get('DESC', ''), mapping.get('CANONICAL', ''))
     missing = need - set(mapping)
     if missing:
         raise RuntimeError('치환 안 된 플레이스홀더: ' + ','.join(sorted(missing)))
-    return re.sub(r'\{\{([A-Z][A-Z0-9_]*)\}\}', lambda m: mapping[m.group(1)], tpl)
+    out = re.sub(r'\{\{([A-Z][A-Z0-9_]*)\}\}', lambda m: mapping[m.group(1)], tpl)
+    if 'noindex' in (mapping.get('ROBOTS') or '') and ADSENSE_LOADER in out:
+        out = out.replace(ADSENSE_LOADER, '')       # noindex(광고 미게재) 페이지에 240KB 광고 스크립트를 싣지 않음
+    return out
+
+
+def og_block(title, desc, canonical, kind='article'):
+    t = re.sub(r'\s*\|\s*EV보조금\s*$', '', title)
+    return ('<meta property="og:type" content="%s">\n<meta property="og:site_name" content="EV보조금">\n<meta property="og:locale" content="ko_KR">\n'
+            '<meta property="og:title" content="%s">\n<meta property="og:description" content="%s">\n<meta property="og:url" content="%s">\n'
+            '<meta property="og:image" content="%s">\n<meta property="og:image:width" content="800">\n<meta property="og:image:height" content="420">\n'
+            '<meta name="twitter:card" content="summary_large_image">' % (kind, t, desc, canonical, OG_IMAGE))
 
 
 def ad_slot(slot_name, gate_chars, noindex):
     """광고 게이팅 — 저가치·noindex 페이지에는 슬롯 자체를 만들지 않음. 라벨은 '광고'."""
-    if noindex or gate_chars < AD_MIN:
+    if noindex or gate_chars < AD_MIN or not ADS_LIVE:
         return ''
     return ('<div class="ad-slot" data-slot="%s"><div class="ad-label">광고</div>'
             '<div class="ad-box"></div></div>' % slot_name)
@@ -1182,12 +1203,12 @@ def build_region(cd, r, cars, regions, meta, status, hist, ctx):
     rows = [x for x in all_rows if x not in special]
 
     def tr_of(c, loc, tot):
-        return ('<tr><td><a href="/car/%d.html" style="color:inherit;font-weight:700">%s</a>'
+        return ('<tr><td><a href="%s" style="color:inherit;font-weight:700">%s</a>'
                 '<div class="small muted">%s%s</div></td>'
                 '<td class="num">%s</td><td class="num">%s</td>'
                 '<td class="num" style="font-weight:800;color:var(--money)">%s</td>'
                 '<td><button class="btn-s btn btn-ghost" data-cmp="%d">비교</button></td></tr>'
-                % (c['id'], esc(c.get('disp') or c['name']), esc(MAKER_SHORT.get(c['maker'], c['maker'])),
+                % (car_href(c['id'], ctx), esc(c.get('disp') or c['name']), esc(MAKER_SHORT.get(c['maker'], c['maker'])),
                    ' · %skm' % c['range'] if c.get('range') else '',
                    fmt(c['nat']), fmt(loc), fmt(tot), c['id']))
     trs = [tr_of(c, loc, tot) for c, loc, tot in rows[:25]]
@@ -2138,9 +2159,9 @@ def build_car(car, cars, regions, meta, status, ctx):
     # 같은 모델그룹 트림 (최대 6)
     grp = model_group(car)
     trims = [c for c in cars if c['id'] != cid and not c['disc'] and model_group(c) == grp][:6]
-    trim_html = ''.join('<a class="row" href="/car/%d.html"><div class="grow"><div class="tit">%s</div>'
+    trim_html = ''.join('<a class="row" id="trim-%d" href="/car/%d.html"><div class="grow"><div class="tit">%s</div>'
                         '<div class="desc">%skm · %skWh</div></div><div class="amt">국비 %s만원</div></a>'
-                        % (c['id'], esc(c['name']), c.get('range') or '-', c.get('batt') or '-', fmt(c['nat']))
+                        % (c['id'], c['id'], esc(c['name']), c.get('range') or '-', c.get('batt') or '-', fmt(c['nat']))
                         for c in trims) or '<p class="muted small" style="padding:10px 4px">등록된 형제 트림 없음</p>'
 
     disc_banner = ''
@@ -2763,7 +2784,13 @@ def build_home_rank(regions):
     return '<!--derived:start-->' + rows + '<!--derived:end-->'
 
 
-def build_home_cars(cars):
+def car_href(cid, ctx):
+    """색인 페이지에서 쓰는 차종 링크 — 비대표 트림은 대표 트림 페이지의 형제 목록 행(#trim-id)으로."""
+    rep_id = (ctx.get('rep_of') or {}).get(cid, cid)
+    return '/car/%d.html' % cid if rep_id == cid else '/car/%d.html#trim-%d' % (rep_id, cid)
+
+
+def build_home_cars(cars, ctx):
     by_name = {c['name']: c for c in cars if not c.get('disc')}
     rows = []
     for nm in _HOME_POPULAR:
@@ -2772,9 +2799,9 @@ def build_home_cars(cars):
             continue
         desc = '%s · %s%s' % (MAKER_SHORT.get(c['maker'], c['maker']), ('%skm' % c['range']) if c.get('range') else '제원 미공개',
                               (' · %skWh' % c['batt']) if c.get('batt') else '')
-        rows.append('<a class="row" href="/car/%d.html"><div class="grow"><div class="tit">%s</div><div class="desc">%s</div></div>'
+        rows.append('<a class="row" href="%s"><div class="grow"><div class="tit">%s</div><div class="desc">%s</div></div>'
                     '<div class="amt">%s만원<small>국비만 · 지역 선택 시 합산</small></div></a>'
-                    % (c['id'], esc(c.get('disp') or c['name']), esc(desc), fmt(c['nat'])))
+                    % (car_href(c['id'], ctx), esc(c.get('disp') or c['name']), esc(desc), fmt(c['nat'])))
     return '<!--derived:start-->' + ''.join(rows) + '<!--derived:end-->'
 
 
@@ -2837,12 +2864,15 @@ def _rfc822(day):
 
 
 def build_feed(title, link, desc, items):
-    """RSS 2.0 — items: (title, url, description, 'YYYY-MM-DD'). 네이버 서치어드바이저 RSS 제출·구독기용."""
+    """RSS 2.0 — items: (title, url, description, 'YYYY-MM-DD'[, body_html]). 네이버는 RSS에 본문 전체를 요구하므로
+    본문이 있으면 content:encoded(CDATA)로 싣는다. 서치어드바이저 RSS 제출·구독기용."""
     items = sorted(items, key=lambda x: x[3], reverse=True)[:40]
-    body = ''.join('<item><title>%s</title><link>%s</link><guid isPermaLink="true">%s</guid><description>%s</description><pubDate>%s</pubDate></item>\n'
-                   % (esc(t), esc(u), esc(u), esc(d), _rfc822(day)) for t, u, d, day in items)
+    def enc(body):
+        return ('<content:encoded><![CDATA[%s]]></content:encoded>' % body.replace(']]>', ']]&gt;')) if body else ''
+    body = ''.join('<item><title>%s</title><link>%s</link><guid isPermaLink="true">%s</guid><description>%s</description>%s<pubDate>%s</pubDate></item>\n'
+                   % (esc(it[0]), esc(it[1]), esc(it[1]), esc(it[2]), enc(it[4] if len(it) > 4 else ''), _rfc822(it[3])) for it in items)
     last = _rfc822(items[0][3]) if items else _rfc822('2026-07-15')
-    return ('<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>'
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel>'
             '<title>%s</title><link>%s</link><description>%s</description><language>ko</language><lastBuildDate>%s</lastBuildDate>'
             '<atom:link href="%s" rel="self" type="application/rss+xml"/>\n%s</channel></rss>\n'
             % (esc(title), esc(link), esc(desc), last, esc(link.rstrip('/') + ('/feed.xml' if link.endswith('/') else '')), body))
@@ -3525,6 +3555,9 @@ def main():
         if cur is None or (c['nat'] or 0, -c['id']) > (cur['nat'] or 0, -cur['id']):
             rep_by_group[g] = c
     ctx['car_rep'] = {c['id'] for c in rep_by_group.values()}
+    # 트림 → 그룹 대표 트림 id. 색인 페이지(지역 표·홈)의 차종 링크를 대표 페이지(+행 앵커)로 모아 noindex 트림으로 흐르던
+    # 내부 링크(비대표 101편 × 123 페이지)를 대표 33편에 집중시킨다(2026-10-11 기술 감사 F3).
+    ctx['rep_of'] = {c['id']: rep_by_group[model_group(c)]['id'] for c in cars if model_group(c) in rep_by_group}
 
     pages = {}   # 전부 메모리에서 완성 → 성공 시에만 원자 쓰기(부분 파일 금지)
 
@@ -3551,11 +3584,11 @@ def main():
     pages[os.path.join(SITE, 'data', 'articles.json')] = json.dumps(art_manifest, ensure_ascii=False, indent=1)
 
     # 구독·외부 이용 표면 — RSS 2종(해설·시리즈 / 일일 브리핑), CSV 2종, 데이터·방법론 페이지
-    feed_items = [(a['title'], BASE + a['url'], a['description'], a['publish']) for a in art_manifest]
+    feed_items = [(e['fm']['title'], '%s/articles/%s.html' % (BASE, e['slug']), e['fm']['description'], e['publish'], e['prose']) for e in art_entries]
     for e in pub_entries:
         fm_ = e.get('fm') or {}
         if fm_.get('title') and e.get('publish'):
-            feed_items.append((fm_['title'], '%s/model/%s.html' % (BASE, e['slug']), fm_.get('description', ''), e['publish']))
+            feed_items.append((fm_['title'], '%s/model/%s.html' % (BASE, e['slug']), fm_.get('description', ''), e['publish'], e.get('prose') or ''))
     pages[os.path.join(SITE, 'feed.xml')] = build_feed('EV보조금 해설·시리즈', BASE + '/', '실측 데이터로 쓰는 전기차 보조금 해설과 모델별 심층 시리즈', feed_items)
     pages[os.path.join(SITE, 'brief', 'feed.xml')] = build_feed(
         'EV보조금 일일 브리핑', BASE + '/brief/', '전국 전기차 보조금 잔여 변동을 매일 아침 실측 데이터로 정리',
@@ -3618,7 +3651,7 @@ def main():
         sched = build_home_schedule(regions, rounds, datetime.date.fromisoformat(kst_today), status.get('updated', ''))
         _fill_slots('index.html', {'sched': sched, 'latest': build_latest_block(art_manifest, 4, home=True),
                                    'strip': build_home_strip(regions, status, ctx), 'rank': build_home_rank(regions),
-                                   'cars': build_home_cars(cars)})
+                                   'cars': build_home_cars(cars, ctx)})
         _fill_slots('articles.html', {'latest': build_latest_block(art_manifest, 12, home=False)})
         s_tiles, s_board = build_status_blocks(regions, status, ctx)
         _fill_slots('status.html', {'summary': s_tiles, 'board': s_board})

@@ -14,6 +14,7 @@
     //    (각 페이지 슬롯의 data-ad-slot 번호는 AdSense 광고단위 생성 후 기입)
     ads: {
       enabled: true,
+      live: false,                            // 애드센스 승인 전: 슬롯 비노출(빈 '광고' 박스·CLS 방지). 승인 후 true + main.css .ad-slot display 기본값 block
       provider: 'adsense',                    // 'adsense' | 'adfit'
       client: 'ca-pub-7688026325140831',      // AdSense 게시자 ID (metlit 계정)
       // AdSense 광고단위 ID. 슬롯 이름이 '-2'로 끝나면 하단, 그 외는 상단 단위를 씀
@@ -705,6 +706,8 @@
   function renderAds(isRetry) {
     const slots = $$('.ad-slot');
     if (!slots.length) return;
+    if (!SITE.ads.live) { slots.forEach(s => s.remove()); return; }   // 승인 전 — 슬롯 마크업 제거(정적 루트 페이지용)
+    document.documentElement.classList.add('ads-live');
     // 본문 게이트: main 텍스트가 1,200자 미만이면 광고 슬롯 자체를 렌더하지 않음(저가치·빈 페이지 광고 차단).
     // JS가 본문을 채우는 페이지(비교표·레거시 region/car 등)를 위해 2.5초 뒤 1회만 재평가 —
     // 재평가 시점에도 미달이면 그대로 미렌더. 게이트에 걸린 동안은 ins 주입이 없어 재호출해도 중복 push 없음.
