@@ -627,6 +627,32 @@ def check_collapse(pages, ctx):
 RX_SCHED_SLOT = re.compile(r'<!--sched:start-->(.*?)<!--sched:end-->', re.S)
 
 
+def check_og_loader_meta(pages, ctx):
+    """색인 페이지: og:image·canonical 필수. noindex 페이지: AdSense 로더 금지. 제목>60자·설명>160자는 경고 집계(네이버 가이드 참고)."""
+    out = []
+    long_t = long_d = 0
+    for p in pages:
+        if p.noindex:
+            if 'adsbygoogle.js' in p.raw:
+                out.append('%s — noindex 페이지에 AdSense 로더' % p.rel)
+            continue
+        if p.rel in ('404.html', '429.html', 'google26c5d436316c40f8.html'):
+            continue
+        if 'property="og:image"' not in p.raw:
+            out.append('%s — og:image 없음' % p.rel)
+        if not p.canonical:
+            out.append('%s — canonical 없음' % p.rel)
+        mt = re.search(r'<title>(.*?)</title>', p.raw, re.S)
+        md = re.search(r'<meta name="description" content="([^"]*)"', p.raw)
+        if mt and len(mt.group(1).strip()) > 60:
+            long_t += 1
+        if md and len(md.group(1)) > 160:
+            long_d += 1
+    if long_t or long_d:
+        out.append('(경고) 제목 60자 초과 %d편 · 설명 160자 초과 %d편 — 네이버 노출 길이 참고' % (long_t, long_d))
+    return out
+
+
 def check_provenance_feed(pages, ctx):
     """생성 페이지(region/car/sido/model/articles)마다 '이 페이지는 어떻게 만들어졌나' 블록이 있고,
     홈·현황판·소진 글의 정적 슬롯이 채워져 있으며, RSS 2종이 XML로 파싱되는지."""
@@ -714,6 +740,7 @@ CHECKS = (
     ('13 수집 붕괴 징후(공고 0대·접수중/소진 단정)', check_collapse),
     ('14 홈 접수 일정 카드(슬롯·derived 마커·링크)', check_home_schedule),
     ('15 투명성 블록·정적 슬롯·RSS', check_provenance_feed),
+    ('16 OG·광고 로더·메타 길이(경고)', check_og_loader_meta),
 )
 
 

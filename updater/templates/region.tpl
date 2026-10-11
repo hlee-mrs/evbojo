@@ -10,7 +10,8 @@
   </div>{{NEXT_ROUND}}
   {{PROG}}
   {{STATUS_LINES}}
-  <div data-live="cats" data-cd="{{CD}}"></div>
+  <div data-live="spark" class="spark-slot"></div>
+  <div data-live="cats" class="cats-slot" data-cd="{{CD}}"></div>
   <div class="grid2 mt8">
     {{TEL_BTN}}
     <a class="btn btn-ghost" href="https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do" target="_blank" rel="noopener">ev.or.kr에서 잔여 확인 ↗</a>

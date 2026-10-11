@@ -93,7 +93,7 @@ CORE_PAGES = [
     ('/extra-support.html', 'weekly'), ('/winter-range.html', 'weekly'), ('/changes-2026-2027.html', 'weekly'),
     ('/sold-out.html', 'weekly'), ('/region-ranking.html', 'weekly'),
     ('/winter-range-ranking.html', 'weekly'), ('/yearend-guide.html', 'weekly'),
-    ('/data.html', 'weekly'), ('/changelog.html', 'weekly'), ('/glossary.html', 'weekly'),
+    ('/data.html', 'weekly'), ('/changelog.html', 'weekly'), ('/glossary.html', 'weekly'), ('/terms.html', 'weekly'),
 ]
 
 
@@ -515,6 +515,12 @@ def render(tpl, mapping):
     if 'noindex' in (mapping.get('ROBOTS') or '') and ADSENSE_LOADER in out:
         out = out.replace(ADSENSE_LOADER, '')       # noindex(광고 미게재) 페이지에 240KB 광고 스크립트를 싣지 않음
     return out
+
+
+def _fm_modified(fm, published):
+    """Article.dateModified는 '원고를 고친 날'만 — 프런트매터 modified(게시일 이후)가 없으면 게시일. 데이터 기준일과 분리."""
+    m = (fm.get('modified') or '').strip()
+    return m if re.fullmatch(r'\d{4}-\d{2}-\d{2}', m) and m >= published else published
 
 
 def og_block(title, desc, canonical, kind='article'):
@@ -1973,6 +1979,15 @@ def region_prose(cd, r, st, closed, contradiction, rank, pct, n_all, sido, sido_
             ['잔여가 다시 늘거나 새 공고가 뜨면 이 페이지 상태도 함께 갱신됩니다.',
              '지자체 공지와 이 페이지의 잔여 수치를 함께 지켜보세요.',
              '잔여가 갑자기 늘면 추가 공고가 나왔다는 뜻으로 읽으면 됩니다.']))
+    elif st and (st.get('a') or 0) > (st.get('n') or 0) and left is not None and left > 0:
+        pF.append(CC('next-over',
+            ['', '신청 전 꼭 알아둘 점은 ', '현재 국면에서는 '],
+            ['접수가 이미 공고 물량(%s대)을 넘어선 상태라(접수 %s대) ' % (fmt(st.get('n')), fmt(st.get('a'))),
+             '공고 %s대에 접수 %s대로 초과 접수된 지역이라 ' % (fmt(st.get('n')), fmt(st.get('a'))),
+             '접수 %s대가 공고 %s대를 넘어 ' % (fmt(st.get('a')), fmt(st.get('n')))],
+            ['지금 신청하면 취소·미출고분이 나와야 차례가 오는 예비 접수가 될 수 있습니다 — 선정 방식과 대기 순번은 지자체에 먼저 확인하세요.',
+             '새 신청은 예비 순번이 될 가능성이 커서, 선정 방식(출고등록순·추첨)과 대기 여부를 지자체에 확인한 뒤 계약하는 편이 안전합니다.',
+             '잔여 숫자만 보고 바로 계약하기보다 지자체에 선정 방식과 예비 접수 여부를 확인하는 것이 먼저입니다.']))
     elif left is not None and left < 30:
         pF.append(CC('next-low',
             ['', '잔여가 적은 만큼 ', '막판 구간이라 '],
@@ -2970,7 +2985,7 @@ def build_sido(sido, regions, meta, status, ctx):
         {'@type': 'ListItem', 'position': 2, 'name': '%s 전기차 보조금' % full, 'item': canonical}]},
         {'@context': 'https://schema.org', '@type': 'Article',
          'headline': head_txt,
-         'datePublished': published, 'dateModified': asof, 'inLanguage': 'ko',
+         'datePublished': published, 'dateModified': _fm_modified(fm, published), 'inLanguage': 'ko', 'image': OG_IMAGE,
          'author': {'@type': 'Person', 'name': 'HyeongHun Lee', 'url': BASE + '/about.html#operator'},
          'publisher': {'@type': 'Organization', 'name': 'EV보조금'},
          'mainEntityOfPage': canonical}]
@@ -3074,8 +3089,20 @@ def build_article(entry, ctx):
     title, desc = fm['title'], fm['description']
     crumb = fm.get('crumb') or (title.split(' — ')[0] if ' — ' in title else title)
     canonical = '%s/articles/%s.html' % (BASE, slug)
+    prose = entry['prose']
+    if '</table></div>' in prose:                     # 첫 표 아래 인용 안내(연구·출처 신호)
+        prose = prose.replace('</table></div>', '</table></div><p class="small muted cite">이 표를 인용할 때: "EV보조금(evbojo.co.kr), 데이터 기준 %s"</p>' % esc(fm.get('asof') or entry['publish']), 1)
     cards = ['<section class="card">%s</section>' % p.strip()
-             for p in re.split(r'(?=<h2>)', entry['prose']) if p.strip()]
+             for p in re.split(r'(?=<h2>)', prose) if p.strip()]
+    meth = [(lb, fm.get(k)) for lb, k in (('관측 기간', 'method_period'), ('표본', 'method_sample'), ('제외 규칙', 'method_exclude'))]
+    method = ''
+    if any(v for _, v in meth) or fm.get('method_data'):
+        dl = ''.join('<dt>%s</dt><dd>%s</dd>' % (lb, esc(v)) for lb, v in meth if v)
+        if fm.get('method_data'):
+            files = [x.strip() for x in fm['method_data'].split(',') if x.strip()]
+            dl += '<dt>재현 데이터</dt><dd>%s · <a href="data.html">필드 설명</a></dd>' % ' · '.join('<a href="data/%s">%s</a>' % (esc(f), esc(f)) for f in files)
+        dl += '<dt>분석</dt><dd>stdlib 스크립트로 집계하고 운영자가 원본 데이터와 대조했습니다. 게시 후 수치는 다시 계산하지 않습니다.</dd>'
+        method = '<aside class="card method" aria-label="이 글의 방법"><h2 class="mt0">이 글의 방법</h2><dl class="gloss">%s</dl></aside>' % dl
     related = []
     for item in (fm.get('related') or '').split(';'):
         if '|' in item:
@@ -3092,7 +3119,7 @@ def build_article(entry, ctx):
         'PUBLISHED': esc(entry['publish']),
         'MODIFIED': (' · 수정 %s' % esc(entry['modified'])) if entry['modified'] != entry['publish'] else '',
         'ASOF': esc(fm.get('asof') or entry['publish']),
-        'PROSE': '\n'.join(cards), 'RELATED': ''.join(related), 'AD2': ad2,
+        'PROSE': '\n'.join(cards), 'RELATED': ''.join(related), 'AD2': ad2, 'METHOD': method,
     }
     mapping['PROVENANCE'] = provenance_block('article', '', '')
     main = render(ctx['tpl_article'], mapping)
@@ -3101,7 +3128,7 @@ def build_article(entry, ctx):
               {'@type': 'ListItem', 'position': 2, 'name': '읽을거리', 'item': BASE + '/articles.html'},
               {'@type': 'ListItem', 'position': 3, 'name': crumb, 'item': canonical}]},
           {'@context': 'https://schema.org', '@type': 'Article', 'headline': title, 'description': desc,
-           'datePublished': entry['publish'], 'dateModified': entry['modified'], 'inLanguage': 'ko',
+           'datePublished': entry['publish'], 'dateModified': entry['modified'], 'inLanguage': 'ko', 'image': OG_IMAGE,
            'author': {'@type': 'Person', 'name': 'HyeongHun Lee', 'url': BASE + '/about.html#operator'},
            'publisher': {'@type': 'Organization', 'name': 'EV보조금'}, 'mainEntityOfPage': canonical}]
     return render(ctx['tpl_page'], {
@@ -3212,7 +3239,7 @@ def build_model(entry, cars, regions, meta, status, ctx):
         {'@type': 'ListItem', 'position': 2, 'name': '모델별 보조금 심층 시리즈', 'item': BASE + '/model/'},
         {'@type': 'ListItem', 'position': 3, 'name': '%s 보조금' % group, 'item': canonical}]},
         {'@context': 'https://schema.org', '@type': 'Article',
-         'headline': title, 'datePublished': entry['publish'], 'dateModified': asof, 'inLanguage': 'ko',
+         'headline': title, 'datePublished': entry['publish'], 'dateModified': _fm_modified(entry.get('fm') or {}, entry['publish']), 'inLanguage': 'ko', 'image': OG_IMAGE,
          'author': {'@type': 'Person', 'name': 'HyeongHun Lee', 'url': BASE + '/about.html#operator'},
          'publisher': {'@type': 'Organization', 'name': 'EV보조금'},
          'mainEntityOfPage': canonical}]

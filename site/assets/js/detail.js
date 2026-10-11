@@ -19,7 +19,7 @@
     /* 비교 버튼(정적 표의 data-cmp) — 데이터 로드와 무관하게 즉시 동작 */
     document.addEventListener('click', function (e) {
       var b = e.target.closest && e.target.closest('[data-cmp]');
-      if (b && window.cmpBasket) { e.preventDefault(); cmpBasket.toggle(+b.getAttribute('data-cmp')); }
+      if (b && window.cmpBasket) { e.preventDefault(); cmpBasket.toggle(+b.getAttribute('data-cmp')); try { gtag('event', 'compare_toggle'); } catch (ex) {} }
     });
     if (cmp && window.cmpBasket) {
       var cmpId = +cmp.getAttribute('data-id');
@@ -50,8 +50,8 @@
 
       /* ②′ 잔여 추이 스파크라인 — 유형 탭 바로 위에 동적 삽입(정적 템플릿 무변경 → lastmod 무영향) */
       if (cats && st && window.sparkline) safe(function () {
-        var box = document.createElement('div'); box.setAttribute('data-live', 'spark');
-        cats.parentNode.insertBefore(box, cats);
+        var box = $('[data-live="spark"]');                                   // 정적 예약 슬롯 재사용(CLS 0)
+        if (!box) { box = document.createElement('div'); box.setAttribute('data-live', 'spark'); cats.parentNode.insertBefore(box, cats); }
         EVData.history().then(function (hist) { safe(function () { box.innerHTML = sparkline(hist, cd, st, updated); }); });
       });
       /* 최근 본 지역 기록 — 검색으로 지역 페이지에 바로 온 사용자도 홈에서 '내 지역' 카드를 보게 */

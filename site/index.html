@@ -8,6 +8,7 @@
 <!-- Google AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7688026325140831" crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>try{if(localStorage.getItem('ev.myRegion')||localStorage.getItem('ev.recentRegion'))document.documentElement.classList.add('has-mr')}catch(e){}</script>
 <title>전기차 보조금 2026 — 지자체별·차종별 한눈에 | EV보조금</title>
 <meta name="description" content="2026년 전국 160개 지자체 전기차 구매보조금과 110여 개 차종 국비·지방비를 한눈에. 접수 잔여현황과 공고 일정, 유지비 계산까지 10초 만에 확인하세요.">
 <meta property="og:site_name" content="EV보조금">
@@ -207,7 +208,7 @@
 </div>
 <footer id="site-footer" class="site-footer"><div class="inner">
   <div class="links">
-    <a href="/about.html">사이트 소개</a><a href="/articles.html">읽을거리</a><a href="/data.html">데이터·방법론</a><a href="/glossary.html">용어집</a><a href="/changelog.html">변경·정정 이력</a><a href="/privacy.html">개인정보처리방침</a>
+    <a href="/about.html">사이트 소개</a><a href="/articles.html">읽을거리</a><a href="/data.html">데이터·방법론</a><a href="/glossary.html">용어집</a><a href="/changelog.html">변경·정정 이력</a><a href="/terms.html">이용안내</a><a href="/privacy.html">개인정보처리방침</a>
     <a href="/donate.html">💛 후원하기</a>
     <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
     <a href="/report.html">오류 제보</a>
@@ -333,6 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 지역 선택 시: 카드 + 차량 리스트 가격을 함께 갱신 (cd=null이면 초기화)
   function pickRegion(cd) {
     currentCd = cd && regions[cd] ? cd : null;
+    if (currentCd) { try { gtag('event', 'region_select', { region: currentCd }); } catch (e) {} }
     renderMyRegion(currentCd);
     const sb = document.getElementById('car-search');
     render(sb ? sb.value.trim() : '');   // 현재 검색어 유지한 채 지역가 반영
