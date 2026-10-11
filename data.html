@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');</script>
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7688026325140831" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 하위 경로(/region/ 등)에서도 상대 URL이 루트 기준으로 풀리도록 base 고정 — app.js의 data/*.json fetch·nav 링크가 그대로 동작 -->
+<base href="/">
+<title>데이터·방법론 — 전기차 보조금 데이터는 어떻게 수집·검증·공개되나 | EV보조금</title>
+<meta name="description" content="EV보조금이 매시간 수집하는 지자체 전기차 보조금 데이터의 출처·필드·수집 주기·검증 규칙·마감 판정 기준·알려진 한계·정정 절차와 CSV/JSON 다운로드. 출처를 밝히면 자유롭게 인용할 수 있습니다.">
+<link rel="canonical" href="https://evbojo.co.kr/data.html">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="alternate" type="application/rss+xml" title="EV보조금 해설·시리즈" href="/feed.xml">
+<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<meta name="naver-site-verification" content="29413de3319d0b4b5a504cdbb92084043d6d663b" />
+<meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
+<meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":"https://evbojo.co.kr/"},{"@type":"ListItem","position":2,"name":"데이터·방법론","item":"https://evbojo.co.kr/data.html"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","@id":"https://evbojo.co.kr/#dataset","name":"2026년 전국 지자체 전기차 구매보조금 현황","description":"전국 160개 지자체 × 전기승용 현행 트림의 국비·지방비 단가와 공고·접수·출고·잔여 대수, 공고 회차 일정, 일별 잔여 이력. 무공해차 통합누리집(ev.or.kr) 공개 데이터를 매시간 수집해 검증·정리한 2차 데이터.","url":"https://evbojo.co.kr/data.html","inLanguage":"ko","isBasedOn":"https://ev.or.kr/","temporalCoverage":"2026","spatialCoverage":{"@type":"Place","name":"대한민국"},"creator":{"@type":"Organization","name":"EV보조금","url":"https://evbojo.co.kr/"},"keywords":["전기차 보조금","지자체 보조금","전기승용 국비 지방비","접수 잔여현황"],"distribution":[{"@type":"DataDownload","name":"지역별 요약(CSV)","encodingFormat":"text/csv","contentUrl":"https://evbojo.co.kr/data/regions.csv"},{"@type":"DataDownload","name":"차종(트림)별 국비·제원(CSV)","encodingFormat":"text/csv","contentUrl":"https://evbojo.co.kr/data/cars.csv"},{"@type":"DataDownload","name":"지역·차종 단가 행렬(JSON)","encodingFormat":"application/json","contentUrl":"https://evbojo.co.kr/data/regions.json"},{"@type":"DataDownload","name":"차종 목록(JSON)","encodingFormat":"application/json","contentUrl":"https://evbojo.co.kr/data/cars.json"},{"@type":"DataDownload","name":"접수 현황(JSON)","encodingFormat":"application/json","contentUrl":"https://evbojo.co.kr/data/status.json"},{"@type":"DataDownload","name":"공고 회차 일정(JSON)","encodingFormat":"application/json","contentUrl":"https://evbojo.co.kr/data/rounds.json"},{"@type":"DataDownload","name":"일별 잔여 이력(JSON)","encodingFormat":"application/json","contentUrl":"https://evbojo.co.kr/data/history.json"}]}</script>
+</head>
+<body>
+<!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
+<header id="site-header" class="site-header"><div class="inner">
+  <a class="logo" href="/"><span class="bolt">⚡</span>EV보조금</a>
+  <nav class="gnb" aria-label="주 메뉴"><a href="/">홈</a><a href="status.html">전국 현황판</a><details class="nav-dd"><summary>도구</summary><div class="dd"><a href="calc.html">유지비 계산기</a><a href="check.html">자격 진단</a><a href="refund.html">환수 계산</a><a href="compare.html">차종 비교</a></div></details><details class="nav-dd"><summary>가이드</summary><div class="dd"><a href="guide.html">신청 절차</a><a href="law.html">제도·법령</a><a href="faq.html">FAQ</a></div></details><details class="nav-dd"><summary>읽을거리</summary><div class="dd"><a href="articles.html">읽을거리 전체</a><a href="brief/">일일 브리핑</a><a href="model/">모델별 시리즈</a></div></details></nav>
+</div></header>
+
+<main class="container">
+<nav class="small muted" aria-label="현재 위치" style="margin:14px 0 0"><a href="/">홈</a> › <b>데이터·방법론</b></nav>
+<div class="hero" style="text-align:left;padding-bottom:0">
+  <p class="muted small">데이터·방법론</p>
+  <h1>전기차 보조금 데이터는 어떻게 수집·검증·공개되나</h1>
+  <p>이 사이트의 모든 숫자는 어디서 오고, 무엇을 뜻하고, 어디까지 믿어도 되는지 — 그리고 그대로 내려받는 법.</p>
+</div>
+
+<p class="stamp"><span>글: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · <span data-derived>잔여현황 기준 2026-10-11 20:10 · 단가 수집일 2026-10-11</span> · 이 페이지의 수치는 매시간 자동 갱신</span></p>
+
+<section class="card">
+  <h2 class="mt0">무엇을 모으나</h2>
+  <p style="line-height:1.75;margin:10px 0">무공해차 통합누리집(ev.or.kr) 보조금관리시스템이 공개하는 2026년 전기승용 구매보조금 자료를 <b>지자체 <span data-derived>160</span>곳 × 현행 트림 <span data-derived>122</span>종</b>(단종 포함 <span data-derived>134</span>종) 단위로 모읍니다. 공단 데이터에는 지자체별 공고 차수와 접수기간, 유형별(우선순위·법인·기관·택시·일반) 물량도 있어 함께 수집합니다.</p>
+  <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>파일</th><th>내용</th><th>갱신</th></tr></thead>
+    <tbody>
+      <tr><td><a href="data/regions.csv">regions.csv</a></td><td>지역코드·지역명·시도·승용 최대 보조금(국비+지방비, 만원)·올해 공고·접수·출고·잔여 대수·공단 등록 접수상태·이 사이트의 상태 판정·기준시각</td><td>매시간</td></tr>
+      <tr><td><a href="data/cars.csv">cars.csv</a></td><td>트림 ID·제조사·트림명·국비(만원)·상온/저온 주행거리(km)·배터리 용량(kWh)·단종 여부·단가 수집일</td><td>매일</td></tr>
+      <tr><td><a href="data/regions.json">regions.json</a></td><td>지역별 메타(담당부서·전화)와 트림별 [지방비, 전환지방비] 행렬</td><td>매일</td></tr>
+      <tr><td><a href="data/status.json">status.json</a></td><td>지역별 공고·접수·출고·잔여, 유형별 분해, 공단 접수상태, 지자체 공지 원문, 신청마감</td><td>매시간</td></tr>
+      <tr><td><a href="data/rounds.json">rounds.json</a></td><td>지역별 공고 회차(본공고·추경)의 게시일·접수기간·신청마감과 최근 90일 공단 변경 이력</td><td>매시간</td></tr>
+      <tr><td><a href="data/history.json">history.json</a></td><td>지역별 일별 승용 잔여 이력(<span data-derived>2026-08-28</span>부터 <span data-derived>45</span>일치)과 추가공고 감지 이벤트</td><td>매일</td></tr>
+      <tr><td><a href="data/articles.json">articles.json</a></td><td>데이터 해설 시리즈 목록(<span data-derived>3</span>편) · <a href="feed.xml">RSS</a></td><td>발행 시</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small muted mt8">CSV는 UTF-8(BOM)이라 엑셀에서 바로 열립니다. 모든 금액 단위는 만원, 대수는 대입니다.</p>
+</section>
+
+<section class="card">
+  <h2 class="mt0">어떻게 모으나 — 수집 주기와 예절</h2>
+  <ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px;line-height:1.7">
+    <li><b>접수 현황</b>(공고·접수·출고·잔여·공지·회차 일정)은 매시간, <b>전체 단가표</b>(지역×트림 지방비)는 매일 새벽 04시에 자동 수집합니다. 수집기는 운영자 Mac에서 예약 실행되며 사람이 매번 손대지 않습니다.</li>
+    <li>공공 사이트에 부담을 주지 않도록 요청 간격을 1.2초 이상 두고, 연락처를 밝힌 식별자(User-Agent)로 접근하며, 실패 시 간격을 늘려 최대 3회만 재시도합니다.</li>
+    <li>수집 결과는 정적 파일로 공개되므로 이용자가 페이지를 열 때 공단 서버로 요청이 가지 않습니다.</li>
+  </ul>
+</section>
+
+<section class="card">
+  <h2 class="mt0">무엇을 믿고, 무엇을 걸러내나 — 검증 규칙</h2>
+  <ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px;line-height:1.7">
+    <li><b>교체하지 않는 경우</b>: 새로 받은 표의 행 수가 모자라거나 값이 이상하면(형식 불일치·범위 이탈) 기존 데이터를 그대로 두고 다음 시간에 다시 시도합니다. 깨진 데이터가 화면에 나가지 않게 하는 첫 번째 장치입니다.</li>
+    <li><b>보류하는 경우</b>: 전체 단가표가 직전 대비 40% 이상 바뀌면 자동 반영하지 않고 보류 폴더에 두었다가 사람이 확인한 뒤에만 반영합니다. 공단 사이트 구조가 바뀌어 엉뚱한 값이 들어오는 상황을 막습니다.</li>
+    <li><b>결손으로 보는 경우</b>: 한 지역의 공고·접수·출고가 갑자기 모두 0으로 떨어지면 '소진'이 아니라 '수집 결손'으로 보고 직전 값을 유지하며 로그에 남깁니다. 동시에 많은 지역이 그러면 그 회차 전체를 버립니다.</li>
+    <li><b>원자적 교체</b>: 파일은 완성본을 만든 뒤 한 번에 바꿉니다. 수집 도중 페이지를 열어도 반쯤 쓰인 파일을 보는 일은 없습니다.</li>
+    <li><b>자동 회귀 검사</b>: 매 회차 배포 전에 상태 배지와 공단 신호의 모순, 산문과 표의 1위 불일치, 금지 표현(점추정 예측·D-day·조건부 마감), 깨진 내부 링크, 광고 게이트 등 14종을 자동 점검하고 위반은 로그에 남깁니다.</li>
+  </ul>
+</section>
+
+<section class="card">
+  <h2 class="mt0">숫자의 뜻 — 잔여·마감·상태 판정</h2>
+  <ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px;line-height:1.7">
+    <li><b>잔여</b>는 공단 통계의 '공고 − 출고'(0 미만은 0)입니다. 접수가 다 차도 출고 전까지는 줄지 않으므로 '잔여 0'이 곧 접수 마감이 아니고, 잔여가 남아도 접수가 끝났을 수 있습니다.</li>
+    <li><b>유형별 잔여</b>는 유형마다 따로 계산된 값이라 합이 전체와 다를 수 있습니다. 화면에는 전체 잔여를 상한으로 표시합니다.</li>
+    <li><b>마감 판정</b>은 보수적입니다. 지자체 공지에 완료형 마감 선언('접수 마감', '접수 종료')이 있거나 공단 등록 상태가 '마감'·'접수예정'이거나 등록된 모든 회차의 접수기간이 지난 경우에만 '마감' 계열 배지를 씁니다. '예산 소진 시 조기 마감' 같은 조건부·미래형 문구는 마감으로 보지 않습니다.</li>
+    <li><b>예측하지 않습니다</b>. 소진되는 날짜를 점치는 표현(예상일·디데이)이나 '실시간' 같은 말을 쓰지 않고, 등록된 일정과 기록된 추이만 보여 줍니다.</li>
+    <li><b>최대 보조금</b>은 승용 기준 국비+지방비 상한이며, 휠체어 접근 차량(WAV)과 미지원 트림은 최고액 서술에서 뺍니다.</li>
+  </ul>
+</section>
+
+<section class="card">
+  <h2 class="mt0">알려진 한계</h2>
+  <ul style="padding-left:20px;margin:8px 0;color:var(--text2);font-size:14.5px;line-height:1.7">
+    <li>공단 집계와 지자체 실제 접수 창구 사이에 시차가 있습니다. 일부 지자체 공지는 "누리집 잔여대수와 실제 잔여대수는 일치하지 않는다"고 직접 밝힙니다.</li>
+    <li>광역시·특별자치시는 자치구 구분 없이 단일 단가표로 공개되므로 구 단위 차이는 담지 못합니다.</li>
+    <li>차량 기본가격(실구매가 계산에 필요한 값)은 수집 대상이 아니라 제공하지 않습니다. 가격 구간은 제조사 신고 기본가격 기준이며 <a href="price-tiers.html">가격구간 해설</a>을 참고하세요.</li>
+    <li>지자체 공고문의 세부 조건(거주 기간, 우선순위 기준, 서류)은 원문이 정본이며 이 사이트는 요약·연결만 합니다.</li>
+  </ul>
+</section>
+
+<section class="card">
+  <h2 class="mt0">인용·이용과 정정</h2>
+  <p style="line-height:1.75;margin:10px 0">원 데이터의 권리는 공단과 각 지자체에 있고, 이 사이트가 정리한 표·이력·해설은 EV보조금이 만들었습니다. 출처를 "EV보조금(evbojo.co.kr), 기준 시각"으로 밝히면 비상업적 인용·연구 이용에 제한을 두지 않습니다. 상업적 이용이나 대량 재배포는 <a href="about.html#operator">운영자</a>에게 먼저 문의해 주세요.</p>
+  <p style="line-height:1.75;margin:10px 0">틀린 수치나 어긋난 설명을 보셨다면 <a href="report.html">오류 제보</a>로 알려 주세요. 확인 후 고치고 <a href="changelog.html">변경·정정 이력</a>에 날짜와 내용을 남깁니다. 용어가 낯설다면 <a href="glossary.html">용어집</a>부터 보세요.</p>
+</section>
+
+</main>
+
+<footer id="site-footer" class="site-footer"><div class="inner">
+  <div class="links">
+    <a href="about.html">사이트 소개</a><a href="articles.html">읽을거리</a><a href="data.html">데이터·방법론</a><a href="glossary.html">용어집</a><a href="changelog.html">변경·정정 이력</a><a href="privacy.html">개인정보처리방침</a>
+    <a href="donate.html">💛 후원하기</a>
+    <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
+    <a href="report.html">오류 제보</a>
+  </div>
+  <div id="foot-stamp">단가 수집일 <b>2026-10-11</b> · 출처 무공해차 통합누리집(ev.or.kr) · 2026년 전기승용 기준</div>
+  <div class="disclaimer">
+    본 사이트는 <b>정부·공공기관과 무관한 개인 운영 정보 사이트</b>입니다. 게시된 보조금·제도 정보는 참고용이며 법적 효력이 없습니다.
+    실제 지원 금액·자격·잔여 물량은 반드시 <b>무공해차 통합누리집(ev.or.kr)</b>과 관할 지자체 공고문으로 확인하세요.
+    본 사이트는 광고(Google AdSense 등)를 게재하며, 광고 수익으로 운영됩니다.
+  </div>
+  <div class="mt8">© 2026 EV보조금 · 데이터 출처: 무공해차 통합누리집(ev.or.kr)</div>
+</div></footer>
+<script src="assets/js/app.js" defer></script>
+<script src="assets/js/detail.js" defer></script>
+</body>
+</html>
