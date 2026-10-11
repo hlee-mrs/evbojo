@@ -33,7 +33,7 @@
 <meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
 <meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":"https://evbojo.co.kr/"},{"@type":"ListItem","position":2,"name":"읽을거리","item":"https://evbojo.co.kr/articles.html"},{"@type":"ListItem","position":3,"name":"금액 vs 물량","item":"https://evbojo.co.kr/articles/max-amount-vs-quota.html"}]}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"보조금 많이 주는 지역이 물량도 많을까 — 금액 상위 20곳과 공고 물량의 역관계","description":"승용 최대 보조금 상위 20개 지자체의 공고 물량 중앙값은 150대, 하위 20곳은 1,270대였습니다(2026년 10월 6일 수집). 금액이 큰 지역일수록 물량은 적고, 상위 20곳 중 10곳은 이미 잔여 0입니다. 금액 랭킹만 보고 움직이면 안 되는 이유를 숫자로 설명합니다.","datePublished":"2026-10-09","dateModified":"2026-10-09","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/articles/max-amount-vs-quota.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"보조금 많이 주는 지역이 물량도 많을까 — 금액 상위 20곳과 공고 물량의 역관계","description":"승용 최대 보조금 상위 20개 지자체의 공고 물량 중앙값은 150대, 하위 20곳은 1,270대였습니다(2026년 10월 6일 수집). 금액이 큰 지역일수록 물량은 적고, 상위 20곳 중 10곳은 이미 잔여 0입니다. 금액 랭킹만 보고 움직이면 안 되는 이유를 숫자로 설명합니다.","datePublished":"2026-10-09","dateModified":"2026-10-09","inLanguage":"ko","image":"https://evbojo.co.kr/assets/og-default.jpg","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/articles/max-amount-vs-quota.html"}</script>
 </head>
 <body>
 <!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
@@ -52,9 +52,11 @@
 
 <p class="stamp"><span>글·데이터: HyeongHun Lee (<a href="about.html#operator">EV보조금 운영자</a>) · 게시 2026-10-09 · 데이터 기준 2026-10-06 · 수치는 무공해차 통합누리집(ev.or.kr) 공고 데이터를 이 사이트가 매시간 수집한 실측값</span></p>
 
+<aside class="card method" aria-label="이 글의 방법"><h2 class="mt0">이 글의 방법</h2><dl class="gloss"><dt>관측 기간</dt><dd>2026-10-06 20:10 수집분</dd><dt>표본</dt><dd>160개 지자체의 승용 최대 보조금(국비+지방비)·올해 공고·잔여</dd><dt>제외 규칙</dt><dd>휠체어 접근 차량(WAV)·미지원 트림은 최대 금액 산정에서 제외</dd><dt>재현 데이터</dt><dd><a href="data/regions.csv">regions.csv</a> · <a href="data.html">필드 설명</a></dd><dt>분석</dt><dd>stdlib 스크립트로 집계하고 운영자가 원본 데이터와 대조했습니다. 게시 후 수치는 다시 계산하지 않습니다.</dd></dl></aside>
+
 <section class="card"><p style="line-height:1.75;margin:10px 0">&quot;보조금 제일 많이 주는 데가 어디예요?&quot; 검색창에 가장 많이 들어오는 질문 중 하나입니다. 답은 <a href="region-ranking.html">지역 랭킹</a>에 있지만, 그 답만 보고 움직이면 두 번 실망합니다. 금액이 큰 지역은 대체로 물량이 작고, 거주요건 때문에 금액을 보고 지역을 고를 수도 없기 때문입니다. 2026년 10월 6일 수집분으로 160개 지자체의 승용 최대 보조금(국비+지방비)과 공고 물량·잔여를 나란히 놓고 봤습니다.</p></section>
 <section class="card"><h2>상위 20곳 vs 하위 20곳</h2>
-<div class="tbl-wrap"><table class="tbl"><thead><tr><th>구분</th><th>공고 물량 중앙값</th><th>잔여 중앙값</th><th>잔여 0인 지역</th></tr></thead><tbody><tr><td>최대 보조금 상위 20곳</td><td class="num">150.5대</td><td class="num">0.5대</td><td class="num">10곳</td></tr><tr><td>최대 보조금 하위 20곳</td><td class="num">1,270.5대</td><td class="num">61대</td><td class="num">6곳</td></tr></tbody></table></div>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>구분</th><th>공고 물량 중앙값</th><th>잔여 중앙값</th><th>잔여 0인 지역</th></tr></thead><tbody><tr><td>최대 보조금 상위 20곳</td><td class="num">150.5대</td><td class="num">0.5대</td><td class="num">10곳</td></tr><tr><td>최대 보조금 하위 20곳</td><td class="num">1,270.5대</td><td class="num">61대</td><td class="num">6곳</td></tr></tbody></table></div><p class="small muted cite">이 표를 인용할 때: "EV보조금(evbojo.co.kr), 데이터 기준 2026-10-06"</p>
 <p style="line-height:1.75;margin:10px 0">금액 상위 20곳의 공고 물량 중앙값은 150대 남짓입니다. 하위 20곳은 1,270대로 여덟 배가 넘습니다. 상위 20곳 중 절반은 이미 잔여가 0입니다. 금액이 큰 곳은 &#39;적은 물량을 높은 단가로&#39; 푸는 구조이고, 금액이 작은 곳은 &#39;많은 물량을 낮은 단가로&#39; 푸는 구조라는 뜻입니다.</p>
 <p style="line-height:1.75;margin:10px 0">상위 5곳을 보면 더 또렷합니다. <a href="/region/4794.html">울릉군</a> 1,647만원(공고 130대·잔여 5대), <a href="/region/4689.html">완도군</a> 1,425만원(107대·31대), <a href="/region/4678.html">보성군</a> 1,425만원(20대·0대), <a href="/region/4680.html">장흥군</a> 1,330만원(153대·1대), <a href="/region/4681.html">강진군</a> 1,330만원(80대·0대). 다섯 곳 모두 군 단위이고, 공고 물량이 가장 큰 곳이 153대입니다.</p>
 <p style="line-height:1.75;margin:10px 0">반대로 공고 물량 상위 5곳은 <a href="/region/1100.html">서울특별시</a> 19,648대(잔여 4,091대·최대 741만원), <a href="/region/2800.html">인천광역시</a> 9,306대(1,997대·741만원), <a href="/region/2600.html">부산광역시</a> 8,629대(1,300대·741만원), <a href="/region/2700.html">대구광역시</a> 5,187대(898대·741만원), <a href="/region/4159.html">화성시</a> 4,528대(866대·760만원)입니다. 광역시는 최대 금액이 741만원으로 같고, 물량으로 승부합니다.</p></section>
@@ -80,7 +82,7 @@
 
 <footer id="site-footer" class="site-footer"><div class="inner">
   <div class="links">
-    <a href="about.html">사이트 소개</a><a href="articles.html">읽을거리</a><a href="data.html">데이터·방법론</a><a href="glossary.html">용어집</a><a href="changelog.html">변경·정정 이력</a><a href="privacy.html">개인정보처리방침</a>
+    <a href="about.html">사이트 소개</a><a href="articles.html">읽을거리</a><a href="data.html">데이터·방법론</a><a href="glossary.html">용어집</a><a href="changelog.html">변경·정정 이력</a><a href="terms.html">이용안내</a><a href="privacy.html">개인정보처리방침</a>
     <a href="donate.html">💛 후원하기</a>
     <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
     <a href="report.html">오류 제보</a>

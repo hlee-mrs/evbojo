@@ -352,10 +352,10 @@
     }
   };
 
-  /* ── 예측 소진 시기 (전체 잔여 기준) ──
-     history.json(잔여 이력)에서 최근 4주/1주 두 창의 '잔여가 줄어드는 속도'(영업일 기준)를 구해
-     0 도달 시기를 '이르면~늦으면' 범위로 추정. 점추정·D-day 금지, 회차 리셋·정체·신선도 명시 처리.
-     이력 부족·로드 실패 시 '수집 중'으로 무소음 강등(페이지 절대 안 깨짐). */
+  /* ── 접수 상태 고지 (전체 잔여 기준) ──
+     초과접수·출고 순서·공단 등록 상태·추가공고 직후·정체 같은 '기록된 사실'만 한 줄씩 고지한다.
+     소진 시기 예측(최근 4주/1주 감소 속도로 0 도달 시기를 추정하던 기능)은 2026-10-11에 제거 — I3(점추정 금지)와
+     검색·심사 리서치 결론('예상 소진일' 류 표현 회피)에 맞춰 기록(잔여 추이 그래프)만 제공한다. */
   const FC = { RESET_MIN: 10, RESET_PCT: 0.05,                    // updater와 동일 리셋 임계
                MIN_OBS: 4, MIN_BDAYS: 3, MIN_SOLD: 5, MIN_DECR: 2, // 정식 예측 최소조건 4종
                GRADE_FAST: 5, GRADE_LONG: 40, RELAX_DAYS: 14,      // 등급 경계(영업일)·낙관 해금
@@ -370,8 +370,6 @@
   const bizDays = (d1, d2, hol) => { let b = 0; for (let d = d1 + 1; d <= d2; d++) if (isBiz(d, hol)) b++; return b; };
   const addBiz = (d, k, hol) => { while (k > 0) { d++; if (isBiz(d, hol)) k--; } return d; };
 
-  const TIP_MAIN = "이렇게 계산해요 — ① ev.or.kr의 '남은 대수(잔여)'를 이 사이트가 갱신될 때마다 기록해요. ② 최근 4주와 최근 1주 동안 잔여가 하루 평균 몇 대씩 줄었는지 구해요. 접수가 거의 없는 주말·공휴일은 빼고 셉니다. ③ 남은 대수 ÷ 하루 감소량 = 며칠 뒤 0이 되는지 — 두 속도로 각각 계산해 '이르면~늦으면' 범위로 보여드려요. 주의: 많은 지역에서 잔여는 신청 순간이 아니라 차가 출고될 때 줄어요. 그래서 실제 접수는 이 예상보다 먼저 마감될 수 있어요. 추가공고가 나면 잔여가 다시 늘고, 그때는 처음부터 다시 계산해요. '언제 마감된다'는 약속이 아니라 '지금 속도가 이어진다면'이라는 가정 계산이니 참고용으로만 봐 주세요.";
-  const TIP_COLLECT = "잔여 대수가 줄어드는 속도를 사이트가 갱신될 때마다 기록하고 있어요. 며칠치 기록이 모이면 '이 속도라면 언제쯤 0이 될지'를 여기에 범위로 보여드려요. 그동안은 위의 잔여 대수와 지자체 공지의 접수기간을 확인해 주세요.";
 
   function renderForecast(el, st, ctx) {
     if (!el) return;
@@ -402,12 +400,11 @@
       lines.push(P(`공단(ev.or.kr) 등록 접수상태가 <b>접수예정</b>이에요. 아직 이번 회차 접수가 시작되지 않아 소진 예측을 표시하지 않아요 — 접수 일정은 지자체 공지를 확인하세요.`));
       return done();
     }
-    const collecting = obs => P(`소진 시기 예측: <b>기록을 모으고 있어요</b>${obs ? ` (관측 ${obs}일째)` : ''}`, TIP_COLLECT, true);
     done();                                                                     // 이력 로드 전 상시 고지 먼저 표시
     EVData.history().then(hist => {
       const updatedISO = ctx && ctx.updated, asOf = isoToDay(updatedISO);
       const e = hist && hist.v === 1 && ctx && hist.r[ctx.cd];
-      if (!e || !e.L || !e.L.rd || asOf == null) { lines.push(collecting(null)); return done(); }
+      if (!e || !e.L || !e.L.rd || asOf == null) { return done(); }
       const hol = new Set(hist.holidays || []);
       // 시리즈 = 이력(현재 회차만) + 라이브 포인트 방어 결합
       let pts = hist.days.map((d, i) => [d, e.l[i]]).filter(p => p[1] != null);
@@ -421,7 +418,7 @@
         else pts[pts.length - 1][1] = Math.min(prev, st.left);
       }
       pts = pts.filter(p => p[0] >= e.L.rd.t);
-      if (!pts.length) { lines.push(collecting(null)); return done(); }
+      if (!pts.length) { return done(); }
       // ③ 추가공고 리셋 7일 내 — 실제 리셋 이벤트(ev 타입0)가 있을 때만.
       //    (관측 첫날의 rd.t는 '기록 시작'이지 공고가 아님 → rd.t만 보면 전 지역에 거짓 안내가 나감)
       const hadReset = (e.L.ev || []).some(v => v[1] === 0 && asOf - v[0] <= 7);
@@ -438,49 +435,8 @@
         lines.push(P(`최근 ${idle}영업일간 잔여가 줄지 않았어요. 접수가 일시 중지됐거나 집계가 멈췄을 수 있어요 — '여유 있다'는 뜻은 아니에요. 지자체 공지를 확인하세요.`));
         return done();
       }
-      const ageH = (Date.now() - Date.parse(updatedISO)) / 3.6e6;
-      const obs = pts.length, dec = pts.filter((p, i) => i && p[1] < pts[i - 1][1]).length;
-      if (!(obs >= FC.MIN_OBS && r28.B >= FC.MIN_BDAYS && r28.N >= FC.MIN_SOLD && dec >= FC.MIN_DECR)) {   // ⑤ 표본 부족
-        if (obs >= 2 && r28.B >= 2 && r28.N >= FC.MIN_SOLD && r28.r > 0 && st.left / r28.r <= FC.GRADE_FAST && ageH <= FC.STALE_ALERT)
-          lines.push(P(`<b>빠르게 줄고 있어요.</b> 지금 속도라면 며칠 안에 잔여가 0이 될 수 있어요 (관측 ${obs}일째 기준이라 오차가 커요)`, TIP_MAIN, true));   // 조기경보(비대칭 예외)
-        else lines.push(collecting(obs));
-        return done();
-      }
-      if (st.left < 20) {                                                       // ⑥ 소량: 나눗셈 착시 차단
-        lines.push(P(`잔여가 20대 미만이라 날짜 예측이 의미 없어요 — 곧 마감될 수 있으니 신청 전에 지자체·제조사에 바로 확인하세요.`));
-        return done();
-      }
-      if (ageH > FC.STALE_HIDE) { lines.push(P(`자료가 오래되어 예측을 표시하지 않아요 (${md(asOf)} 기준)`)); return done(); }
-      // ⑦ 이중창(4주/1주) 영업일 secant 예측
-      const r7raw = rate(7);
-      const r7 = (r7raw.oldest >= 3 && r7raw.B >= 2) ? r7raw.r : null;          // 몇 시간짜리 창의 과민 반응 방지
-      const u = Math.min(0.8, 1.6 / Math.sqrt(Math.max(r28.N, 1)) + 0.2);       // 불확실성 계수
-      const rHi = (r7 != null ? Math.max(r7, r28.r) : r28.r) * (1 + u);
-      const rLo = (r7 != null ? Math.min(r7, r28.r) : r28.r) * (1 - u);
-      const dE = st.left / rHi, dL = rLo > 0.01 ? st.left / rLo : Infinity;     // 영업일
-      if (dE <= FC.GRADE_FAST && ageH > FC.STALE_ALERT) {                       // 임박 + 오래된 자료 → 경보 강등
-        lines.push(P(`빠르게 줄던 지역이에요. 자료가 ${Math.max(1, Math.round(ageH / 24))}일 지나 지금은 마감됐을 수 있어요 — 지자체에 바로 확인하세요.`));
-        return done();
-      }
-      let body;
-      if (dE <= FC.GRADE_FAST) body = `<b>빠르게 줄고 있어요.</b> 지금 속도라면 며칠 안에 잔여가 0이 될 수 있어요`;   // 날짜 표기 금지(정밀 착시)
-      else if (dE <= FC.GRADE_LONG) {
-        const aTxt = soon(addBiz(asOf, Math.floor(dE), hol));
-        const bTxt = (isFinite(dL) && dL <= 120) ? soon(addBiz(asOf, Math.ceil(dL), hol)) : null;
-        body = bTxt ? (aTxt === bTxt
-          ? `<b>꾸준히 줄고 있어요.</b> 지금 속도라면 잔여가 ${aTxt}쯤 0이 될 수 있어요`
-          : `<b>꾸준히 줄고 있어요.</b> 지금 속도라면 잔여가 이르면 ${aTxt}, 늦으면 ${bTxt}쯤 0이 될 수 있어요`)
-          // 상한(늦은 쪽)이 계산 범위를 벗어난 단측 분기 — 하한만 있는데 날짜를 하나만 쓰면
-          // 점추정으로 읽힌다(I3). 방향이 드러나는 '빨라도 ~ 이후' 구간 표현만 쓰고 상한은 명시적으로 비운다.
-          : `<b>꾸준히 줄고 있어요.</b> 지금 속도라면 잔여가 0이 되는 시점은 <b>빨라도 ${aTxt} 이후</b>예요 — 늦어지는 쪽은 범위가 잡히지 않아 시점을 특정하지 않아요`;
-      } else if (asOf - pts[0][0] >= FC.RELAX_DAYS && (r7 == null || r7 <= 1.3 * r28.r))
-        body = `<b>천천히 줄고 있어요.</b> 이 속도라면 두 달 이상 남은 것으로 보여요. 다만 신청이 몰리면 갑자기 빨라질 수 있어요`;   // 낙관 해금 조건 충족 시만
-      else body = `이 속도라면 두 달 이상으로 계산되지만 <b>기록이 짧아 확실하지 않아요</b>`;
-      const spanLbl = r28.oldest >= 21 ? '최근 4주' : `최근 ${r28.oldest}일`;   // 창이 짧으면 짧다고 말함
-      let tail = ` · ${spanLbl} 하루 평균 ${r28.r >= 1 ? Math.round(r28.r) + '대' : '약 ' + Math.round(1 / Math.max(r28.r, 1e-9)) + '일에 1대꼴'} 감소 (전체 기준)`;
-      if (r7 != null && r7 > 2 * r28.r) tail += ' · 최근 1주는 평소보다 빨라요';
-      if (ageH > FC.STALE_TAG) tail += ` · ${md(asOf)} 자료 기준`;
-      lines.push(P(body + tail, TIP_MAIN, true));
+      done();                                                                 // 여기서 끝 — 예측 없음
+      return;
       done();
     });
   }
@@ -663,7 +619,7 @@
     el.className = 'site-footer';
     el.innerHTML = `<div class="inner">
       <div class="links">
-        <a href="about.html">사이트 소개</a><a href="articles.html">읽을거리</a><a href="data.html">데이터·방법론</a><a href="glossary.html">용어집</a><a href="changelog.html">변경·정정 이력</a><a href="privacy.html">개인정보처리방침</a>
+        <a href="about.html">사이트 소개</a><a href="articles.html">읽을거리</a><a href="data.html">데이터·방법론</a><a href="glossary.html">용어집</a><a href="changelog.html">변경·정정 이력</a><a href="terms.html">이용안내</a><a href="privacy.html">개인정보처리방침</a>
         <a href="donate.html">💛 후원하기</a>
         <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
         <a href="report.html">오류 제보</a>

@@ -217,6 +217,8 @@ details.acc .acc-body{padding:0 16px 16px;color:var(--text2);font-size:14.5px}
 /* ── freshness / trust ── */
 .stamp{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:5px;margin-top:8px}
 .gloss{margin:0}.gloss dt{font-weight:800;margin:12px 0 2px;color:var(--text)}.gloss dt:first-child{margin-top:0}.gloss dfn{font-style:normal}.gloss dd{margin:0;color:var(--text2);font-size:14.5px;line-height:1.7}.gloss dd a.small{white-space:nowrap}
+.spark-slot{min-height:121px}.cats-slot{min-height:150px}@media(max-width:600px){.cats-slot{min-height:280px}}html.has-mr #my-region{min-height:760px}@media(min-width:720px){html.has-mr #my-region{min-height:760px}}/* JS 채움 전 레이아웃 예약(CLS) — 2026-10-11 라이브 실측: spark 121, cats 204(데스크톱)/361(모바일, 예측 제거 전), 내 지역 카드 780/1153 */
+.method dt{margin-top:8px}.cite{margin:6px 0 0}
 .provenance{border-left:3px solid var(--line)}.prov{padding-left:18px;margin:6px 0;font-size:13.5px;color:var(--text2);line-height:1.65}.prov li{margin:4px 0}.prov b{color:var(--text)}
 .stale-banner{background:var(--warn-soft);color:var(--warn);border-radius:var(--radius-s);padding:10px 14px;font-size:13px;font-weight:600;margin:10px 0;display:none}
 .stale-banner.show{display:block}
