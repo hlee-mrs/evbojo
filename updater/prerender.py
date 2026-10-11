@@ -2084,6 +2084,16 @@ def model_group(c):
     return c['name'].replace('(단종)', '').strip()
 
 
+def _car_title(name, nat):
+    """차종 제목 — 60자(네이버 노출 길이 참고) 안에서 정보가 많은 순으로: 국비+지역별 합계 → 국비 → 이름만."""
+    for t in ('%s 보조금 2026 — 국비 %s만원·지역별 합계 | EV보조금' % (name, fmt(nat)),
+              '%s 보조금 2026 — 국비 %s만원 | EV보조금' % (name, fmt(nat)),
+              '%s 보조금 2026 | EV보조금' % name):
+        if len(t) <= 60:
+            return t
+    return t
+
+
 def build_car(car, cars, regions, meta, status, ctx):
     cid = car['id']
     name = car['name']
@@ -2226,7 +2236,7 @@ def build_car(car, cars, regions, meta, status, ctx):
     mapping['PROVENANCE'] = provenance_block('car', status.get('updated', ''), meta['updated'])
     main = render(ctx['tpl_car'], mapping)
     page = render(ctx['tpl_page'], {
-        'TITLE': esc('%s 보조금 2026 — 국비 %s만원·지역별 합계 | EV보조금' % (name, fmt(car['nat']))),
+        'TITLE': esc(_car_title(name, car['nat'])),
         'DESC': esc('%s 2026년 전기차 보조금: 국비 %s만원, 지역별 국비+지방비 합계 %s만~%s만원. 주행거리 %skm(저온 %skm), 인증 제원과 트림 비교까지.'
                     % (name, fmt(car['nat']),
                        fmt(rows[-1][3]) if rows else '-', fmt(rows[0][3]) if rows else '-',
@@ -3132,7 +3142,7 @@ def build_article(entry, ctx):
            'author': {'@type': 'Person', 'name': 'HyeongHun Lee', 'url': BASE + '/about.html#operator'},
            'publisher': {'@type': 'Organization', 'name': 'EV보조금'}, 'mainEntityOfPage': canonical}]
     return render(ctx['tpl_page'], {
-        'TITLE': esc('%s | EV보조금' % title), 'DESC': esc(desc), 'ROBOTS': '', 'CANONICAL': canonical,
+        'TITLE': esc('%s | EV보조금' % (fm.get('seo_title') or title)), 'DESC': esc(fm.get('seo_desc') or desc), 'ROBOTS': '', 'CANONICAL': canonical,
         'JSONLD': jsonld_script(ld),
         'BREADCRUMB': '<a href="/">홈</a> › <a href="/articles.html">읽을거리</a> › <b>%s</b>' % esc(crumb),
         'MAIN': main, 'META_UPDATED': esc(entry['modified']),
