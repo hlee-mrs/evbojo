@@ -870,6 +870,9 @@ def content_hash(html):
     return hashlib.md5(_mask(body).encode('utf-8')).hexdigest()
 
 
+_STYLE_BLOCK_RE = re.compile(r'<style\b[^>]*>.*?</style>', re.S)
+
+
 def head_hash(html):
     """<title>·meta description·canonical의 md5(본문과 같은 수치 마스킹).
 
@@ -878,7 +881,9 @@ def head_hash(html):
     기존 캐시(hh 없음)와의 호환 — 아래 lm_of 주석 참조). 빈 입력은 ''."""
     if not html:
         return ''
-    head = html[:8192]                       # 세 요소 모두 문서 앞부분에 있음
+    # 인라인 <style>(25KB)이 title·description·canonical 앞에 올 수 있어(루트 손편집 페이지) 스타일 블록을 걷어낸 뒤 앞부분만 본다.
+    # 2026-10-12: 창이 8,192자뿐이라 CSS 인라인 직후 루트 4쪽의 세 요소를 못 찾아 lastmod가 거짓으로 오늘이 됐던 회귀.
+    head = _STYLE_BLOCK_RE.sub('', html[:131072])[:8192]
     t = _TITLE_RE.search(head)
     d = _DESC_RE.search(head)
     c = _CANON_RE.search(head)
