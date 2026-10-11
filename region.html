@@ -3,8 +3,7 @@
 <head>
 <meta charset="utf-8">
 <!-- Google Analytics (GA4) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');</script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');addEventListener('load',function(){setTimeout(function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB';document.head.appendChild(s)},1500)})</script><!-- GA4 지연 로드: 페이지 로드 1.5초 뒤 주입 — 느린 모바일에서 첫 화면 렌더와 경합하지 않게. 이벤트는 dataLayer에 큐잉돼 유실 없음 -->
 <!-- Google AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7688026325140831" crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">

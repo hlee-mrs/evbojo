@@ -4,13 +4,13 @@
    ═══════════════════════════════════════════════ */
 :root{
   --bg:#f4f6f9; --surface:#ffffff; --surface2:#f8fafc;
-  --text:#191f28; --text2:#4e5968; --text3:#8b95a1;
+  --text:#191f28; --text2:#4e5968; --text3:#667280;
   --line:#e5e8eb; --line2:#f2f4f6;
   --primary:#2563eb; --primary-soft:#eff4ff; --primary-dark:#1d4ed8;
-  --money:#059669; --money-soft:#ecfdf5;
-  --warn:#d97706; --warn-soft:#fffbeb;
+  --money:#047857; --money-soft:#ecfdf5;
+  --warn:#b45309; --warn-soft:#fffbeb;
   --danger:#dc2626; --danger-soft:#fef2f2;
-  --badge-open:#059669; --badge-low:#d97706; --badge-closed:#6b7280;
+  --badge-open:#047857; --badge-low:#b45309; --badge-closed:#6b7280;
   --radius:14px; --radius-s:10px;
   --shadow:0 1px 3px rgba(25,31,40,.06),0 4px 14px rgba(25,31,40,.04);
   --maxw:760px;
@@ -18,7 +18,7 @@
 @media (prefers-color-scheme:dark){
   :root{
     --bg:#101418; --surface:#1a2027; --surface2:#20272f;
-    --text:#e9edf1; --text2:#aab3bd; --text3:#727c87;
+    --text:#e9edf1; --text2:#aab3bd; --text3:#9aa4b0;
     --line:#2b333d; --line2:#242b34;
     --primary:#4f83ff; --primary-soft:#1a2540; --primary-dark:#6d9aff;
     --money:#34d399; --money-soft:#0d2b22;
@@ -281,7 +281,7 @@ input[type=range]{flex:1;accent-color:var(--primary);height:32px}
 .notice-badge{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--line2);color:var(--text3);font-weight:700;vertical-align:middle}
 
 /* ── (?) 툴팁 ── */
-.tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--line);color:var(--text3);font-size:10px;font-weight:800;cursor:help;position:relative;border:0;vertical-align:middle;margin-left:4px;padding:0;flex-shrink:0}
+.tip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;padding:4.5px;box-sizing:border-box;background-clip:content-box;margin:-4.5px -2px;border-radius:50%;background:var(--line);color:var(--text3);font-size:10px;font-weight:800;cursor:help;position:relative;border:0;vertical-align:middle;margin-left:4px;flex-shrink:0}main p a:not(.btn):not(.chip):not(.row){text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
 .tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);font-size:12px;font-weight:500;line-height:1.5;padding:8px 11px;border-radius:8px;width:max-content;max-width:min(240px,calc(100vw - 48px));text-align:left;opacity:0;pointer-events:none;transition:opacity .12s;z-index:70;box-shadow:0 4px 14px rgba(0,0,0,.25);white-space:normal;word-break:keep-all}
 .tip::before{content:"";position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--text);opacity:0;transition:opacity .12s;z-index:70}
 .tip:hover::after,.tip:focus-visible::after,.tip.on::after,
