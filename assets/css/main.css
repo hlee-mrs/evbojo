@@ -9,7 +9,7 @@
   --primary:#2563eb; --primary-soft:#eff4ff; --primary-dark:#1d4ed8;
   --money:#047857; --money-soft:#ecfdf5;
   --warn:#b45309; --warn-soft:#fffbeb;
-  --danger:#dc2626; --danger-soft:#fef2f2;
+  --danger:#b91c1c; --danger-soft:#fef2f2;
   --badge-open:#047857; --badge-low:#b45309; --badge-closed:#6b7280;
   --radius:14px; --radius-s:10px;
   --shadow:0 1px 3px rgba(25,31,40,.06),0 4px 14px rgba(25,31,40,.04);
@@ -281,7 +281,7 @@ input[type=range]{flex:1;accent-color:var(--primary);height:32px}
 .notice-badge{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--line2);color:var(--text3);font-weight:700;vertical-align:middle}
 
 /* ── (?) 툴팁 ── */
-.tip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;padding:4.5px;box-sizing:border-box;margin:-4.5px -2px;border-radius:50%;background:var(--line) content-box;color:var(--text3);font-size:10px;font-weight:800;cursor:help;position:relative;border:0;vertical-align:middle;margin-left:4px;flex-shrink:0}main p a:not(.btn):not(.chip):not(.row){text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.tip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;padding:4.5px;box-sizing:border-box;margin:-4.5px -2px;border-radius:50%;background:var(--line) content-box;color:var(--text3);font-size:10px;font-weight:800;cursor:help;position:relative;border:0;vertical-align:middle;margin-left:4px;flex-shrink:0}main p a:not(.btn):not(.chip):not(.row),main li a:not(.btn):not(.chip):not(.row),main dd a,main nav[aria-label="현재 위치"] a,.callout a:not(.btn),.provenance a{text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
 .tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);font-size:12px;font-weight:500;line-height:1.5;padding:8px 11px;border-radius:8px;width:max-content;max-width:min(240px,calc(100vw - 48px));text-align:left;opacity:0;pointer-events:none;transition:opacity .12s;z-index:70;box-shadow:0 4px 14px rgba(0,0,0,.25);white-space:normal;word-break:keep-all}
 .tip::before{content:"";position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--text);opacity:0;transition:opacity .12s;z-index:70}
 .tip:hover::after,.tip:focus-visible::after,.tip.on::after,
