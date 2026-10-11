@@ -13,7 +13,8 @@
 <meta name="description" content="{{DESC}}">{{ROBOTS}}
 {{OG}}
 <link rel="canonical" href="{{CANONICAL}}">
-<link rel="stylesheet" href="assets/css/main.css">
+<!-- 코어 CSS 인라인: 생성 페이지는 매시 다시 쓰이므로 외부 CSS의 캐시 이점이 작고, 느린 모바일에서 렌더 차단 요청 1회(8KiB·~300ms)를 없앤다. 원본은 assets/css/main.css(루트 손편집 페이지는 링크 유지) -->
+<style>{{INLINE_CSS}}</style>
 <link rel="alternate" type="application/rss+xml" title="EV보조금 해설·시리즈" href="/feed.xml">
 <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>

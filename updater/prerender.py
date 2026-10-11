@@ -760,6 +760,9 @@ def render(tpl, mapping):
     """단일 패스 치환 — 템플릿(원본)의 키 집합을 mapping과 사전 대조하고,
     치환된 값 영역은 다시 스캔하지 않는다(데이터 유래 '{{…}}'가 빌드를 오염·중단시키지 않음)."""
     need = set(re.findall(r'\{\{([A-Z][A-Z0-9_]*)\}\}', tpl))
+    if 'INLINE_CSS' in need and 'INLINE_CSS' not in mapping:
+        mapping = dict(mapping)
+        mapping['INLINE_CSS'] = inline_css()
     if 'OG' in need and 'OG' not in mapping:
         # 페이지 템플릿 공통 Open Graph — 네이버·카카오·구글이 썸네일·제목에 사용. 값은 TITLE/DESC/CANONICAL에서 유도.
         mapping = dict(mapping)
@@ -777,6 +780,17 @@ def _fm_modified(fm, published):
     """Article.dateModified는 '원고를 고친 날'만 — 프런트매터 modified(게시일 이후)가 없으면 게시일. 데이터 기준일과 분리."""
     m = (fm.get('modified') or '').strip()
     return m if re.fullmatch(r'\d{4}-\d{2}-\d{2}', m) and m >= published else published
+
+
+_INLINE_CSS = []
+
+
+def inline_css():
+    """site/assets/css/main.css 본문(한 번 읽어 캐시). 생성 페이지 <style>에 그대로 넣는다 — </style>가 섞이면 깨지므로 방어."""
+    if not _INLINE_CSS:
+        with open(os.path.join(SITE, 'assets', 'css', 'main.css'), encoding='utf-8') as f:
+            _INLINE_CSS.append(f.read().replace('</style', '<\\/style'))
+    return _INLINE_CSS[0]
 
 
 def og_block(title, desc, canonical, kind='article'):
