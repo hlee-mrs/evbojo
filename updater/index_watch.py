@@ -83,9 +83,11 @@ def watch_urls(sitemap_path=SITEMAP, limit=MAX_URLS):
             continue
         seen.add(url)
         picked.append((url, b))
+    def _core_rank(path):
+        # CORE_PAGES 순서 우선, 그 밖의 core(유틸리티 페이지)는 뒤로 — 2026-10-13 ValueError 회귀(UTILITY_PAGES 도입) 수정
+        return CORE_PAGES.index(path) if path in CORE_PAGES else len(CORE_PAGES)
     picked.sort(key=lambda t: (BUCKET_ORDER.index(t[1]),
-                               CORE_PAGES.index(t[0][len(ORIGIN):] or "/")
-                               if t[1] == "core" else 0))
+                               _core_rank(t[0][len(ORIGIN):] or "/") if t[1] == "core" else 0))
     return picked[:limit]
 
 
