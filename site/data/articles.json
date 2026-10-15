@@ -1,5 +1,14 @@
 [
  {
+  "slug": "zero-local-subsidy-patterns",
+  "url": "/articles/zero-local-subsidy-patterns.html",
+  "title": "지방비 0원 차종은 왜 생기나 — 146개 셀로 본 지역·차종 패턴",
+  "description": "160개 지자체와 현행 트림의 조합 가운데 지방비가 0원으로 집계된 셀은 146개입니다(2026년 10월 6일 수집). BMW iX1·iX2 eDrive20이 각 12곳, 테슬라 Model Y Premium Long Range AWD가 9곳, 지역으로는 보은군 14개·고창군 13개 셀처럼 특정 수입 고가 트림과 소규모 군 지역에 몰려 있습니다. 0원이 뜻하는 것과 확인 방법을 정리합니다.",
+  "publish": "2026-10-16",
+  "modified": "2026-10-16",
+  "crumb": "지방비 0원 패턴"
+ },
+ {
   "slug": "allocation-by-buyer-type-2026",
   "url": "/articles/allocation-by-buyer-type-2026.html",
   "title": "우선순위·법인·택시 물량은 실제로 얼마나 배정되나 — 160곳 유형별 배정 실측",
