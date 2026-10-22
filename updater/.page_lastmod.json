@@ -39,6 +39,11 @@
 "h": "d989bcaca308c6454c2d4f570d45bd08",
 "hh": "9058fe03a642a4732ec371456f18d603"
 },
+"/articles/sido-remaining-map-2026.html": {
+"d": "2026-10-23",
+"h": "81a742ff45d6fa7675c0303977ea2494",
+"hh": "dc7068085fd3fb2177f388c50cb50342"
+},
 "/articles/supplementary-rounds-2026.html": {
 "d": "2026-10-11",
 "h": "83a8fc3d1ad8918d63a2948b1a66dd8f",
@@ -390,8 +395,8 @@
 "hh": "d334bf759f7d55b5d4c61d4e2f96e39a"
 },
 "/region/2800.html": {
-"d": "2026-10-22",
-"h": "c6c332864e683db235d58e28adfc1df3",
+"d": "2026-10-23",
+"h": "3344c87e64cca6f94a1fec864a456b97",
 "hh": "6994ece5133e42e2f8d9967a856c0117"
 },
 "/region/2900.html": {
@@ -430,8 +435,8 @@
 "hh": "6e211cc453b81dd687e6d108d0555d14"
 },
 "/region/4117.html": {
-"d": "2026-10-19",
-"h": "f02676bebc36fd3d1ef7b4f08c40f11e",
+"d": "2026-10-23",
+"h": "90c1db29cec8abb49e4b3ea08067ca50",
 "hh": "8b8b3043568fa249f3a93ed23b8e16a8"
 },
 "/region/4119.html": {
@@ -570,13 +575,13 @@
 "hh": "1007f72ce0ab33c54bf632a29eb54341"
 },
 "/region/4215.html": {
-"d": "2026-10-22",
-"h": "73d252da2c346f6cf1ab0aa0211bab60",
+"d": "2026-10-23",
+"h": "85dc0e8dbb2bf4fe6041ff8abcf847c0",
 "hh": "a0660ff11a63da25cc83b2f280b35cf9"
 },
 "/region/4217.html": {
-"d": "2026-10-20",
-"h": "a105fa0b050f7b53edfa69ef81c48ab5",
+"d": "2026-10-23",
+"h": "99174f008450febbee99410b5402b917",
 "hh": "463a02cc0a5914372802c5bea90077da"
 },
 "/region/4219.html": {
@@ -625,19 +630,19 @@
 "hh": "6c14a7720ab4182f3c957259f94bb012"
 },
 "/region/4313.html": {
-"d": "2026-10-22",
-"h": "5c303df48a2e412748805c4066b61ddc",
+"d": "2026-10-23",
+"h": "1d3255a246a71e15c2407ed3d829bfef",
 "hh": "1442d79bb56eb735556bfcfc1b3fba00"
 },
 "/region/4315.html": {
-"d": "2026-10-20",
-"h": "dc273491aa0afc04e1c6812fdbd43d2e",
+"d": "2026-10-23",
+"h": "dc34752dd4cccca15d455ca3a2755815",
 "hh": "70fe01a116e0d8e373d864ed823aa923"
 },
 "/region/4373.html": {
-"d": "2026-10-22",
-"h": "6135246576fd124aa01b9dc305a1dcf1",
-"hh": "9b90ed69545b5e88f28399c970e4a558"
+"d": "2026-10-23",
+"h": "5f91f77cd1ee71f1117693b55afa096b",
+"hh": "622668e1a0bb97501eb8c278c1820aa7"
 },
 "/region/4374.html": {
 "d": "2026-10-20",
@@ -645,8 +650,8 @@
 "hh": "5b7c9d8e64b5cf14e780129b26c1d1c9"
 },
 "/region/4377.html": {
-"d": "2026-10-13",
-"h": "33f929bee8baf7047c52cc9d861746f8",
+"d": "2026-10-23",
+"h": "51780d5d7f59a50e13d2cb7cbb41aeac",
 "hh": "d4bbb1ad0f744ee174451a66024d8744"
 },
 "/region/4413.html": {
@@ -915,8 +920,8 @@
 "hh": "1884f828912d0e9323c6265e1c80b636"
 },
 "/region/4793.html": {
-"d": "2026-10-22",
-"h": "5717bd6921ccf12f0a2457fe88dbefc6",
+"d": "2026-10-23",
+"h": "fbde970806756f37e3e888576dd7aae3",
 "hh": "04071ce73b64d4ddfb120e5ee44b9bef"
 },
 "/region/4812.html": {
@@ -925,8 +930,8 @@
 "hh": "a1910d83cbdca09261cab5b07a794e20"
 },
 "/region/4817.html": {
-"d": "2026-10-20",
-"h": "39af30dba9c0510ad81aa4844120c06e",
+"d": "2026-10-23",
+"h": "f3f6fe637288a62e034f0d0a29e024b0",
 "hh": "7f9d3408fd86fc81cc0a114b4fb748e5"
 },
 "/region/4822.html": {
@@ -945,8 +950,8 @@
 "hh": "2a03da237b43012fc986492a4f6be661"
 },
 "/region/4827.html": {
-"d": "2026-10-20",
-"h": "c231fe1d5044272e292a3f0d1d91a8ce",
+"d": "2026-10-23",
+"h": "eee3720e8645aef41a48949d28fd7e7e",
 "hh": "caf670da541b95627360b2335fb353d8"
 },
 "/region/4831.html": {
@@ -1000,8 +1005,8 @@
 "hh": "b2ffcd957fad65b07dd06ce3379e0e1c"
 },
 "/sido/chungbuk.html": {
-"d": "2026-10-22",
-"h": "6c449cc1e2489fc5dbe04d7a8e1d6ed7",
+"d": "2026-10-23",
+"h": "12aacd098edbc69f26a5d36cd9a9c278",
 "hh": "dadfe1e6d613d30723d6a0abb482b002"
 },
 "/sido/chungnam.html": {
