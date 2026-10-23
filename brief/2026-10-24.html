@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<!-- Google Analytics (GA4) -->
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-2Q0YFZGWWB');addEventListener('load',function(){setTimeout(function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-2Q0YFZGWWB';document.head.appendChild(s)},1500)})</script><!-- GA4 지연 로드: 페이지 로드 1.5초 뒤 주입 — 느린 모바일에서 첫 화면 렌더와 경합하지 않게. 이벤트는 dataLayer에 큐잉돼 유실 없음 -->
+<!-- Google AdSense -->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 하위 경로(/region/ 등)에서도 상대 URL이 루트 기준으로 풀리도록 base 고정 — app.js의 data/*.json fetch·nav 링크가 그대로 동작 -->
+<base href="/">
+<title>전기차 보조금 일일 브리핑 2026-10-24 — 전국 잔여 11,159대 | EV보조금</title>
+<meta name="description" content="10월 24일(토) 전기차 보조금 브리핑: 전국 잔여 11,159대(전일 대비 −754대), 최대 감소 인천광역시 −295대, 신규 마감 1곳. ev.or.kr 실측 데이터 기준.">
+<meta name="robots" content="noindex">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="EV보조금">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="전기차 보조금 일일 브리핑 2026-10-24 — 전국 잔여 11,159대">
+<meta property="og:description" content="10월 24일(토) 전기차 보조금 브리핑: 전국 잔여 11,159대(전일 대비 −754대), 최대 감소 인천광역시 −295대, 신규 마감 1곳. ev.or.kr 실측 데이터 기준.">
+<meta property="og:url" content="https://evbojo.co.kr/brief/2026-10-24.html">
+<meta property="og:image" content="https://evbojo.co.kr/assets/og-default.jpg">
+<meta property="og:image:width" content="800">
+<meta property="og:image:height" content="420">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://evbojo.co.kr/brief/2026-10-24.html">
+<!-- 코어 CSS 인라인: 생성 페이지는 매시 다시 쓰이므로 외부 CSS의 캐시 이점이 작고, 느린 모바일에서 렌더 차단 요청 1회(8KiB·~300ms)를 없앤다. 원본은 assets/css/main.css(루트 손편집 페이지는 링크 유지) -->
+<style>/* ═══════════════════════════════════════════════
+   EV보조금 — 전기차 구매보조금 현황  main.css
+   모바일 우선 · 라이트/다크 · 시스템 폰트
+   ═══════════════════════════════════════════════ */
+:root{
+  --bg:#f4f6f9; --surface:#ffffff; --surface2:#f8fafc;
+  --text:#191f28; --text2:#4e5968; --text3:#667280;
+  --line:#e5e8eb; --line2:#f2f4f6;
+  --primary:#2563eb; --primary-soft:#eff4ff; --primary-dark:#1d4ed8;
+  --money:#047857; --money-soft:#ecfdf5;
+  --warn:#b45309; --warn-soft:#fffbeb;
+  --danger:#b91c1c; --danger-soft:#fef2f2;
+  --badge-open:#047857; --badge-low:#b45309; --badge-closed:#6b7280;
+  --radius:14px; --radius-s:10px;
+  --shadow:0 1px 3px rgba(25,31,40,.06),0 4px 14px rgba(25,31,40,.04);
+  --maxw:760px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101418; --surface:#1a2027; --surface2:#20272f;
+    --text:#e9edf1; --text2:#aab3bd; --text3:#9aa4b0;
+    --line:#2b333d; --line2:#242b34;
+    --primary:#4f83ff; --primary-soft:#1a2540; --primary-dark:#6d9aff;
+    --money:#34d399; --money-soft:#0d2b22;
+    --warn:#fbbf24; --warn-soft:#2e2410;
+    --danger:#f87171; --danger-soft:#341a1a;
+    --shadow:0 1px 3px rgba(0,0,0,.3);
+  }
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",Pretendard,"Noto Sans KR","Segoe UI","Malgun Gothic",sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.55;
+  font-size:16px; word-break:keep-all;
+}
+a{color:var(--primary);text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select{font:inherit;color:inherit}
+.container{max-width:var(--maxw);margin:0 auto;padding:0 16px}
+
+/* ── header ── */
+.site-header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line2)}
+.site-header .inner{max-width:var(--maxw);margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.logo{font-weight:800;font-size:18px;color:var(--text);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.logo .bolt{color:var(--money)}
+/* 상위 5항목 + 드롭다운. 좁은 화면에서도 잘리지 않게 줄바꿈 허용 */
+.gnb{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:2px;margin-left:auto}
+.gnb a{padding:7px 10px;border-radius:8px;color:var(--text2);font-size:14px;font-weight:600;white-space:nowrap}
+@media(max-width:700px){.gnb a,.nav-dd summary{padding:5px 7px !important;font-size:13px !important}.site-header .inner{padding-top:8px;padding-bottom:8px}}
+/* 드롭다운(details 기반 — JS 없이 동작, 터치 안전) */
+.nav-dd{position:relative}
+.nav-dd summary{list-style:none;cursor:pointer;padding:7px 10px;border-radius:8px;color:var(--text2);font-size:14px;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:3px;user-select:none}
+.nav-dd summary::-webkit-details-marker{display:none}
+.nav-dd summary::after{content:"▾";font-size:9px;opacity:.65;margin-left:1px}
+.nav-dd summary:hover{background:var(--surface2)}
+.nav-dd summary.on{color:var(--primary)}
+.nav-dd[open] summary{color:var(--primary);background:var(--primary-soft)}
+.nav-dd .dd{position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column;min-width:150px;z-index:70}
+.nav-dd .dd a{padding:8px 10px !important;border-radius:8px;font-size:14px !important;color:var(--text2);font-weight:600;white-space:nowrap}
+.nav-dd .dd a:hover{background:var(--surface2)}
+.nav-dd .dd a.on{color:var(--primary);background:var(--primary-soft)}
+
+/* ── 홈 상단 일일 브리핑 배너 (고정 최소 높이 → CLS 없음) ── */
+.brief-banner{display:flex;align-items:center;gap:10px;min-height:44px;margin:14px 0 0;padding:9px 14px;background:var(--primary-soft);border:1px solid color-mix(in srgb,var(--primary) 25%,transparent);border-radius:var(--radius-s);color:var(--text)}
+.brief-banner .bb-tag{font-weight:800;font-size:13px;color:var(--primary);white-space:nowrap}
+.brief-banner .bb-text{font-size:13.5px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.brief-banner .bb-go{margin-left:auto;font-weight:700;font-size:13px;color:var(--primary);white-space:nowrap}
+.gnb a:hover{background:var(--surface2)}
+.gnb a.on{color:var(--primary);background:var(--primary-soft)}
+
+/* ── hero ── */
+.hero{padding:34px 0 10px;text-align:center}
+.hero h1{font-size:clamp(22px,5.6vw,30px);font-weight:800;letter-spacing:-.4px}
+.hero h1 .hl{color:var(--primary)}
+.hero p{color:var(--text2);margin-top:8px;font-size:15px}
+
+/* ── 인덱스 요약 스탯 스트립 (고정 높이 → CLS 방지, 로드 실패 시 숨김) ── */
+.stat-strip{display:flex;align-items:stretch;gap:8px;margin:14px 0 0;min-height:64px;color:inherit}
+.stat-strip[hidden]{display:none}
+.st-tile{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line2);border-radius:var(--radius-s);box-shadow:var(--shadow);padding:8px 4px;text-align:center}
+.st-tile b{display:block;font-size:19px;font-variant-numeric:tabular-nums;letter-spacing:-.5px;line-height:1.3;min-height:25px}
+.st-tile span{font-size:11px;color:var(--text3);font-weight:700;white-space:nowrap}
+.st-tile.t-open b{color:var(--badge-open)}
+.st-tile.t-low b{color:var(--badge-low)}
+.st-tile.t-closed b{color:var(--badge-closed)}
+.stat-strip .st-go{display:flex;align-items:center;font-size:12.5px;font-weight:700;color:var(--primary);white-space:nowrap}
+
+/* ── cards ── */
+.card{background:var(--surface);border:1px solid var(--line2);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:14px 0}
+.card h2,.section-title{font-size:17px;font-weight:800;margin-bottom:12px;letter-spacing:-.2px}
+.card .sub{font-size:13px;color:var(--text3);font-weight:500}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.grid2.collapse{grid-template-columns:1fr}}
+
+/* ── selects / inputs ── */
+.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.field label{font-size:13px;font-weight:700;color:var(--text2)}
+.select,.input{
+  width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--radius-s);
+  background:var(--surface);color:var(--text);font-size:16px;appearance:none;
+}
+.select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b95a1' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.select:focus,.input:focus{outline:none;border-color:var(--primary)}
+.input-suffix{position:relative}
+.input-suffix .sfx{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none}
+
+/* ── buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 18px;border-radius:var(--radius-s);font-weight:700;font-size:15px;transition:.15s;border:1.5px solid transparent}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-ghost{border-color:var(--line);color:var(--text2);background:var(--surface)}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
+.btn-block{width:100%}
+.btn-s{padding:8px 12px;font-size:13px;border-radius:8px}
+
+/* ── badges ── */
+.badge{display:inline-flex;align-items:flex-start;gap:4px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:normal;word-break:keep-all;max-width:100%;text-align:left;line-height:1.45}
+.badge-open{background:var(--money-soft);color:var(--badge-open)}
+.badge-low{background:var(--warn-soft);color:var(--badge-low)}
+.badge-closed{background:var(--line2);color:var(--badge-closed)}
+.badge-info{background:var(--primary-soft);color:var(--primary)}
+.badge-warn{background:var(--warn-soft);color:var(--warn)}
+.badge-shut{background:var(--danger-soft);color:var(--danger)} /* 공지상 접수 마감(잔여>0) — 소진 회색과 구분되는 danger 톤 */
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+
+/* ── money display ── */
+.money-xl{font-size:clamp(28px,7vw,38px);font-weight:800;color:var(--money);letter-spacing:-1px;line-height:1.15}
+.money-l{font-size:22px;font-weight:800;color:var(--money)}
+.strike{color:var(--text3);text-decoration:line-through;font-weight:500}
+
+/* ── list rows ── */
+.rowlist{display:flex;flex-direction:column}
+.rowlist .row{display:flex;align-items:center;gap:10px;padding:13px 4px;border-bottom:1px solid var(--line2);color:inherit}
+.rowlist .row:last-child{border-bottom:0}
+.rowlist .row:hover{background:var(--surface2);border-radius:8px}
+.row .grow{flex:1;min-width:0}
+.row .tit{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .desc{font-size:12.5px;color:var(--text3);margin-top:1px}
+.row .amt{font-weight:800;color:var(--money);font-size:16px;white-space:nowrap}
+.row .amt small{font-weight:600;color:var(--text3);font-size:11.5px;display:block;text-align:right}
+
+/* ── tables ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px -18px;padding:0 18px}
+table.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:480px}
+.tbl th{font-size:12px;color:var(--text3);font-weight:700;text-align:left;padding:8px 10px;border-bottom:1.5px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 10px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.tbl tr:hover td{background:var(--surface2)}
+.tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl .best td{background:var(--money-soft)}
+
+/* ── stacked bar (국비/지방비) ── */
+.stack{display:flex;height:10px;border-radius:6px;overflow:hidden;background:var(--line2);margin:6px 0}
+.stack .nat{background:var(--primary)}
+.stack .loc{background:var(--money)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--text3)}
+.legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:4px}
+
+/* ── 소진 진행률 스택바 (출고/접수대기/잔여 — region 상태 카드) ── */
+.prog{margin-top:10px}
+.prog .stack{margin:0 0 5px}
+.prog .seg-r{background:var(--text3)}
+.prog .seg-w{background:var(--warn)}
+.prog .seg-l{background:var(--money)}
+.prog .legend{flex-wrap:wrap;gap:6px 14px}
+
+/* ── callouts ── */
+.callout{border-radius:var(--radius-s);padding:13px 15px;font-size:13.5px;margin:12px 0;background:var(--primary-soft);color:var(--text2);border:1px solid color-mix(in srgb,var(--primary) 18%,transparent)}
+.callout b{color:var(--text)}
+.callout-warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 25%,transparent)}
+.callout-danger{background:var(--danger-soft);border-color:color-mix(in srgb,var(--danger) 22%,transparent)}
+.callout-green{background:var(--money-soft);border-color:color-mix(in srgb,var(--money) 22%,transparent)}
+
+/* ── accordion ── */
+details.acc{border:1px solid var(--line2);border-radius:var(--radius-s);margin:8px 0;background:var(--surface);overflow:hidden}
+details.acc summary{padding:14px 16px;font-weight:700;font-size:15px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:"+";margin-left:auto;color:var(--text3);font-size:18px;font-weight:400}
+details.acc[open] summary::after{content:"−"}
+details.acc .acc-body{padding:0 16px 16px;color:var(--text2);font-size:14.5px}
+.acc-body p{margin:8px 0}
+.acc-body ul,.acc-body ol{padding-left:20px;margin:8px 0}
+.acc-body li{margin:5px 0}
+
+/* ── timeline ── */
+.timeline{position:relative;padding-left:26px;margin:16px 0}
+.timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl-step{position:relative;padding:0 0 22px}
+.tl-step::before{content:"";position:absolute;left:-24px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:3px solid var(--primary)}
+.tl-step h3{font-size:15.5px;font-weight:800}
+.tl-step .who{font-size:12px;font-weight:700;margin:4px 0}
+.who .me{color:var(--primary)}.who .dealer{color:var(--money)}
+.tl-step p{font-size:13.5px;color:var(--text2);margin-top:4px}
+.tl-warn{display:inline-block;background:var(--danger-soft);color:var(--danger);font-size:12px;font-weight:700;padding:2px 8px;border-radius:6px;margin-top:6px}
+
+/* ── chips ── */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 13px;border-radius:999px;border:1.5px solid var(--line);font-size:13.5px;font-weight:600;color:var(--text2);background:var(--surface)}
+.chip:hover,.chip.on{border-color:var(--primary);color:var(--primary);background:var(--primary-soft)}
+.chip-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:1px;flex-shrink:0} /* 형제 지역 칩 상태 점 */
+/* 지역 페이지 '함께 읽으면 좋은 해설' — 상태 맥락별 해설 링크 목록(제목+한 줄 요약) */
+.rel-list{list-style:none;padding:0;margin:0}
+.rel-list li{padding:9px 0;border-bottom:1px solid var(--line2);line-height:1.5}
+.rel-list li:last-child{border-bottom:0}
+.rel-list a{font-weight:700;color:var(--text)}
+.rel-list a:hover{color:var(--primary)}
+.rel-list .desc{display:block;color:var(--text2);font-size:13px;margin-top:2px}
+
+/* ── ad slots (CLS 방지 고정 높이 · 라벨 명시) ── */
+.ad-slot{margin:20px 0;text-align:center;display:none}html.ads-live .ad-slot{display:block}/* 승인 전 비노출 — 승인 후 display:block 기본으로 전환(docs/3) */
+.ad-slot .ad-label{font-size:10px;color:var(--text3);letter-spacing:2px;margin-bottom:4px}/* 한글 '광고' 라벨 — 자간 미세 확대, uppercase 불필요 */
+.ad-slot .ad-box{min-height:280px;border:1px dashed var(--line);border-radius:var(--radius-s);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;background:var(--surface2)}
+.ad-slot.ad-h90 .ad-box{min-height:90px}
+.ad-slot.ad-h250 .ad-box{min-height:250px}
+@media(min-width:640px){.ad-slot .ad-box{min-height:250px}}
+
+/* ── freshness / trust ── */
+.stamp{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:5px;margin-top:8px}
+.gloss{margin:0}.gloss dt{font-weight:800;margin:12px 0 2px;color:var(--text)}.gloss dt:first-child{margin-top:0}.gloss dfn{font-style:normal}.gloss dd{margin:0;color:var(--text2);font-size:14.5px;line-height:1.7}.gloss dd a.small{white-space:nowrap}
+.spark-slot:empty{min-height:121px}html.has-mr #my-region{min-height:760px}@media(min-width:720px){html.has-mr #my-region{min-height:760px}}/* JS 채움 전 레이아웃 예약(CLS) — 2026-10-11 라이브 실측: spark 121, cats 204(데스크톱)/361(모바일, 예측 제거 전), 내 지역 카드 780/1153 */
+.method dt{margin-top:8px}.cite{margin:6px 0 0}.facts q{quotes:none;color:var(--text)}.facts dd{font-size:14px}
+.provenance{border-left:3px solid var(--line)}.prov{padding-left:18px;margin:6px 0;font-size:13.5px;color:var(--text2);line-height:1.65}.prov li{margin:4px 0}.prov b{color:var(--text)}
+.stale-banner{background:var(--warn-soft);color:var(--warn);border-radius:var(--radius-s);padding:10px 14px;font-size:13px;font-weight:600;margin:10px 0;display:none}
+.stale-banner.show{display:block}
+
+/* ── wizard (자가진단) ── */
+.wizard-step{display:none}
+.wizard-step.on{display:block;animation:fadein .25s}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.wizard-opts{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.wizard-opts button{padding:16px;border:1.5px solid var(--line);border-radius:var(--radius-s);background:var(--surface);font-size:15.5px;font-weight:600;text-align:left;transition:.12s}
+.wizard-opts button:hover{border-color:var(--primary);background:var(--primary-soft)}
+.progressbar{height:5px;background:var(--line2);border-radius:3px;margin:12px 0 20px;overflow:hidden}
+.progressbar i{display:block;height:100%;background:var(--primary);border-radius:3px;transition:width .3s}
+
+/* ── result gauge / bars ── */
+.hbar{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+.hbar .nm{width:88px;color:var(--text2);font-weight:600;flex-shrink:0;text-align:right}
+.hbar .bar{flex:1;height:20px;background:var(--line2);border-radius:6px;overflow:hidden}
+.hbar .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),color-mix(in srgb,var(--primary) 60%,var(--money)));border-radius:6px;min-width:2px}
+.hbar .val{width:84px;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
+.hbar.top .bar i{background:linear-gradient(90deg,var(--money),#34d399)}
+
+/* ── compare bar ── */
+#cmp-bar{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:60;background:var(--text);color:var(--bg);border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;box-shadow:0 6px 24px rgba(0,0,0,.25);display:none;align-items:center;gap:10px;white-space:nowrap}
+#cmp-bar.show{display:flex}
+#cmp-bar a{color:inherit;text-decoration:underline}
+#cmp-bar .x{opacity:.6}
+
+/* ── receipt (실구매가) ── */
+.receipt{border:1px solid var(--line);border-radius:var(--radius-s);overflow:hidden;margin:12px 0}
+.receipt .r-row{display:flex;justify-content:space-between;padding:11px 16px;font-size:14.5px;border-bottom:1px dashed var(--line2)}
+.receipt .r-row:last-child{border-bottom:0}
+.receipt .r-row.total{background:var(--money-soft);font-weight:800;font-size:16px}
+.receipt .r-row .minus{color:var(--money);font-weight:700}
+.receipt .r-row .plus{color:var(--danger);font-weight:700}
+
+/* ── footer ── */
+.site-footer{margin-top:40px;border-top:1px solid var(--line2);background:var(--surface);padding:26px 0 90px}
+.site-footer .inner{max-width:var(--maxw);margin:0 auto;padding:0 16px;font-size:12.5px;color:var(--text3);line-height:1.8}
+.site-footer .links{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-weight:600}
+.site-footer .links a{color:var(--text2)}
+.disclaimer{background:var(--surface2);border-radius:var(--radius-s);padding:12px 14px;margin-top:10px}
+
+/* ── misc ── */
+.center{text-align:center}
+.mt0{margin-top:0}.mt8{margin-top:8px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+.muted{color:var(--text3);font-size:13px}
+.small{font-size:12.5px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.skeleton{background:linear-gradient(90deg,var(--line2) 25%,var(--surface2) 50%,var(--line2) 75%);background-size:200% 100%;animation:sk 1.4s infinite;border-radius:8px;color:transparent!important}
+@keyframes sk{to{background-position:-200% 0}}
+.pill-tabs{display:flex;background:var(--line2);border-radius:10px;padding:3px;gap:2px;margin:10px 0}
+.pill-tabs button{flex:1;padding:8px;border-radius:8px;font-size:13.5px;font-weight:700;color:var(--text3)}
+.pill-tabs button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.range-row{display:flex;align-items:center;gap:12px}
+input[type=range]{flex:1;accent-color:var(--primary);height:32px}
+.kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line2);font-size:14.5px}
+.kv:last-child{border:0}
+.kv b{font-variant-numeric:tabular-nums}
+.notice-badge{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--line2);color:var(--text3);font-weight:700;vertical-align:middle}
+
+/* ── (?) 툴팁 ── */
+.tip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;padding:4.5px;box-sizing:border-box;margin:-4.5px -2px;border-radius:50%;background:var(--line) content-box;color:var(--text3);font-size:10px;font-weight:800;cursor:help;position:relative;border:0;vertical-align:middle;margin-left:4px;flex-shrink:0}main p a:not(.btn):not(.chip):not(.row),main li a:not(.btn):not(.chip):not(.row),main dd a,main nav[aria-label="현재 위치"] a,.callout a:not(.btn),.provenance a{text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);font-size:12px;font-weight:500;line-height:1.5;padding:8px 11px;border-radius:8px;width:max-content;max-width:min(240px,calc(100vw - 48px));text-align:left;opacity:0;pointer-events:none;transition:opacity .12s;z-index:70;box-shadow:0 4px 14px rgba(0,0,0,.25);white-space:normal;word-break:keep-all}
+.tip::before{content:"";position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--text);opacity:0;transition:opacity .12s;z-index:70}
+.tip:hover::after,.tip:focus-visible::after,.tip.on::after,
+.tip:hover::before,.tip:focus-visible::before,.tip.on::before{opacity:1}
+.tip--wide::after{max-width:min(340px,86vw)}
+.cat-forecast .tip::after{left:auto;right:0;transform:none}
+.split-item:first-child .tip::after,.split-item:nth-child(2) .tip::after{left:0;transform:none}
+.split-item:last-child .tip::after{left:auto;right:0;transform:none}
+
+/* ── 항목별 잔여물량 그리드 ── */
+.split-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+@media(max-width:480px){.split-grid{grid-template-columns:repeat(2,1fr)}}
+.split-item{background:var(--surface2);border:1px solid var(--line2);border-radius:var(--radius-s);padding:9px 10px;text-align:center}
+.split-item .split-label{font-size:11.5px;color:var(--text3);font-weight:700;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.split-item b{font-size:16.5px;font-variant-numeric:tabular-nums;display:block;margin-top:2px}
+.split-item b.zero{color:var(--text3);font-weight:600}
+.split-item b.pos{color:var(--money)}
+
+/* ── 계산기 차종 검색 제안 목록 ── */
+#k-suggest{position:relative;z-index:30}
+#k-suggest .row{cursor:pointer}
+#k-suggest:not(:empty){border:1px solid var(--line);border-radius:var(--radius-s);margin-top:6px;max-height:280px;overflow-y:auto;background:var(--surface)}
+
+/* ── 신청 유형 선택 바 (우선순위/법인·기관/택시/일반 직접 선택) ── */
+.cat-head{font-size:13px;font-weight:800;margin:12px 0 6px;display:flex;align-items:center;color:var(--text2)}
+.cat-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:480px){.cat-tabs{grid-template-columns:repeat(2,1fr)}}
+.cat-tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:11px 8px;border:1.5px solid var(--line);border-radius:var(--radius-s);background:var(--surface);transition:.12s;text-align:center}
+.cat-tab .cat-nm{font-size:12.5px;font-weight:700;color:var(--text2);display:flex;align-items:center;white-space:nowrap}
+.cat-tab b{font-size:16px;font-variant-numeric:tabular-nums;color:var(--text3);font-weight:800}
+.cat-tab.has b{color:var(--money)}
+.cat-tab.none b{color:var(--text3)}
+.cat-tab:hover{border-color:var(--primary)}
+.cat-tab.on{border-color:var(--primary);background:var(--primary-soft);box-shadow:0 0 0 1px var(--primary) inset}
+.cat-tab.on .cat-nm{color:var(--primary)}
+/* 유형 탭 툴팁: 기준점을 아이콘이 아니라 탭 박스로 잡아 좁은 화면에서 뷰포트를 넘지 않게 한다.
+   (아이콘 기준이면 라벨이 긴 탭에서 툴팁이 오른쪽으로 밀려 가로 스크롤이 생김) */
+.cat-tabs .cat-tab{position:relative}
+.cat-tabs .cat-tab .tip{position:static}
+@media(max-width:480px){
+  .cat-tabs .cat-tab:nth-child(odd) .tip::after{left:0;right:auto;transform:none}
+  .cat-tabs .cat-tab:nth-child(even) .tip::after{left:auto;right:0;transform:none}
+  .cat-tabs .cat-tab .tip::after{bottom:calc(100% - 4px)}
+}
+
+.cat-note{margin-top:6px}
+
+/* ── 비활성 셀렉터(광역시 등 하위 지역 없음) ── */
+.select:disabled{opacity:.65;cursor:default;background-color:var(--surface2);color:var(--text2)}
+
+/* ── 접수 일정 카드(홈) ── */
+.sched{list-style:none;padding:0;margin:6px 0 0}
+.sched li{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line2);font-size:13.5px;line-height:1.55;align-items:flex-start}
+.sched li:last-child{border-bottom:0}
+.sched .sd{flex:0 0 84px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text2);white-space:nowrap}
+.sched .sd.today{color:var(--money)}
+.sched .si{flex:1;min-width:0;word-break:keep-all}
+.sched .si a{font-weight:700;color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+.sched .si a.mine{background:var(--money-soft);color:var(--badge-open);border-radius:5px;padding:0 5px;border-bottom:0}
+.sched .si a.mine::before{content:"📍 "}
+.sched .si .k{color:var(--text3);font-size:12.5px}
+.sched .si .sep{color:var(--line);margin:0 5px}
+.sched-h{font-weight:800;font-size:14px;margin:14px 0 0}
+.sched-h:first-child{margin-top:4px}
+.sched-h .n{color:var(--text3);font-weight:600;font-size:12.5px}
+#sched-card details.acc{margin-top:6px}
+/* ── 잔여 추이 스파크라인 ── */
+.spark{margin-top:12px;padding:10px 12px 8px;background:var(--surface2);border-radius:var(--radius-s)}
+.spark svg{width:100%;height:56px;display:block}
+.spark-cap{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-top:3px;font-variant-numeric:tabular-nums}
+.spark-cap b{color:var(--text)}
+.spark-note{font-size:12.5px;color:var(--text2);margin:6px 0 0}
+/* ── 내 지역 카드 KPI ── */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.kpi-row .st-tile b{font-size:17px}
+@media(max-width:360px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+/* ── 회차 일정 한 줄(지역 페이지·내 지역 카드) ── */
+.next-round{background:var(--surface2);border-radius:var(--radius-s);padding:8px 10px;line-height:1.6}
+
+/* ── 제휴 링크 박스(쿠팡 파트너스) ── */
+.aff-box .aff-go{font-size:12.5px;font-weight:700;color:var(--primary);white-space:nowrap}
+.aff-box .aff-note{font-size:15.5px;font-weight:700;color:var(--warn);margin:0 0 6px;line-height:1.6}
+.aff-box .aff-sub{font-size:12px;color:var(--text3);margin:10px 0 0;line-height:1.6}
+</style>
+<link rel="alternate" type="application/rss+xml" title="EV보조금 해설·시리즈" href="/feed.xml">
+<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="icon" href="https://evbojo.co.kr/favicon.png" type="image/png" sizes="64x64">
+<link rel="apple-touch-icon" href="https://evbojo.co.kr/assets/apple-touch-icon.png">
+<meta name="naver-site-verification" content="29413de3319d0b4b5a504cdbb92084043d6d663b" />
+<meta name="naver-site-verification" content="6a560bf53350f3b601da82f08e43384e76844919" />
+<meta name="naver-site-verification" content="a5ce2391aae3ed03c0769d1d857d7a22e02ffb61" />
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"홈","item":"https://evbojo.co.kr/"},{"@type":"ListItem","position":2,"name":"일일 브리핑","item":"https://evbojo.co.kr/brief/"},{"@type":"ListItem","position":3,"name":"10월 24일(토) 브리핑","item":"https://evbojo.co.kr/brief/2026-10-24.html"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"전기차 보조금 일일 브리핑 2026-10-24","datePublished":"2026-10-24","dateModified":"2026-10-24","inLanguage":"ko","author":{"@type":"Person","name":"HyeongHun Lee","url":"https://evbojo.co.kr/about.html#operator"},"publisher":{"@type":"Organization","name":"EV보조금"},"mainEntityOfPage":"https://evbojo.co.kr/brief/2026-10-24.html","description":"무공해차 통합누리집(ev.or.kr) 수집 데이터 기반 일일 브리핑 — 집계 자동화·검수 운영자"}</script>
+</head>
+<body>
+<!-- 정적 nav — app.js가 동일 마크업으로 재렌더(내용 동일 → 시프트 없음). JS 꺼져도 완전한 내비게이션 -->
+<header id="site-header" class="site-header"><div class="inner">
+  <a class="logo" href="/"><span class="bolt">⚡</span>EV보조금</a>
+  <nav class="gnb" aria-label="주 메뉴"><a href="/">홈</a><a href="status.html">전국 현황판</a><details class="nav-dd"><summary>도구</summary><div class="dd"><a href="calc.html">유지비 계산기</a><a href="check.html">자격 진단</a><a href="refund.html">환수 계산</a><a href="compare.html">차종 비교</a></div></details><details class="nav-dd"><summary>가이드</summary><div class="dd"><a href="guide.html">신청 절차</a><a href="law.html">제도·법령</a><a href="faq.html">FAQ</a></div></details><details class="nav-dd"><summary>읽을거리</summary><div class="dd"><a href="articles.html">읽을거리 전체</a><a href="brief/">일일 브리핑</a><a href="model/">모델별 시리즈</a></div></details></nav>
+</div></header>
+
+<main class="container">
+<nav class="small muted" aria-label="현재 위치" style="margin:14px 0 0"><a href="/">홈</a> › <a href="/brief/">일일 브리핑</a> › <b>2026-10-24</b></nav>
+<div class="hero" style="text-align:left;padding-bottom:0">
+  <h1>10월 24일(토) <span class="hl">보조금 브리핑</span></h1>
+  <p>전국 잔여 11,159대 · 전일 대비 −754대 · 실측 데이터 브리핑</p>
+</div>
+<p class="stamp">기준시각 2026-10-24 08:10+09:00 · 전일 스냅샷(2026-10-23 08:10+09:00 수집) 대비 · 출처 무공해차 통합누리집(ev.or.kr)</p>
+
+<section class="card">
+  <h2 class="mt0">오늘의 요약</h2>
+  <p style="line-height:1.8;margin:10px 0">10월 24일(토) 아침 집계 기준, 전기승용 잔여 물량은 전국을 합쳐 11,159대입니다. 전일 대비 754대가 줄어든 수치입니다. 하루 새 가장 많이 줄어든 곳은 인천광역시입니다 — 295대 감소(419대→124대)였습니다. 부산광역시에서 새로 접수 마감 공지가 확인됐습니다. 오늘 집계에서 마감 공지 없이 잔여가 남은 지역 수는 32곳으로 집계됩니다. 공고 일정도 움직였습니다 — 남양주시의 추경2차 접수마감이 새로 등록됐습니다(2개 지자체에서 3건 감지).</p>
+</section>
+
+<section class="card">
+  <h2 class="mt0">전국 잔여 합계 추이 <span class="sub">최근 28일 · 160개 지자체 합계 · 2026-10-24 08:10+09:00 기준</span></h2>
+  <svg viewBox="0 0 720 250" style="width:100%;height:auto" role="img" aria-label="전국 잔여 합계 최근 28일 추이, 최근 값 11,159대" xmlns="http://www.w3.org/2000/svg"><line x1="64" x2="636" y1="156.9" y2="156.9" stroke="var(--line2)" stroke-width="1"/><text x="56" y="160.9" font-size="11" fill="var(--text3)" text-anchor="end">15,000</text><line x1="64" x2="636" y1="93.0" y2="93.0" stroke="var(--line2)" stroke-width="1"/><text x="56" y="97.0" font-size="11" fill="var(--text3)" text-anchor="end">20,000</text><text x="64.0" y="242" font-size="11" fill="var(--text3)" text-anchor="middle">9/27</text><text x="212.3" y="242" font-size="11" fill="var(--text3)" text-anchor="middle">10/4</text><text x="360.6" y="242" font-size="11" fill="var(--text3)" text-anchor="middle">10/11</text><text x="508.9" y="242" font-size="11" fill="var(--text3)" text-anchor="middle">10/18</text><text x="636.0" y="242" font-size="11" fill="var(--text3)" text-anchor="middle">10/24</text><path d="M64.0,37.9 L85.2,41.4 L106.4,30.1 L127.6,34.0 L148.7,41.4 L169.9,59.9 L191.1,60.2 L212.3,60.3 L233.5,60.5 L254.7,73.9 L275.9,90.2 L297.0,104.0 L318.2,104.2 L339.4,104.2 L360.6,104.5 L381.8,116.3 L403.0,123.4 L424.1,133.2 L445.3,149.3 L466.5,158.5 L487.7,158.6 L508.9,158.6 L530.1,169.8 L551.3,180.4 L572.4,187.8 L593.6,196.2 L614.8,205.9 L636.0,205.9" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="636.0" cy="205.9" r="3.5" fill="var(--primary)"/><text x="644.0" y="209.9" font-size="12" font-weight="700" fill="var(--text)">11,159대</text></svg>
+</section>
+
+
+
+<section class="card">
+  <h2 class="mt0">전일 대비 잔여 감소 상위 <span class="sub">전일 스냅샷(2026-10-23 08:10+09:00 수집) 대비 · 2026-10-24 08:10+09:00 기준</span></h2>
+  <svg viewBox="0 0 720 316" style="width:100%;height:auto" role="img" aria-label="전일 대비 잔여 감소 상위 10개 지역 가로 막대 차트" xmlns="http://www.w3.org/2000/svg"><text x="122" y="27.0" font-size="12" fill="var(--text2)" text-anchor="end">인천광역시</text><rect x="132" y="16.0" width="496.0" height="14" rx="3" fill="var(--money)"/><text x="636.0" y="27.0" font-size="12" font-weight="700" fill="var(--text)">−295대</text><text x="122" y="57.0" font-size="12" fill="var(--text2)" text-anchor="end">부산광역시</text><rect x="132" y="46.0" width="164.8" height="14" rx="3" fill="var(--money)"/><text x="304.8" y="57.0" font-size="12" font-weight="700" fill="var(--text)">−98대</text><text x="122" y="87.0" font-size="12" fill="var(--text2)" text-anchor="end">서울특별시</text><rect x="132" y="76.0" width="156.4" height="14" rx="3" fill="var(--money)"/><text x="296.4" y="87.0" font-size="12" font-weight="700" fill="var(--text)">−93대</text><text x="122" y="117.0" font-size="12" fill="var(--text2)" text-anchor="end">대구광역시</text><rect x="132" y="106.0" width="100.9" height="14" rx="3" fill="var(--money)"/><text x="240.9" y="117.0" font-size="12" font-weight="700" fill="var(--text)">−60대</text><text x="122" y="147.0" font-size="12" fill="var(--text2)" text-anchor="end">안산시</text><rect x="132" y="136.0" width="43.7" height="14" rx="3" fill="var(--money)"/><text x="183.7" y="147.0" font-size="12" font-weight="700" fill="var(--text)">−26대</text><text x="122" y="177.0" font-size="12" fill="var(--text2)" text-anchor="end">창원시</text><rect x="132" y="166.0" width="38.7" height="14" rx="3" fill="var(--money)"/><text x="178.7" y="177.0" font-size="12" font-weight="700" fill="var(--text)">−23대</text><text x="122" y="207.0" font-size="12" fill="var(--text2)" text-anchor="end">서산시</text><rect x="132" y="196.0" width="37.0" height="14" rx="3" fill="var(--money)"/><text x="177.0" y="207.0" font-size="12" font-weight="700" fill="var(--text)">−22대</text><text x="122" y="237.0" font-size="12" fill="var(--text2)" text-anchor="end">계룡시</text><rect x="132" y="226.0" width="26.9" height="14" rx="3" fill="var(--money)"/><text x="166.9" y="237.0" font-size="12" font-weight="700" fill="var(--text)">−16대</text><text x="122" y="267.0" font-size="12" fill="var(--text2)" text-anchor="end">파주시</text><rect x="132" y="256.0" width="23.5" height="14" rx="3" fill="var(--money)"/><text x="163.5" y="267.0" font-size="12" font-weight="700" fill="var(--text)">−14대</text><text x="122" y="297.0" font-size="12" fill="var(--text2)" text-anchor="end">익산시</text><rect x="132" y="286.0" width="18.5" height="14" rx="3" fill="var(--money)"/><text x="158.5" y="297.0" font-size="12" font-weight="700" fill="var(--text)">−11대</text></svg>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>지역</th><th class="num">전일 잔여</th><th class="num">오늘 잔여</th><th class="num">감소</th></tr></thead><tbody><tr><td><a href="/region/2800.html" style="color:inherit;font-weight:700">인천광역시</a><span class="small muted"> 인천</span></td><td class="num">419</td><td class="num">124</td><td class="num" style="font-weight:800;color:var(--money)">−295</td></tr><tr><td><a href="/region/2600.html" style="color:inherit;font-weight:700">부산광역시</a><span class="small muted"> 부산</span></td><td class="num">1,158</td><td class="num">1,060</td><td class="num" style="font-weight:800;color:var(--money)">−98</td></tr><tr><td><a href="/region/1100.html" style="color:inherit;font-weight:700">서울특별시</a><span class="small muted"> 서울</span></td><td class="num">2,224</td><td class="num">2,131</td><td class="num" style="font-weight:800;color:var(--money)">−93</td></tr><tr><td><a href="/region/2700.html" style="color:inherit;font-weight:700">대구광역시</a><span class="small muted"> 대구</span></td><td class="num">96</td><td class="num">36</td><td class="num" style="font-weight:800;color:var(--money)">−60</td></tr><tr><td><a href="/region/4127.html" style="color:inherit;font-weight:700">안산시</a><span class="small muted"> 경기</span></td><td class="num">120</td><td class="num">94</td><td class="num" style="font-weight:800;color:var(--money)">−26</td></tr><tr><td><a href="/region/4812.html" style="color:inherit;font-weight:700">창원시</a><span class="small muted"> 경남</span></td><td class="num">443</td><td class="num">420</td><td class="num" style="font-weight:800;color:var(--money)">−23</td></tr><tr><td><a href="/region/4421.html" style="color:inherit;font-weight:700">서산시</a><span class="small muted"> 충남</span></td><td class="num">103</td><td class="num">81</td><td class="num" style="font-weight:800;color:var(--money)">−22</td></tr><tr><td><a href="/region/4425.html" style="color:inherit;font-weight:700">계룡시</a><span class="small muted"> 충남</span></td><td class="num">45</td><td class="num">29</td><td class="num" style="font-weight:800;color:var(--money)">−16</td></tr><tr><td><a href="/region/4148.html" style="color:inherit;font-weight:700">파주시</a><span class="small muted"> 경기</span></td><td class="num">55</td><td class="num">41</td><td class="num" style="font-weight:800;color:var(--money)">−14</td></tr><tr><td><a href="/region/4514.html" style="color:inherit;font-weight:700">익산시</a><span class="small muted"> 전북</span></td><td class="num">68</td><td class="num">57</td><td class="num" style="font-weight:800;color:var(--money)">−11</td></tr></tbody></table></div><p class="small muted mt8">잔여 감소는 대부분 출고 진행에 따른 차감입니다. 접수 가능 여부는 별개이니 각 지역 페이지의 공지를 확인하세요.</p>
+</section>
+
+<section class="card"><h2 class="mt0">신규 마감 공지 <span class="sub">1곳 · 전일 스냅샷과 비교해 새로 감지</span></h2><div class="rowlist"><a class="row" href="/region/2600.html"><div class="grow"><div class="tit">부산광역시</div><div class="desc">공지상 접수 마감 · 잔여 표기 1,060대는 미출고분일 수 있음</div></div></a></div></section>
+
+<section class="card"><h2 class="mt0">📋 공고 일정 변경 <span class="sub">10월 23일 이후 · 2개 지자체 · 3건</span></h2><p class="small muted" style="margin:0 0 10px">신규 공고 2건 · 마감 앞당김 1건</p><div class="tbl-wrap"><table class="tbl"><thead><tr><th>지역</th><th>항목</th><th>변경</th><th>감지</th></tr></thead><tbody><tr><td><a href="/region/4136.html" style="color:inherit;font-weight:700">남양주시</a><div class="small muted">경기</div></td><td class="small">추경2차 접수마감</td><td class="small"><b>2026-08-04</b> <span class="small muted">(당일 2회 정정)</span></td><td class="small muted">10/23 10:05</td></tr><tr><td><a href="/region/4136.html" style="color:inherit;font-weight:700">남양주시</a><div class="small muted">경기</div></td><td class="small">추경2차 접수시작</td><td class="small"><b>2026-08-04</b> <span class="small muted">(당일 2회 정정)</span></td><td class="small muted">10/23 10:05</td></tr><tr><td><a href="/region/2600.html" style="color:inherit;font-weight:700">부산광역시</a><div class="small muted">부산</div></td><td class="small">추경3차 접수마감</td><td class="small">2026-12-11 → <b>2026-10-23</b></td><td class="small muted">10/23 16:14</td></tr></tbody></table></div><p class="small muted mt8">공고 일정은 지자체가 예고 없이 바꾸는 경우가 있어, 이 표는 무공해차 통합누리집에 <b>등록된 값이 바뀐 시점</b>을 매시간 수집해 기록한 것입니다. 공고문 원문과 다를 수 있으니 신청 전에는 해당 지자체 공고문을 확인하세요.</p></section>
+
+<section class="card">
+  <h2 class="mt0">짧은 해설</h2>
+  <p style="line-height:1.8;margin:10px 0">오늘 집계에서 감소가 확인된 지역은 38곳, 합계 754대가 줄었습니다. 많이 줄어든 곳부터 보면 인천광역시(−295대)·부산광역시(−98대)·서울특별시(−93대)입니다. 이 감소분의 다수는 이미 접수된 물량의 출고 차감이므로, 신규 신청 가능 물량과는 구분해 읽어야 합니다.</p><p style="line-height:1.8;margin:10px 0">마감·증가 신호는 보수적으로 읽습니다. 오늘 새로 마감이 공지된 1곳은 공지 원문에 완료형 마감 선언이 있는 경우만 집계한 것입니다. 마감으로 표시돼도 일부 유형(우선순위·법인 등) 칸에는 물량이 남는 경우가 있고, 유형별 칸 합계가 전체와 다른 지역(회차 이월)도 있으니 원문 확인이 우선입니다.</p><p style="line-height:1.8;margin:10px 0">최근 28일(관측 28회) 흐름으로는 합계 기준 24,312대였던 전국 잔여가 11,159대까지 13,153대 감소했습니다. 일평균 약 487대꼴로 줄어든 과거 실측이며, 앞으로의 속도를 보장하는 수치는 아닙니다.</p>
+</section>
+
+<section class="card">
+  <h2 class="mt0">이 브리핑에 대하여</h2>
+  <p style="line-height:1.8;margin:10px 0">이 페이지는 무공해차 통합누리집(ev.or.kr)에서 매시간 수집한 공고 데이터를 바탕으로 매일 1회(원칙적으로 아침) 발행하는 브리핑입니다. 수치 집계는 자동화 파이프라인이 수행하고, 집계 방법 설계와 문안 검수는 운영자(HyeongHun Lee)가 관리합니다. 외부 기사를 재작성하지 않으며, 본문·차트의 수치는 전부 수집 시점의 실측값입니다. 변화가 없거나 데이터가 오래된 날에는 발행을 건너뜁니다.</p><p style="line-height:1.8;margin:10px 0">집계 방법: 수치는 매시간 수집분 가운데 브리핑 생성 직전 값을 쓰고, 증감은 직전 보관 스냅샷(수집 공백이 있으면 그 이전 마지막 관측값 — 본문에 기준일 명시)과 비교합니다. 마감은 지자체 공지 원문에 완료형 마감 선언이 있을 때만 인정하고, "예산 소진 시 조기 마감" 같은 조건부 예고는 마감으로 세지 않습니다. 물량 증가는 공고 물량 대비 5% 이상(최소 10대) 늘어난 경우에 감지합니다.</p><p style="line-height:1.8;margin:10px 0">잔여 수치는 출고 시점에 차감하는 지역이 많아 실제 접수는 더 일찍 마감될 수 있고, 잔여가 남아 있어도 유형·요건에 따라 신청이 어려울 수 있습니다. 신청 전에는 반드시 관할 지자체 공고문을 확인하세요.</p><p class="stamp">데이터·생성: EV보조금 자동 브리핑 · 편집 책임: HyeongHun Lee · 기준시각 2026-10-24 08:10+09:00 · 비교 기준: 전일 스냅샷(2026-10-23 08:10+09:00 수집) 대비</p>
+  <div class="chips" style="margin-top:10px"><a class="chip" href="status.html">🗺 전국 현황판</a><a class="chip" href="brief/">📅 지난 브리핑 목록</a><a class="chip" href="quota-reading.html">📖 잔여 대수 읽는 법</a><a class="chip" href="articles.html">📚 읽을거리 전체</a></div>
+</section>
+
+</main>
+
+<footer id="site-footer" class="site-footer"><div class="inner">
+  <div class="links">
+    <a href="about.html">사이트 소개</a><a href="articles.html">읽을거리</a><a href="data.html">데이터·방법론</a><a href="glossary.html">용어집</a><a href="changelog.html">변경·정정 이력</a><a href="terms.html">이용안내</a><a href="privacy.html">개인정보처리방침</a>
+    <a href="donate.html">💛 후원하기</a>
+    <a href="https://ev.or.kr" target="_blank" rel="noopener">무공해차 통합누리집 ↗</a>
+    <a href="report.html">오류 제보</a>
+  </div>
+  <div id="foot-stamp">단가 수집일 <b>2026-10-24</b> · 출처 무공해차 통합누리집(ev.or.kr) · 2026년 전기승용 기준</div>
+  <div class="disclaimer">
+    본 사이트는 <b>정부·공공기관과 무관한 개인 운영 정보 사이트</b>입니다. 게시된 보조금·제도 정보는 참고용이며 법적 효력이 없습니다.
+    실제 지원 금액·자격·잔여 물량은 반드시 <b>무공해차 통합누리집(ev.or.kr)</b>과 관할 지자체 공고문으로 확인하세요.
+    본 사이트는 광고(Google AdSense 등)를 게재하며, 광고 수익으로 운영됩니다.
+  </div>
+  <div class="mt8">© 2026 EV보조금 · 데이터 출처: 무공해차 통합누리집(ev.or.kr)</div>
+</div></footer>
+<script src="assets/js/app.js" defer></script>
+<script src="assets/js/detail.js" defer></script>
+</body>
+</html>
