@@ -1,5 +1,14 @@
 [
  {
+  "slug": "moving-and-residency",
+  "url": "/articles/moving-and-residency.html",
+  "title": "이사 예정자의 전기차 보조금 — 주소지 판단 순서와 하면 안 되는 것",
+  "description": "이사를 앞두고 전기차를 사려는 사람이 가장 많이 틀리는 지점은 '기준일'입니다. 거주요건은 접수일 기준 주민등록 주소지로 판정하고, 지자체에 따라 일정 기간 이상 거주를 요구합니다. 어느 지역으로 신청할지, 전입 전후에 무엇을 확인할지, 왜 주소만 옮기는 방법이 안 되는지를 순서대로 정리합니다.",
+  "publish": "2026-10-30",
+  "modified": "2026-10-30",
+  "crumb": "이사 예정자 가이드"
+ },
+ {
   "slug": "contract-now-checklist",
   "url": "/articles/contract-now-checklist.html",
   "title": "지금 계약해도 되나 — 전기차 보조금 신청 전 5항목 체크리스트",
