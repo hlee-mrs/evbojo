@@ -320,43 +320,43 @@
 "hh": "81de65c62798e9cbd86e2e007af71415"
 },
 "/model/casper.html": {
-"d": "2026-10-31",
-"h": "ccbaac9897f003493b624e7e52d03cf1",
+"d": "2026-11-03",
+"h": "d3931e637c16dbb204b07e2c999b628b",
 "hh": "e991934490e481bf33928683b0470416"
 },
 "/model/ev3.html": {
-"d": "2026-10-31",
-"h": "9108c04e3d819841db7344f9cab1e8ce",
+"d": "2026-11-03",
+"h": "2a8beacbd7fd4350112e7e5846f059c2",
 "hh": "773d6922ca905161d447b4b7286fe94b"
 },
 "/model/ev6.html": {
-"d": "2026-10-31",
-"h": "074f1d94fdb51c204617266f5e29b5a0",
+"d": "2026-11-03",
+"h": "e7c2b975df22067e16f2263ec161f579",
 "hh": "03facfc655d79dee547f235b4c2fd774"
 },
 "/model/ioniq5.html": {
-"d": "2026-10-31",
-"h": "0551fc5223524a288683d3e96c8e2e49",
+"d": "2026-11-03",
+"h": "467f0c601325c571af64fc72230258ef",
 "hh": "9a9d86e44cc87b238258354ab5db9abf"
 },
 "/model/ioniq6.html": {
-"d": "2026-10-31",
-"h": "b528d856f8e6741da704eb06084192aa",
+"d": "2026-11-03",
+"h": "bef345fa3849f31c4d85e335bb6f0454",
 "hh": "1628a0ebf8a9f961e84af45805086a91"
 },
 "/model/kona.html": {
-"d": "2026-10-31",
-"h": "414a3399d2dd66c123ee0d6091a768eb",
+"d": "2026-11-03",
+"h": "7a09a6f2edf47f6a4c3dda50fe9d7080",
 "hh": "84c14c2bb4ac9e2bf65bfb88447c1090"
 },
 "/model/model-y.html": {
-"d": "2026-10-31",
-"h": "b63b706ef2d156522d05f5906049eab3",
+"d": "2026-11-03",
+"h": "e22df8591a606403bc3c4c0e89c8cb3e",
 "hh": "07f800b4d3b0853fd9152c65d8da0f0e"
 },
 "/model/ray.html": {
-"d": "2026-10-31",
-"h": "4f4f9221f088cc94efafd4c7ed75ed88",
+"d": "2026-11-03",
+"h": "e0a15c77e71a40bf7ddd685b83280198",
 "hh": "b046105a902ca5479bbe33a2da229707"
 },
 "/myths.html": {
@@ -400,8 +400,8 @@
 "hh": "c2a7e8d8f91bbea900fc4b6850d867b6"
 },
 "/region/2600.html": {
-"d": "2026-10-26",
-"h": "ff26b14bddbf1d7f5f8d36cf16c2e864",
+"d": "2026-11-03",
+"h": "c02b57b8cf0c4d8b6f3563f5c57c75ad",
 "hh": "57f1c21777a9f481b6c8319686026993"
 },
 "/region/2700.html": {
@@ -485,8 +485,8 @@
 "hh": "a03bd026548d7ee28167f66031f594bb"
 },
 "/region/4129.html": {
-"d": "2026-11-01",
-"h": "08238ca11da1df3a66715bd3d1430c64",
+"d": "2026-11-03",
+"h": "d6656839b001658575a5a295b7910009",
 "hh": "daa60b005083dceb67d93c2854f03243"
 },
 "/region/4131.html": {
@@ -536,7 +536,7 @@
 },
 "/region/4150.html": {
 "d": "2026-11-03",
-"h": "dbfb1542c2f1b7985ee6e6fa6db71b77",
+"h": "a1a011afe43165e87fecab406ae26004",
 "hh": "1cedf98ee00d9925127d66794f3cb898"
 },
 "/region/4155.html": {
@@ -580,8 +580,8 @@
 "hh": "caca5c8d4b08dba798e7b11a8ce67629"
 },
 "/region/4211.html": {
-"d": "2026-10-31",
-"h": "9ce22fb0fcaedf6deb2a26508d4d7b55",
+"d": "2026-11-03",
+"h": "183ca782201b75eb78817289f879e8d2",
 "hh": "d2ec2856f76c8f86f9cfc94e478816ce"
 },
 "/region/4213.html": {
@@ -610,8 +610,8 @@
 "hh": "ea032983afdcdffe172b64b37ebfb242"
 },
 "/region/4223.html": {
-"d": "2026-10-15",
-"h": "cdcd28aaa08c13f395dba1f1f98c6f12",
+"d": "2026-11-03",
+"h": "c5526876bfbd11c3677998cfc0f43c0c",
 "hh": "89eab711aca542c56ce930faa94a9756"
 },
 "/region/4273.html": {
@@ -690,9 +690,9 @@
 "hh": "5c16e9c4f2afa642019d9022ec917c62"
 },
 "/region/4421.html": {
-"d": "2026-11-02",
-"h": "e03f310da78683d523bc585e5767c4b2",
-"hh": "780b40aec23c754f701d01af552f69e5"
+"d": "2026-11-03",
+"h": "d4044f23781edc2d458e3f5abc32222c",
+"hh": "f7a61c56160b6d2118d6f14314e1de4d"
 },
 "/region/4423.html": {
 "d": "2026-10-30",
@@ -750,9 +750,9 @@
 "hh": "da6a706dc53d1558e3f3996ab1ab0f1e"
 },
 "/region/4519.html": {
-"d": "2026-11-02",
-"h": "c1911a9e234f6d9be3693c2d17eb2215",
-"hh": "e73e3bef3f9330ce46f158ec5a76cb93"
+"d": "2026-11-03",
+"h": "de3d4942a68c903ee2ce7862314a8ac5",
+"hh": "ffcdd92886a71c385254dd614d90a851"
 },
 "/region/4521.html": {
 "d": "2026-10-11",
@@ -845,18 +845,18 @@
 "hh": "fb3107722d6dbbc9332ebc6124d52c88"
 },
 "/region/4684.html": {
-"d": "2026-11-02",
-"h": "25485fa6e44cf203d2777afc0cc70060",
+"d": "2026-11-03",
+"h": "f58906e7a2b351f3462712097e6bef21",
 "hh": "8a5ea3b465234b0cfbdda051128affe3"
 },
 "/region/4686.html": {
-"d": "2026-10-31",
-"h": "a9ebc6f99defe5843784fe7a53716736",
+"d": "2026-11-03",
+"h": "0189dfe46e840dd91854dae87e407205",
 "hh": "7a981f1f0357160ec89992b4824c7e8e"
 },
 "/region/4688.html": {
 "d": "2026-11-03",
-"h": "c9e7cf1030c1ffb18a5984adb60e03bf",
+"h": "b4e15089ba5d5e700f1290082ad7e0b0",
 "hh": "e04720a2848d5650b498a7b1f90f767c"
 },
 "/region/4691.html": {
@@ -935,13 +935,13 @@
 "hh": "1884f828912d0e9323c6265e1c80b636"
 },
 "/region/4793.html": {
-"d": "2026-11-02",
-"h": "267a7159be85f2d28621f694519c20cf",
+"d": "2026-11-03",
+"h": "5a7e927a1b5d326ae367ef131fd12507",
 "hh": "04071ce73b64d4ddfb120e5ee44b9bef"
 },
 "/region/4812.html": {
-"d": "2026-11-02",
-"h": "9744f2a1cd59d44d6ee2beb1cd54472a",
+"d": "2026-11-03",
+"h": "376c29b892c3fd875484566f6a7af35f",
 "hh": "a1910d83cbdca09261cab5b07a794e20"
 },
 "/region/4817.html": {
@@ -980,9 +980,9 @@
 "hh": "10da5001bb2f60662ef0c661403ba5d4"
 },
 "/region/4872.html": {
-"d": "2026-10-31",
-"h": "1248314a8b29bc4fb53d1e5eb71b0d7c",
-"hh": "3aeece5a46a8cec146b4480e461a3f74"
+"d": "2026-11-03",
+"h": "42027c1e295fe925a0f1ebc0e3bac618",
+"hh": "ed9b0b6eeddd67af8065cb4f312dba9d"
 },
 "/region/4884.html": {
 "d": "2026-10-24",
@@ -1025,8 +1025,8 @@
 "hh": "dadfe1e6d613d30723d6a0abb482b002"
 },
 "/sido/chungnam.html": {
-"d": "2026-11-02",
-"h": "66e33aa869f1821a55b1dc381216494a",
+"d": "2026-11-03",
+"h": "fcfa7a45e01f248e12b839b9c310e198",
 "hh": "a0d8f596551d0a8990c5bff31bc753e8"
 },
 "/sido/daegu.html": {
@@ -1060,8 +1060,8 @@
 "hh": "a12268edf8eb6c0d109f57c0519028c9"
 },
 "/sido/gyeongnam.html": {
-"d": "2026-10-31",
-"h": "78450abbe855704b9bc6ab962641e302",
+"d": "2026-11-03",
+"h": "1495c8ba79b72d59e9ef033595ebd9a1",
 "hh": "8025c3fde2974e15d1cd33fb24ce44e6"
 },
 "/sido/incheon.html": {
@@ -1075,8 +1075,8 @@
 "hh": "85a646de2fe2792915cdbe9b52e04dea"
 },
 "/sido/jeonbuk.html": {
-"d": "2026-10-15",
-"h": "af0b7ae77ae24765044294c6f42882b7",
+"d": "2026-11-03",
+"h": "fcc2e29479129a7eeb6e296fcaa540ea",
 "hh": "3814672ee8af0b3fcf907623c0ac7e87"
 },
 "/sido/jeonnam.html": {
