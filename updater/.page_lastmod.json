@@ -401,7 +401,7 @@
 },
 "/region/1100.html": {
 "d": "2026-11-09",
-"h": "be17519aff96555507ff1fd07edd8560",
+"h": "d4ad25e50e267a74384ba4ab02031550",
 "hh": "c2a7e8d8f91bbea900fc4b6850d867b6"
 },
 "/region/2600.html": {
@@ -505,8 +505,8 @@
 "hh": "b5f60f5bdf98a04ab51bf7ca80d9c01d"
 },
 "/region/4137.html": {
-"d": "2026-11-07",
-"h": "058382e824038aad2dfb27a75fd807b9",
+"d": "2026-11-09",
+"h": "bb509f94081164a371ca4633a1978ae8",
 "hh": "e8ef7790c0521734acd3e4fcb8b6d7ca"
 },
 "/region/4139.html": {
@@ -525,9 +525,9 @@
 "hh": "300482075649a357bc04c45e1664e8f0"
 },
 "/region/4145.html": {
-"d": "2026-11-05",
-"h": "9ecb84af170eebf8953168496c4c322d",
-"hh": "789e9ff37ab429e9f04575635630574a"
+"d": "2026-11-09",
+"h": "9502aa0a153f9bd9f6bb9151457b502c",
+"hh": "2fa44556a967ece5eff6e20a746a2a28"
 },
 "/region/4146.html": {
 "d": "2026-11-06",
@@ -666,7 +666,7 @@
 },
 "/region/4374.html": {
 "d": "2026-11-09",
-"h": "6c57bc4d4a6a44da556a0b6499b0d82b",
+"h": "20094303d4d2cf9057e211114570e9e9",
 "hh": "20441d35bf9ebe8a70e84992a8b3cfe6"
 },
 "/region/4377.html": {
@@ -966,7 +966,7 @@
 },
 "/region/4825.html": {
 "d": "2026-11-09",
-"h": "4ad5401f9aa88c9287af469ab88c1ef5",
+"h": "07eccfb1a62ca3d88591913e7f87badd",
 "hh": "2a03da237b43012fc986492a4f6be661"
 },
 "/region/4827.html": {
@@ -980,8 +980,8 @@
 "hh": "d32dd89b5ce4f87be0efa69b8b3f063c"
 },
 "/region/4833.html": {
-"d": "2026-11-05",
-"h": "bda145da82a71515cb437831efec7d0c",
+"d": "2026-11-09",
+"h": "2404dcc6a9017f7dab6dd060195088ac",
 "hh": "10da5001bb2f60662ef0c661403ba5d4"
 },
 "/region/4872.html": {
@@ -1061,7 +1061,7 @@
 },
 "/sido/gyeonggi.html": {
 "d": "2026-11-09",
-"h": "651371fc5668a9c5c06a87660cae7a5b",
+"h": "6e657abb6eca365810092154cc7df0d3",
 "hh": "a12268edf8eb6c0d109f57c0519028c9"
 },
 "/sido/gyeongnam.html": {
